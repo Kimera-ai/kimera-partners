@@ -2,6 +2,7 @@ import BaseLayout from "@/components/layouts/BaseLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowUpRight, Users, DollarSign, Star } from "lucide-react";
+import { SectionHeader } from "@/components/ui/portal";
 
 const stats = [
   {
@@ -28,14 +29,17 @@ const Dashboard = () => {
   return (
     <BaseLayout>
       <div className="space-y-8">
-        <div>
-          <h1 className="text-4xl font-bold text-white mb-2">Dashboard</h1>
-          <p className="text-gray-400">Welcome back to your partner portal</p>
+        <div className="flex items-center justify-between">
+          <SectionHeader
+            title="Dashboard"
+            description="Welcome back to your partner portal"
+          />
+          <Button>Download Report</Button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {stats.map((stat) => (
-            <Card key={stat.title} className="p-6 bg-card">
+            <Card key={stat.title} className="p-6 bg-card hover:border-[#FF2B6E]/50 transition-all duration-300 hover:-translate-y-1">
               <div className="flex items-center justify-between">
                 <stat.icon className="w-5 h-5 text-primary" />
                 <div className="flex items-center text-green-500">
