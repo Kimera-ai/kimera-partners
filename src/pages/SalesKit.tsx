@@ -73,7 +73,7 @@ const CategoryCard = ({ title, description, icon, count }: {
   count: number;
 }) => {
   return (
-    <Card className="hover:border-[#FF2B6E]/50 transition-all duration-300 hover:-translate-y-1">
+    <Card className="bg-white/5 border-white/10 hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 backdrop-blur-sm">
       <div className="flex items-start gap-4 p-6">
         <img src={icon} alt="" className="w-10 h-10 rounded" />
         <div>
@@ -95,10 +95,10 @@ const ResourceCard = ({ type, title, description, thumbnail, downloadUrl, previe
   previewUrl: string;
 }) => {
   return (
-    <Card className="overflow-hidden hover:border-[#FF2B6E]/50 transition-all duration-300 hover:-translate-y-1">
+    <Card className="bg-white/5 border-white/10 overflow-hidden hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 backdrop-blur-sm">
       <div className="aspect-video relative group">
         <img src={thumbnail} alt="" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
+        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 backdrop-blur-sm">
           <Button variant="ghost" size="icon" className="bg-white/10 hover:bg-white/20">
             <Eye className="text-white" size={20} />
           </Button>
@@ -108,7 +108,7 @@ const ResourceCard = ({ type, title, description, thumbnail, downloadUrl, previe
         </div>
       </div>
       <div className="p-6">
-        <div className="text-sm text-[#FF2B6E] mb-2">{type}</div>
+        <div className="text-sm text-primary mb-2">{type}</div>
         <h3 className="text-white text-lg mb-2">{title}</h3>
         <p className="text-gray-300 text-sm">{description}</p>
       </div>
@@ -130,7 +130,7 @@ const ResourceSection = ({ title, resources }: {
 }) => {
   return (
     <div>
-      <h2 className="text-2xl text-white mb-6">{title}</h2>
+      <h2 className="text-3xl md:text-4xl text-white mb-6">{title}</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {resources.map((resource) => (
           <ResourceCard key={resource.id} {...resource} />
@@ -158,13 +158,13 @@ const SalesKit = () => {
           <Input
             type="search"
             placeholder="Search sales materials..."
-            className="pl-10"
+            className="pl-10 bg-white/5 border-white/10 text-white focus:ring-2 focus:ring-primary focus:border-transparent"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <Button variant="outline" className="flex items-center gap-2">
-          <Filter size={20} />
+        <Button variant="outline" className="border-white/20 hover:bg-white/20 text-white">
+          <Filter size={20} className="mr-2" />
           <span>Filter</span>
         </Button>
       </div>
