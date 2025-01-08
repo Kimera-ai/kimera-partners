@@ -161,7 +161,7 @@ const BenefitsSection = () => {
     {
       icon: <Shield size={24} />,
       title: 'Exclusive Technology',
-      description: 'Be the first to offer the world's most advanced AI photobooth.'
+      description: 'Be the first to offer the world\'s most advanced AI photobooth.'
     },
     {
       icon: <Users size={24} />,
