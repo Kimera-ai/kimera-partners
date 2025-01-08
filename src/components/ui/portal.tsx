@@ -1,15 +1,16 @@
 import React from 'react';
 import { Bell, ChevronDown, Search } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
 export const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => {
   return (
-    <a 
-      href={href}
+    <Link 
+      to={href}
       className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors"
     >
       {children}
-    </a>
+    </Link>
   );
 };
 
