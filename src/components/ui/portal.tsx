@@ -34,7 +34,6 @@ export const Navigation = () => {
           <div className="flex items-center gap-8">
             <h1 className="text-2xl font-bold text-white">Kimera</h1>
             <div className="hidden md:flex items-center gap-6">
-              <NavLink href="/dashboard">Dashboard</NavLink>
               <NavLink href="/partnerships">Partnerships</NavLink>
               <NavLink href="/sales-kit">Sales Kit</NavLink>
               <NavLink href="/playground">Playground</NavLink>
