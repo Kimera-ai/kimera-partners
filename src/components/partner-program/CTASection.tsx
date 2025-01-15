@@ -1,7 +1,11 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 
-const CTASection = () => {
+interface CTASectionProps {
+  setIsFormOpen: (open: boolean) => void;
+}
+
+const CTASection = ({ setIsFormOpen }: CTASectionProps) => {
   return (
     <div className="container mx-auto px-4 py-16">
       <motion.div

@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import MarketingKit from "@/pages/MarketingKit";
 import Login from "@/pages/Login";
-import Partnerships from "@/pages/Partnerships";
+import PartnerProgram from "@/pages/PartnerProgram";
 import Dashboard from "@/pages/Dashboard";
 import { useSession } from "@/hooks/useSession";
 
@@ -24,17 +24,17 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <Navigate to="/partnerships" replace />,
+    element: <Navigate to="/partner-program" replace />,
   },
   {
     path: "/login",
     element: <Login />,
   },
   {
-    path: "/partnerships",
+    path: "/partner-program",
     element: (
       <ProtectedRoute>
-        <Partnerships />
+        <PartnerProgram />
       </ProtectedRoute>
     ),
   },
