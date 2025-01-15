@@ -47,7 +47,7 @@ export const Navigation = () => {
           </div>
           <div className="flex-1 flex items-center justify-end">
             <div className="hidden md:flex items-center gap-6">
-              <NavLink href="/partnerships">Partnerships</NavLink>
+              <NavLink href="/partner-program">Partner Program</NavLink>
               <NavLink href="/marketing-kit">Marketing Kit</NavLink>
             </div>
           </div>
