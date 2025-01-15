@@ -12,20 +12,38 @@ export const CaseStudyCard = ({ study }: { study: CaseStudy }) => {
 
       if (data?.signedUrl) {
         window.open(data.signedUrl, '_blank');
+      } else {
+        console.error('No signed URL generated for:', study.pdf_path);
       }
     } catch (error) {
       console.error('Error downloading case study:', error);
     }
   };
 
+  // Get the public URL for the image
   const imageUrl = supabase.storage
     .from('marketing_materials')
     .getPublicUrl(study.main_image_path).data.publicUrl;
 
+  console.log('Rendering case study:', {
+    title: study.title,
+    imagePath: study.main_image_path,
+    imageUrl: imageUrl,
+    pdfPath: study.pdf_path
+  });
+
   return (
     <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 backdrop-blur-sm">
       <div className="aspect-video relative">
-        <img src={imageUrl} alt={study.title} className="w-full h-full object-cover" />
+        <img 
+          src={imageUrl} 
+          alt={study.title} 
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            console.error('Image failed to load:', imageUrl);
+            e.currentTarget.src = '/placeholder.svg';
+          }}
+        />
       </div>
       <div className="p-6">
         <h3 className="text-white text-xl mb-3">{study.title}</h3>
