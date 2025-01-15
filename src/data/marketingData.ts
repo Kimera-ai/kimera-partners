@@ -65,10 +65,10 @@ export const templates: Template[] = [
 export const caseStudies: CaseStudy[] = [
   {
     id: "1",
-    title: 'Mary Dowling Whisky Campaign',
-    description: "How Kimera AI transformed a whisky brand's event experience",
-    main_image_path: 'https://images.unsplash.com/photo-1513708847802-f2fa846a7eaa',
-    pdf_path: '#',
+    title: "Transforming Engagement with Paybox Young",
+    description: "PayBox launched their innovative \"PayBox Young\" app through an engaging event in Tel Aviv, partnering with Kimera AI to create an interactive AI photobooth experience that transformed adults into their younger selves",
+    main_image_path: "https://images.unsplash.com/photo-1513708847802-f2fa846a7eaa",
+    pdf_path: "Transforming-Engagement-with-Paybox-Young-An-AI-Powered-Event-Success-Story.pdf",
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
   },
