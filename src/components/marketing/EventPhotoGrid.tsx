@@ -39,6 +39,7 @@ export const EventPhotoGrid = () => {
       );
 
       setPhotos(formattedPhotos);
+      console.log('Fetched photos:', formattedPhotos); // Added for debugging
     } catch (error) {
       console.error('Error fetching photos:', error);
     } finally {
