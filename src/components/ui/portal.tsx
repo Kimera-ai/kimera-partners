@@ -41,8 +41,12 @@ export const Navigation = () => {
       <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
-            <Link to="/" className="text-white text-xl font-bold">
-              Kimera AI
+            <Link to="/" className="flex items-center">
+              <img 
+                src="https://gerodpwicbuukllgkmzg.supabase.co/storage/v1/object/public/stuff/Partners%20logo.png?t=2025-01-15T17%3A24%3A57.611Z" 
+                alt="Kimera AI Logo" 
+                className="h-8"
+              />
             </Link>
           </div>
           <div className="flex-1 flex items-center justify-end">
