@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Image as ImageIcon, FileText, Video, Star, Plus, Camera } from 'lucide-react';
+import { Search, Filter, Image as ImageIcon, FileText, Video, Star, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import BaseLayout from '@/components/layouts/BaseLayout';
@@ -11,8 +11,6 @@ import { VideoCard } from '@/components/marketing/VideoCard';
 import { visualAssets, templates, videos } from '@/data/marketingData';
 import { supabase } from '@/integrations/supabase/client';
 import type { CaseStudy } from '@/types/marketing';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { EventPhotoUploader } from '@/components/marketing/EventPhotoUploader';
 import { EventPhotoGrid } from '@/components/marketing/EventPhotoGrid';
 
 const TemplatesSection = () => (
@@ -68,32 +66,12 @@ const VideosSection = () => (
   </div>
 );
 
-const EventPhotosSection = () => {
-  const [refreshKey, setRefreshKey] = useState(0);
-
-  return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl text-white">Event Photos</h2>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="outline" className="border-white/20 hover:bg-white/20 text-white">
-              <Plus size={20} className="mr-2" />
-              Add Event Photo
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px] bg-gray-900 text-white">
-            <DialogHeader>
-              <DialogTitle>Upload Event Photo</DialogTitle>
-            </DialogHeader>
-            <EventPhotoUploader onUploadComplete={() => setRefreshKey(prev => prev + 1)} />
-          </DialogContent>
-        </Dialog>
-      </div>
-      <EventPhotoGrid key={refreshKey} />
-    </div>
-  );
-};
+const EventPhotosSection = () => (
+  <div className="space-y-8">
+    <h2 className="text-xl text-white">Event Photos</h2>
+    <EventPhotoGrid />
+  </div>
+);
 
 const VisualAssetsSection = () => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
