@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Filter, Image as ImageIcon, FileText, Video, Star } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, Filter, Image as ImageIcon, FileText, Video, Star, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import BaseLayout from '@/components/layouts/BaseLayout';
@@ -11,15 +11,9 @@ import { VideoCard } from '@/components/marketing/VideoCard';
 import { visualAssets, templates, videos } from '@/data/marketingData';
 import { supabase } from '@/integrations/supabase/client';
 import type { CaseStudy } from '@/types/marketing';
-
-// Section Components
-const VisualAssetsSection = () => (
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-    {visualAssets.map(asset => (
-      <VisualAssetCard key={asset.id} asset={asset} />
-    ))}
-  </div>
-);
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { EventPhotoUploader } from '@/components/marketing/EventPhotoUploader';
+import { EventPhotoGrid } from '@/components/marketing/EventPhotoGrid';
 
 const TemplatesSection = () => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -73,6 +67,42 @@ const VideosSection = () => (
     ))}
   </div>
 );
+
+const VisualAssetsSection = () => {
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  return (
+    <div className="space-y-8">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl text-white">Stock Assets</h2>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="border-white/20 hover:bg-white/20 text-white">
+              <Plus size={20} className="mr-2" />
+              Add Event Photo
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px] bg-gray-900 text-white">
+            <DialogHeader>
+              <DialogTitle>Upload Event Photo</DialogTitle>
+            </DialogHeader>
+            <EventPhotoUploader onUploadComplete={() => setRefreshKey(prev => prev + 1)} />
+          </DialogContent>
+        </Dialog>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {visualAssets.map(asset => (
+          <VisualAssetCard key={asset.id} asset={asset} />
+        ))}
+      </div>
+      
+      <div className="mt-12">
+        <h2 className="text-xl text-white mb-6">Event Photos</h2>
+        <EventPhotoGrid key={refreshKey} />
+      </div>
+    </div>
+  );
+};
 
 const MarketingKit = () => {
   const [activeTab, setActiveTab] = useState('visual-assets');
