@@ -18,6 +18,23 @@ const NavLink = ({ href, children }: { href: string; children: React.ReactNode }
   );
 };
 
+export const SectionHeader = ({
+  title,
+  description,
+}: {
+  title: string;
+  description?: string;
+}) => {
+  return (
+    <div className="space-y-1">
+      <h2 className="text-2xl font-bold tracking-tight text-white">{title}</h2>
+      {description && (
+        <p className="text-gray-400">{description}</p>
+      )}
+    </div>
+  );
+};
+
 export const Navigation = () => {
   return (
     <nav className="border-b border-white/10 bg-[#100919]">
