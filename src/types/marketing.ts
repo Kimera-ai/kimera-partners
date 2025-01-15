@@ -23,13 +23,13 @@ export interface Template {
 }
 
 export interface CaseStudy {
-  id: number;
+  id: string;
   title: string;
   description: string;
-  thumbnail: string;
-  downloadUrl: string;
-  results: string[];
-  fileSize: string;
+  main_image_path: string;
+  pdf_path: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Video {

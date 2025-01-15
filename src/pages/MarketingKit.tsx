@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Filter, Image as ImageIcon, FileText, Video, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,7 +8,9 @@ import { VisualAssetCard } from '@/components/marketing/VisualAssetCard';
 import { TemplateCard } from '@/components/marketing/TemplateCard';
 import { CaseStudyCard } from '@/components/marketing/CaseStudyCard';
 import { VideoCard } from '@/components/marketing/VideoCard';
-import { visualAssets, templates, caseStudies, videos } from '@/data/marketingData';
+import { visualAssets, templates, videos } from '@/data/marketingData';
+import { supabase } from '@/integrations/supabase/client';
+import type { CaseStudy } from '@/types/marketing';
 
 // Section Components
 const VisualAssetsSection = () => (
@@ -27,13 +29,42 @@ const TemplatesSection = () => (
   </div>
 );
 
-const CaseStudiesSection = () => (
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-    {caseStudies.map(study => (
-      <CaseStudyCard key={study.id} study={study} />
-    ))}
-  </div>
-);
+const CaseStudiesSection = () => {
+  const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCaseStudies = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('case_studies')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        setCaseStudies(data || []);
+      } catch (error) {
+        console.error('Error fetching case studies:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCaseStudies();
+  }, []);
+
+  if (isLoading) {
+    return <div className="text-center text-gray-400">Loading case studies...</div>;
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      {caseStudies.map(study => (
+        <CaseStudyCard key={study.id} study={study} />
+      ))}
+    </div>
+  );
+};
 
 const VideosSection = () => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
