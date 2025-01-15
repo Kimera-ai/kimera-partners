@@ -67,7 +67,7 @@ export const caseStudies: CaseStudy[] = [
     id: "1",
     title: "Transforming Engagement with Paybox Young",
     description: "PayBox launched their innovative \"PayBox Young\" app through an engaging event in Tel Aviv, partnering with Kimera AI to create an interactive AI photobooth experience that transformed adults into their younger selves",
-    main_image_path: "https://images.unsplash.com/photo-1513708847802-f2fa846a7eaa",
+    main_image_path: "Collage2.jpg",
     pdf_path: "Transforming-Engagement-with-Paybox-Young-An-AI-Powered-Event-Success-Story.pdf",
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
