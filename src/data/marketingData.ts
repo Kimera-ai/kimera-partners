@@ -64,22 +64,22 @@ export const templates: Template[] = [
 
 export const caseStudies: CaseStudy[] = [
   {
-    id: 1,
+    id: "1",
     title: 'Mary Dowling Whisky Campaign',
     description: "How Kimera AI transformed a whisky brand's event experience",
-    thumbnail: 'https://images.unsplash.com/photo-1513708847802-f2fa846a7eaa',
-    downloadUrl: '#',
-    results: ['15 new bookings', '1000+ social shares'],
-    fileSize: '4.2 MB'
+    main_image_path: 'https://images.unsplash.com/photo-1513708847802-f2fa846a7eaa',
+    pdf_path: '#',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
   },
   {
-    id: 2,
+    id: "2",
     title: 'Fashion Week Integration',
     description: 'Elevating the fashion week experience with AI photography',
-    thumbnail: 'https://images.unsplash.com/photo-1509631179647-0177331693ae',
-    downloadUrl: '#',
-    results: ['2500+ photos', '35% engagement rate'],
-    fileSize: '3.8 MB'
+    main_image_path: 'https://images.unsplash.com/photo-1509631179647-0177331693ae',
+    pdf_path: '#',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
   }
 ];
 
