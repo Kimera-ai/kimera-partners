@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Image as ImageIcon, FileText, Video, Star, Camera } from 'lucide-react';
+import { Search, Filter, FileText, Video, Star, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import BaseLayout from '@/components/layouts/BaseLayout';
 import { TabButton } from '@/components/marketing/TabButton';
-import { VisualAssetCard } from '@/components/marketing/VisualAssetCard';
 import { TemplateCard } from '@/components/marketing/TemplateCard';
 import { CaseStudyCard } from '@/components/marketing/CaseStudyCard';
 import { VideoCard } from '@/components/marketing/VideoCard';
-import { visualAssets, templates, videos } from '@/data/marketingData';
+import { templates, videos } from '@/data/marketingData';
 import { supabase } from '@/integrations/supabase/client';
 import type { CaseStudy } from '@/types/marketing';
 import { EventPhotoGrid } from '@/components/marketing/EventPhotoGrid';
@@ -73,16 +72,8 @@ const EventPhotosSection = () => (
   </div>
 );
 
-const VisualAssetsSection = () => (
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-    {visualAssets.map(asset => (
-      <VisualAssetCard key={asset.id} asset={asset} />
-    ))}
-  </div>
-);
-
 const MarketingKit = () => {
-  const [activeTab, setActiveTab] = useState('visual-assets');
+  const [activeTab, setActiveTab] = useState('event-photos');
   const [searchTerm, setSearchTerm] = useState('');
 
   return (
@@ -117,13 +108,6 @@ const MarketingKit = () => {
       <div className="border-b border-white/10 mb-8">
         <nav className="flex gap-8">
           <TabButton 
-            active={activeTab === 'visual-assets'} 
-            onClick={() => setActiveTab('visual-assets')}
-            icon={ImageIcon}
-          >
-            Visual Assets
-          </TabButton>
-          <TabButton 
             active={activeTab === 'event-photos'} 
             onClick={() => setActiveTab('event-photos')}
             icon={Camera}
@@ -155,7 +139,6 @@ const MarketingKit = () => {
       </div>
 
       {/* Content Sections */}
-      {activeTab === 'visual-assets' && <VisualAssetsSection />}
       {activeTab === 'event-photos' && <EventPhotosSection />}
       {activeTab === 'templates' && <TemplatesSection />}
       {activeTab === 'case-studies' && <CaseStudiesSection />}
