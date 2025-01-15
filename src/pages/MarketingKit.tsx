@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Image as ImageIcon, FileText, Video, Star, Plus } from 'lucide-react';
+import { Search, Filter, Image as ImageIcon, FileText, Video, Star, Plus, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import BaseLayout from '@/components/layouts/BaseLayout';
@@ -68,13 +68,13 @@ const VideosSection = () => (
   </div>
 );
 
-const VisualAssetsSection = () => {
+const EventPhotosSection = () => {
   const [refreshKey, setRefreshKey] = useState(0);
 
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl text-white">Stock Assets</h2>
+        <h2 className="text-xl text-white">Event Photos</h2>
         <Dialog>
           <DialogTrigger asChild>
             <Button variant="outline" className="border-white/20 hover:bg-white/20 text-white">
@@ -90,19 +90,18 @@ const VisualAssetsSection = () => {
           </DialogContent>
         </Dialog>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {visualAssets.map(asset => (
-          <VisualAssetCard key={asset.id} asset={asset} />
-        ))}
-      </div>
-      
-      <div className="mt-12">
-        <h2 className="text-xl text-white mb-6">Event Photos</h2>
-        <EventPhotoGrid key={refreshKey} />
-      </div>
+      <EventPhotoGrid key={refreshKey} />
     </div>
   );
 };
+
+const VisualAssetsSection = () => (
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    {visualAssets.map(asset => (
+      <VisualAssetCard key={asset.id} asset={asset} />
+    ))}
+  </div>
+);
 
 const MarketingKit = () => {
   const [activeTab, setActiveTab] = useState('visual-assets');
@@ -147,6 +146,13 @@ const MarketingKit = () => {
             Visual Assets
           </TabButton>
           <TabButton 
+            active={activeTab === 'event-photos'} 
+            onClick={() => setActiveTab('event-photos')}
+            icon={Camera}
+          >
+            Event Photos
+          </TabButton>
+          <TabButton 
             active={activeTab === 'templates'} 
             onClick={() => setActiveTab('templates')}
             icon={FileText}
@@ -172,6 +178,7 @@ const MarketingKit = () => {
 
       {/* Content Sections */}
       {activeTab === 'visual-assets' && <VisualAssetsSection />}
+      {activeTab === 'event-photos' && <EventPhotosSection />}
       {activeTab === 'templates' && <TemplatesSection />}
       {activeTab === 'case-studies' && <CaseStudiesSection />}
       {activeTab === 'videos' && <VideosSection />}
