@@ -41,14 +41,6 @@ export const VisualAssetCard = ({ asset }: { asset: VisualAsset }) => {
           </Button>
         </div>
       </div>
-      <div className="p-6">
-        <div className="text-sm text-primary mb-2">{asset.category}</div>
-        <h3 className="text-white text-lg mb-2">{asset.title}</h3>
-        <div className="flex items-center gap-4 text-sm text-gray-400">
-          <span>{asset.dimensions}</span>
-          <span>{asset.fileSize}</span>
-        </div>
-      </div>
     </div>
   );
 };
