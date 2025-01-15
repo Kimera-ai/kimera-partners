@@ -20,8 +20,10 @@ export const CaseStudyCard = ({ study }: { study: CaseStudy }) => {
     }
   };
 
-  // Get the public URL for the image directly from Supabase
-  const imageUrl = `${supabase.storageUrl}/object/public/marketing_materials/${study.main_image_path}`;
+  // Get the public URL for the image using the proper method
+  const { data: { publicUrl: imageUrl } } = supabase.storage
+    .from('marketing_materials')
+    .getPublicUrl(study.main_image_path);
 
   console.log('Rendering case study:', {
     title: study.title,
