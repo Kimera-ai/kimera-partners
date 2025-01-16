@@ -23,7 +23,6 @@ export const VideoCard = ({ video }: { video: Video }) => {
           ) : (
             <>
               {thumbnailError ? (
-                // Fallback to a video element when thumbnail fails
                 <video
                   src={video.downloadUrl}
                   className="w-full h-full object-cover cursor-pointer"
@@ -66,10 +65,6 @@ export const VideoCard = ({ video }: { video: Video }) => {
             </>
           )}
         </AspectRatio>
-      </div>
-      <div className="p-4">
-        <h3 className="text-white text-base font-medium mb-1 truncate">{video.title}</h3>
-        <div className="text-xs text-gray-400">{video.fileSize}</div>
       </div>
     </div>
   );
