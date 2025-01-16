@@ -33,7 +33,7 @@ export interface CaseStudy {
 }
 
 export interface Video {
-  id: number;
+  id: string;  // Changed from number to string to match Supabase UUID
   title: string;
   description: string;
   thumbnail: string;
