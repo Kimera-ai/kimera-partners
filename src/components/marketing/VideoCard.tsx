@@ -7,7 +7,7 @@ export const VideoCard = ({ video }: { video: Video }) => {
   const [isPlaying, setIsPlaying] = useState(false);
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 backdrop-blur-sm">
+    <div className="bg-[#1A1123] border border-white/5 rounded-2xl overflow-hidden hover:border-primary/50 transition-all duration-300 hover:-translate-y-1">
       <div className="aspect-video relative group">
         {isPlaying ? (
           <video
@@ -25,7 +25,7 @@ export const VideoCard = ({ video }: { video: Video }) => {
               className="w-full h-full object-cover cursor-pointer"
               onClick={() => setIsPlaying(true)}
             />
-            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 backdrop-blur-sm">
+            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
               <Button 
                 variant="default" 
                 size="icon" 
@@ -47,16 +47,15 @@ export const VideoCard = ({ video }: { video: Video }) => {
                 </Button>
               </a>
             </div>
-            <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/75 rounded text-white text-sm">
+            <div className="absolute top-2 right-2 px-2 py-1 bg-black/75 rounded text-xs font-medium text-white">
               {video.duration}
             </div>
           </>
         )}
       </div>
-      <div className="p-6">
-        <h3 className="text-white text-lg mb-2">{video.title}</h3>
-        <p className="text-gray-300 text-sm mb-3">{video.description}</p>
-        <div className="text-sm text-gray-400">{video.fileSize}</div>
+      <div className="p-4">
+        <h3 className="text-white text-base font-medium mb-1 truncate">{video.title}</h3>
+        <div className="text-xs text-gray-400">{video.fileSize}</div>
       </div>
     </div>
   );
