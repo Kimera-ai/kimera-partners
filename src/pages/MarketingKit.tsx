@@ -11,6 +11,7 @@ import { templates, videos } from '@/data/marketingData';
 import { supabase } from '@/integrations/supabase/client';
 import type { CaseStudy } from '@/types/marketing';
 import { EventPhotoGrid } from '@/components/marketing/EventPhotoGrid';
+import { VideoGrid } from '@/components/marketing/VideoGrid';
 
 const TemplatesSection = () => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -58,10 +59,9 @@ const CaseStudiesSection = () => {
 };
 
 const VideosSection = () => (
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-    {videos.map(video => (
-      <VideoCard key={video.id} video={video} />
-    ))}
+  <div className="space-y-8">
+    <h2 className="text-xl text-white">Videos</h2>
+    <VideoGrid />
   </div>
 );
 

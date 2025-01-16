@@ -90,6 +90,39 @@ export type Database = {
         }
         Relationships: []
       }
+      videos: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration: string | null
+          file_size: string | null
+          id: string
+          thumbnail_path: string | null
+          title: string
+          video_path: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          file_size?: string | null
+          id?: string
+          thumbnail_path?: string | null
+          title: string
+          video_path: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          file_size?: string | null
+          id?: string
+          thumbnail_path?: string | null
+          title?: string
+          video_path?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
