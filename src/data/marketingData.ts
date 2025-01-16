@@ -41,16 +41,6 @@ export const visualAssets: VisualAsset[] = [
 
 export const templates: Template[] = [
   {
-    id: 1,
-    type: 'social',
-    title: 'Instagram Post Template',
-    description: 'Ready-to-use templates for promoting AI photobooth events',
-    thumbnail: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113',
-    downloadUrl: '#',
-    format: 'PSD, AI',
-    fileSize: '12.4 MB'
-  },
-  {
     id: 2,
     type: 'presentation',
     title: 'Pitch Deck Template',
