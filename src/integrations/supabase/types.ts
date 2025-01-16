@@ -132,6 +132,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      sync_videos: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

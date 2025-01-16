@@ -19,19 +19,21 @@ export const VideoGrid = () => {
 
       const formattedVideos: Video[] = await Promise.all(
         (data || []).map(async (video) => {
+          // Get the video URL
           const { data: { publicUrl: videoUrl } } = supabase.storage
             .from('videos')
             .getPublicUrl(video.video_path);
 
+          // Get the thumbnail URL (if exists, otherwise use video URL)
           const { data: { publicUrl: thumbnailUrl } } = supabase.storage
             .from('videos')
-            .getPublicUrl(video.thumbnail_path || '');
+            .getPublicUrl(video.thumbnail_path || video.video_path);
 
           return {
-            id: parseInt(video.id),
+            id: video.id,
             title: video.title,
             description: video.description || '',
-            thumbnail: thumbnailUrl || videoUrl,
+            thumbnail: thumbnailUrl,
             downloadUrl: videoUrl,
             duration: video.duration || 'N/A',
             fileSize: video.file_size || 'N/A'
