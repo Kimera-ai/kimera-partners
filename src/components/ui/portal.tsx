@@ -11,7 +11,7 @@ const NavLink = ({ href, children }: { href: string; children: React.ReactNode }
       to={href}
       className={`${
         isActive ? "text-white" : "text-gray-300"
-      } hover:text-white px-3 py-2 text-sm font-medium transition-colors`}
+      } hover:text-white px-4 py-2 rounded-md text-sm font-medium transition-colors hover:bg-white/5`}
     >
       {children}
     </Link>
@@ -50,13 +50,13 @@ export const Navigation = () => {
             </Link>
           </div>
           <div className="flex-1 flex items-center justify-end">
-            <div className="hidden md:flex items-center gap-6">
+            <div className="hidden md:flex items-center gap-8 mr-8">
               <NavLink href="/partner-program">Partner Program</NavLink>
               <NavLink href="/marketing-kit">Marketing Kit</NavLink>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <Button variant="outline" className="border-white/20 hover:bg-white/20 text-white">
+          <div className="flex items-center">
+            <Button variant="outline" className="border-white/20 hover:bg-white/20 text-white px-6">
               Sign In
             </Button>
           </div>
