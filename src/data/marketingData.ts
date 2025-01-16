@@ -85,7 +85,7 @@ export const caseStudies: CaseStudy[] = [
 
 export const videos: Video[] = [
   {
-    id: 1,
+    id: "1",  // Changed from number to string
     title: 'Kimera AI Product Overview',
     description: 'A comprehensive look at our AI photobooth solution',
     thumbnail: 'https://images.unsplash.com/photo-1536240478700-b869070f9279',
@@ -94,7 +94,7 @@ export const videos: Video[] = [
     fileSize: '48.2 MB'
   },
   {
-    id: 2,
+    id: "2",  // Changed from number to string
     title: 'Setup Tutorial',
     description: 'Step-by-step guide to setting up the Kimera AI system',
     thumbnail: 'https://images.unsplash.com/photo-1492619375914-88005aa9e8fb',
