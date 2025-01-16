@@ -5,6 +5,7 @@ import { useState } from "react";
 
 export const VideoCard = ({ video }: { video: Video }) => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [thumbnailError, setThumbnailError] = useState(false);
 
   return (
     <div className="bg-[#1A1123] border border-white/5 rounded-2xl overflow-hidden hover:border-primary/50 transition-all duration-300 hover:-translate-y-1">
@@ -19,12 +20,22 @@ export const VideoCard = ({ video }: { video: Video }) => {
           />
         ) : (
           <>
-            <img 
-              src={video.thumbnail} 
-              alt={video.title} 
-              className="w-full h-full object-cover cursor-pointer"
-              onClick={() => setIsPlaying(true)}
-            />
+            {thumbnailError ? (
+              // Fallback to a video element when thumbnail fails
+              <video
+                src={video.downloadUrl}
+                className="w-full h-full object-cover cursor-pointer"
+                onClick={() => setIsPlaying(true)}
+              />
+            ) : (
+              <img 
+                src={video.thumbnail} 
+                alt={video.title} 
+                className="w-full h-full object-cover cursor-pointer"
+                onClick={() => setIsPlaying(true)}
+                onError={() => setThumbnailError(true)}
+              />
+            )}
             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
               <Button 
                 variant="default" 

@@ -24,10 +24,17 @@ export const VideoGrid = () => {
             .from('videos')
             .getPublicUrl(video.video_path);
 
-          // Get the thumbnail URL (if exists, otherwise use video URL)
-          const { data: { publicUrl: thumbnailUrl } } = supabase.storage
-            .from('videos')
-            .getPublicUrl(video.thumbnail_path || video.video_path);
+          // Get the thumbnail URL if it exists, otherwise use a placeholder
+          let thumbnailUrl;
+          if (video.thumbnail_path) {
+            const { data: { publicUrl } } = supabase.storage
+              .from('videos')
+              .getPublicUrl(video.thumbnail_path);
+            thumbnailUrl = publicUrl;
+          } else {
+            // Use the first frame of the video as thumbnail
+            thumbnailUrl = videoUrl;
+          }
 
           return {
             id: video.id,
