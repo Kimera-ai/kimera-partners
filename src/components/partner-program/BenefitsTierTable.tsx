@@ -103,13 +103,13 @@ const benefits = [
 
 const BenefitsTierTable = () => {
   const CheckMark = () => (
-    <div className="flex justify-center">
+    <div className="flex items-center justify-center">
       <Check className="h-4 w-4 text-green-500" />
     </div>
   );
 
   const Dash = () => (
-    <div className="flex justify-center">
+    <div className="flex items-center justify-center">
       <span className="text-gray-400">-</span>
     </div>
   );
@@ -127,18 +127,30 @@ const BenefitsTierTable = () => {
           <TableHeader>
             <TableRow className="hover:bg-transparent">
               <TableHead className="w-[250px]">Benefit</TableHead>
-              <TableHead className="px-2">Basic (1-5 Events)</TableHead>
-              <TableHead className="px-2">Growth (6-10 Events)</TableHead>
-              <TableHead className="px-2">Loyalty (10+ Events)</TableHead>
+              <TableHead className="text-center">Basic (1-5 Events)</TableHead>
+              <TableHead className="text-center">Growth (6-10 Events)</TableHead>
+              <TableHead className="text-center">Loyalty (10+ Events)</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {benefits.map((benefit, index) => (
               <TableRow key={index}>
-                <TableCell className="font-medium py-2">{benefit.benefit}</TableCell>
-                <TableCell className="px-2 py-2">{benefit.basic ? <CheckMark /> : <Dash />}</TableCell>
-                <TableCell className="px-2 py-2">{benefit.growth ? <CheckMark /> : <Dash />}</TableCell>
-                <TableCell className="px-2 py-2">{benefit.loyalty ? <CheckMark /> : <Dash />}</TableCell>
+                <TableCell className="font-medium">{benefit.benefit}</TableCell>
+                <TableCell className="text-center">
+                  <div className="flex items-center justify-center">
+                    {benefit.basic ? <CheckMark /> : <Dash />}
+                  </div>
+                </TableCell>
+                <TableCell className="text-center">
+                  <div className="flex items-center justify-center">
+                    {benefit.growth ? <CheckMark /> : <Dash />}
+                  </div>
+                </TableCell>
+                <TableCell className="text-center">
+                  <div className="flex items-center justify-center">
+                    {benefit.loyalty ? <CheckMark /> : <Dash />}
+                  </div>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
