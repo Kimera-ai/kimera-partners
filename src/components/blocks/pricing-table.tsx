@@ -3,8 +3,10 @@
 import * as React from "react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { Check, ArrowRight } from "lucide-react"
-import NumberFlow from "@number-flow/react"
+import { ArrowRight } from "lucide-react"
+import { PlanCard } from "./pricing/PlanCard"
+import { IntervalToggle } from "./pricing/IntervalToggle"
+import { FeaturesTable } from "./pricing/FeaturesTable"
 
 export type PlanLevel = "starter" | "pro" | "all" | string
 
@@ -23,8 +25,7 @@ export interface PricingPlan {
   popular?: boolean
 }
 
-export interface PricingTableProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+export interface PricingTableProps extends React.HTMLAttributes<HTMLDivElement> {
   features: PricingFeature[]
   plans: PricingPlan[]
   onPlanSelect?: (plan: PlanLevel) => void
@@ -61,125 +62,22 @@ export function PricingTable({
         "fade-bottom overflow-hidden pb-0",
       )}
     >
-      <div
-        className={cn("w-full max-w-2xl mx-auto px-4", containerClassName)}
-        {...props}
-      >
-        <div className="flex justify-end mb-4 sm:mb-8">
-          <div className="inline-flex items-center gap-2 text-xs sm:text-sm">
-            <button
-              type="button"
-              onClick={() => setIsYearly(false)}
-              className={cn(
-                "px-3 py-1 rounded-md transition-colors",
-                !isYearly ? "bg-zinc-100 dark:bg-zinc-800" : "text-zinc-500",
-              )}
-            >
-              Monthly
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsYearly(true)}
-              className={cn(
-                "px-3 py-1 rounded-md transition-colors",
-                isYearly ? "bg-zinc-100 dark:bg-zinc-800" : "text-zinc-500",
-              )}
-            >
-              Yearly
-            </button>
-          </div>
-        </div>
+      <div className={cn("w-full max-w-2xl mx-auto px-4", containerClassName)} {...props}>
+        <IntervalToggle isYearly={isYearly} onChange={setIsYearly} />
 
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           {plans.map((plan) => (
-            <button
-              key={plan.name}
-              type="button"
-              onClick={() => handlePlanSelect(plan.level)}
-              className={cn(
-                "flex-1 p-3 rounded-xl text-left transition-all",
-                "border border-zinc-200 dark:border-zinc-800",
-                selectedPlan === plan.level &&
-                  "ring-2 ring-blue-500 dark:ring-blue-400",
-              )}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium">{plan.name}</span>
-                {plan.popular && (
-                  <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 px-2 py-0.5 rounded-full">
-                    Popular
-                  </span>
-                )}
-              </div>
-              <div className="flex items-baseline gap-1">
-                <NumberFlow
-                  format={{
-                    style: "currency",
-                    currency: "USD",
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0,
-                  }}
-                  value={isYearly ? plan.price.yearly : plan.price.monthly}
-                  className="text-2xl font-bold"
-                />
-                <span className="text-sm font-normal text-zinc-500">
-                  /{isYearly ? "year" : "month"}
-                </span>
-              </div>
-            </button>
+            <PlanCard
+              key={plan.level}
+              plan={plan}
+              isYearly={isYearly}
+              selectedPlan={selectedPlan}
+              onSelect={handlePlanSelect}
+            />
           ))}
         </div>
 
-        <div className="border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden">
-          <div className="overflow-x-auto">
-            <div className="min-w-[480px] divide-y divide-zinc-200 dark:divide-zinc-800">
-              <div className="flex items-center p-3 bg-zinc-50 dark:bg-zinc-900">
-                <div className="flex-1 text-sm font-medium">Features</div>
-                <div className="flex items-center gap-4 text-sm">
-                  {plans.map((plan) => (
-                    <div
-                      key={plan.level}
-                      className="w-12 text-center font-medium"
-                    >
-                      {plan.name}
-                    </div>
-                  ))}
-                </div>
-              </div>
-              {features.map((feature) => (
-                <div
-                  key={feature.name}
-                  className={cn(
-                    "flex items-center p-3 transition-colors",
-                    feature.included === selectedPlan &&
-                      "bg-blue-50/50 dark:bg-blue-900/20",
-                  )}
-                >
-                  <div className="flex-1 text-sm">{feature.name}</div>
-                  <div className="flex items-center gap-4 text-sm">
-                    {plans.map((plan) => (
-                      <div
-                        key={plan.level}
-                        className={cn(
-                          "w-12 flex justify-center",
-                          plan.level === selectedPlan && "font-medium",
-                        )}
-                      >
-                        {shouldShowCheck(feature.included, plan.level) ? (
-                          <Check className="w-4 h-4 text-blue-500" />
-                        ) : (
-                          <span className="text-zinc-300 dark:text-zinc-700">
-                            -
-                          </span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <FeaturesTable features={features} plans={plans} selectedPlan={selectedPlan} />
 
         <div className="mt-8 text-center">
           <Button
@@ -195,18 +93,4 @@ export function PricingTable({
       </div>
     </section>
   )
-}
-
-function shouldShowCheck(
-  included: PricingFeature["included"],
-  level: string,
-): boolean {
-  if (included === "all") return true
-  if (included === "pro" && (level === "pro" || level === "all")) return true
-  if (
-    included === "starter" &&
-    (level === "starter" || level === "pro" || level === "all")
-  )
-    return true
-  return false
 }
