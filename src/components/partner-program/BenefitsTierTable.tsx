@@ -1,121 +1,69 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Check } from "lucide-react";
-
-const benefits = [
-  {
-    benefit: "Discount on Event Packages",
-    basic: "-",
-    growth: "5% off",
-    loyalty: "10% off",
-  },
-  {
-    benefit: "Discount on AI Processing Credits",
-    basic: "-",
-    growth: "5% off",
-    loyalty: "5% off",
-  },
-  {
-    benefit: "Branded Experience (White Labeling)",
-    basic: "Available for $130",
-    growth: "Available for $130",
-    loyalty: "1st branded event free",
-  },
-  {
-    benefit: "Access to beta features",
-    basic: "-",
-    growth: "-",
-    loyalty: "-",
-  },
-  {
-    benefit: "Sales & Marketing Materials",
-    basic: <div className="flex items-center"><Check className="w-5 h-5 text-green-500 mr-2" /> Partner Hub Access</div>,
-    growth: <div className="flex items-center"><Check className="w-5 h-5 text-green-500 mr-2" /> Partner Hub Access</div>,
-    loyalty: <div className="flex items-center"><Check className="w-5 h-5 text-green-500 mr-2" /> Custom co-marketing</div>,
-  },
-  {
-    benefit: "Sales Support & Training",
-    basic: "-",
-    growth: "Group training sessions",
-    loyalty: "1-on-1 strategy call",
-  },
-  {
-    benefit: "Lead Generation & Referrals",
-    basic: "-",
-    growth: 'Listed as "Trusted Partner"',
-    loyalty: "Featured on website/socials",
-  },
-  {
-    benefit: "AI Playground Access",
-    basic: <div className="flex items-center"><Check className="w-5 h-5 text-green-500 mr-2" /> Full Access</div>,
-    growth: <div className="flex items-center"><Check className="w-5 h-5 text-green-500 mr-2" /> Full Access</div>,
-    loyalty: <div className="flex items-center"><Check className="w-5 h-5 text-green-500 mr-2" /> Full Access + Beta Features</div>,
-  },
-  {
-    benefit: "Loyalty Rewards & Bonuses",
-    basic: "-",
-    growth: "-",
-    loyalty: "Extra 1000 credits every 5 events",
-  },
-  {
-    benefit: "Free optimized landing page",
-    basic: "-",
-    growth: "-",
-    loyalty: "Yes",
-  },
-  {
-    benefit: "Your Own Domain",
-    basic: "-",
-    growth: "-",
-    loyalty: "Yes",
-  },
-  {
-    benefit: "Dedicated Partner Support",
-    basic: "Standard email support",
-    growth: "Priority Email/Discord support",
-    loyalty: "Priority support on Discord/Whatsapp",
-  },
-  {
-    benefit: "Direct influence on our product roadmap",
-    basic: "-",
-    growth: "-",
-    loyalty: <div className="flex items-center"><Check className="w-5 h-5 text-green-500 mr-2" /> Shape the future of AI photobooths with us</div>,
-  },
-];
+import { PricingCard } from "@/components/ui/dark-gradient-pricing";
 
 const BenefitsTierTable = () => {
   return (
-    <div className="container mx-auto px-4 py-16">
-      <h2 className="text-3xl font-bold text-center mb-8">Partner Benefits by Tier</h2>
-      <div className="rounded-xl border bg-card">
-        <Table>
-          <TableHeader>
-            <TableRow className="hover:bg-transparent">
-              <TableHead className="w-[250px] bg-muted/50">Benefit</TableHead>
-              <TableHead className="bg-muted/50">Basic (1-5 Events)</TableHead>
-              <TableHead className="bg-muted/50">Growth (6-10 Events)</TableHead>
-              <TableHead className="bg-muted/50">Loyalty (10+ Events)</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {benefits.map((benefit, index) => (
-              <TableRow key={index} className="hover:bg-muted/50">
-                <TableCell className="font-medium">{benefit.benefit}</TableCell>
-                <TableCell>{benefit.basic}</TableCell>
-                <TableCell>{benefit.growth}</TableCell>
-                <TableCell>{benefit.loyalty}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+    <section className="relative overflow-hidden bg-background text-foreground">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 py-20 md:px-8">
+        <div className="mb-12 space-y-3">
+          <h2 className="text-center text-3xl font-semibold leading-tight sm:text-4xl sm:leading-tight md:text-5xl md:leading-tight">
+            Partner Benefits by Tier
+          </h2>
+          <p className="text-center text-base text-muted-foreground md:text-lg">
+            Choose the partnership tier that best fits your business needs
+          </p>
+        </div>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          <PricingCard
+            tier="Basic"
+            price="1-5 Events"
+            bestFor="Best for getting started"
+            CTA="Get started"
+            benefits={[
+              { text: "Partner Hub Access", checked: true },
+              { text: "Standard Email Support", checked: true },
+              { text: "AI Playground Access", checked: true },
+              { text: "White Labeling ($130)", checked: true },
+              { text: "Lead Generation", checked: false },
+              { text: "Priority Support", checked: false },
+              { text: "Custom Co-marketing", checked: false },
+              { text: "Free Landing Page", checked: false },
+            ]}
+          />
+          <PricingCard
+            tier="Growth"
+            price="6-10 Events"
+            bestFor="Best for growing businesses"
+            CTA="Level up"
+            benefits={[
+              { text: "Partner Hub Access", checked: true },
+              { text: "Priority Email/Discord Support", checked: true },
+              { text: "AI Playground Access", checked: true },
+              { text: "White Labeling ($130)", checked: true },
+              { text: "Listed as Trusted Partner", checked: true },
+              { text: "Group Training Sessions", checked: true },
+              { text: "5% Discount on Packages", checked: true },
+              { text: "5% off AI Credits", checked: true },
+            ]}
+          />
+          <PricingCard
+            tier="Loyalty"
+            price="10+ Events"
+            bestFor="Best for established partners"
+            CTA="Join elite partners"
+            benefits={[
+              { text: "Partner Hub + Custom Co-marketing", checked: true },
+              { text: "Priority Discord/WhatsApp Support", checked: true },
+              { text: "AI Playground + Beta Features", checked: true },
+              { text: "1st Branded Event Free", checked: true },
+              { text: "Featured Partner Status", checked: true },
+              { text: "1-on-1 Strategy Calls", checked: true },
+              { text: "10% Discount on Packages", checked: true },
+              { text: "Free Landing Page & Domain", checked: true },
+            ]}
+          />
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
 
