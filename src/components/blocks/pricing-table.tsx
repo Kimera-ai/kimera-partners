@@ -62,7 +62,7 @@ export function PricingTable({
       )}
     >
       <div
-        className={cn("w-full max-w-3xl mx-auto px-4", containerClassName)}
+        className={cn("w-full max-w-2xl mx-auto px-4", containerClassName)}
         {...props}
       >
         <div className="flex justify-end mb-4 sm:mb-8">
@@ -90,14 +90,14 @@ export function PricingTable({
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row gap-3 mb-6">
           {plans.map((plan) => (
             <button
               key={plan.name}
               type="button"
               onClick={() => handlePlanSelect(plan.level)}
               className={cn(
-                "flex-1 p-4 rounded-xl text-left transition-all",
+                "flex-1 p-3 rounded-xl text-left transition-all",
                 "border border-zinc-200 dark:border-zinc-800",
                 selectedPlan === plan.level &&
                   "ring-2 ring-blue-500 dark:ring-blue-400",
@@ -132,14 +132,14 @@ export function PricingTable({
 
         <div className="border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
-            <div className="min-w-[640px] divide-y divide-zinc-200 dark:divide-zinc-800">
-              <div className="flex items-center p-4 bg-zinc-50 dark:bg-zinc-900">
+            <div className="min-w-[480px] divide-y divide-zinc-200 dark:divide-zinc-800">
+              <div className="flex items-center p-3 bg-zinc-50 dark:bg-zinc-900">
                 <div className="flex-1 text-sm font-medium">Features</div>
-                <div className="flex items-center gap-8 text-sm">
+                <div className="flex items-center gap-4 text-sm">
                   {plans.map((plan) => (
                     <div
                       key={plan.level}
-                      className="w-16 text-center font-medium"
+                      className="w-12 text-center font-medium"
                     >
                       {plan.name}
                     </div>
@@ -150,23 +150,23 @@ export function PricingTable({
                 <div
                   key={feature.name}
                   className={cn(
-                    "flex items-center p-4 transition-colors",
+                    "flex items-center p-3 transition-colors",
                     feature.included === selectedPlan &&
                       "bg-blue-50/50 dark:bg-blue-900/20",
                   )}
                 >
                   <div className="flex-1 text-sm">{feature.name}</div>
-                  <div className="flex items-center gap-8 text-sm">
+                  <div className="flex items-center gap-4 text-sm">
                     {plans.map((plan) => (
                       <div
                         key={plan.level}
                         className={cn(
-                          "w-16 flex justify-center",
+                          "w-12 flex justify-center",
                           plan.level === selectedPlan && "font-medium",
                         )}
                       >
                         {shouldShowCheck(feature.included, plan.level) ? (
-                          <Check className="w-5 h-5 text-blue-500" />
+                          <Check className="w-4 h-4 text-blue-500" />
                         ) : (
                           <span className="text-zinc-300 dark:text-zinc-700">
                             -
