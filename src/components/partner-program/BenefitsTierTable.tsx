@@ -100,8 +100,7 @@ const BenefitsTierTable = () => {
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="mb-8">
-        <div className="flex items-center justify-center gap-4 mb-4">
-          <img src="/lovable-uploads/879070b2-a66d-419b-9a07-6e5ab90e68e4.png" alt="Target icon" className="w-6 h-6" />
+        <div className="flex items-center justify-center mb-4">
           <h2 className="text-2xl font-bold">Partner Benefits by Tier</h2>
         </div>
       </div>
