@@ -105,7 +105,7 @@ const BenefitsTierTable = () => {
           <h2 className="text-2xl font-bold">Partner Benefits by Tier</h2>
         </div>
       </div>
-      <div className="max-w-4xl mx-auto rounded-xl border backdrop-blur-md bg-white/10 dark:bg-slate-900/50 shadow-xl">
+      <div className="max-w-4xl mx-auto rounded-xl border backdrop-blur-md bg-white/5 dark:bg-slate-900/70 shadow-xl">
         <Table>
           <BenefitsTableHeader />
           <TableBody>
