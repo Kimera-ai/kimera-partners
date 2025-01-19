@@ -1,6 +1,7 @@
 import BaseLayout from '@/components/layouts/BaseLayout';
 import Hero from "@/components/partner-program/Hero";
 import BenefitsGrid from "@/components/partner-program/BenefitsGrid";
+import BenefitsTierTable from "@/components/partner-program/BenefitsTierTable";
 import ApplicationForm from '@/components/partnerships/ApplicationForm';
 import { useState } from 'react';
 
@@ -12,6 +13,7 @@ const PartnershipsPage = () => {
       <div className="min-h-screen bg-background pt-24 pb-16">
         <Hero />
         <BenefitsGrid />
+        <BenefitsTierTable />
         <ApplicationForm isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} />
       </div>
     </BaseLayout>

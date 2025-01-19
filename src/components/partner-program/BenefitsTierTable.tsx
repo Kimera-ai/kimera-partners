@@ -1,69 +1,150 @@
-import { PricingCard } from "@/components/ui/dark-gradient-pricing";
+import { Check } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+const benefits = [
+  {
+    benefit: "Branded Experience (White Labeling)",
+    basic: true,
+    growth: true,
+    loyalty: true,
+  },
+  {
+    benefit: "AI Playground Access",
+    basic: true,
+    growth: true,
+    loyalty: true,
+  },
+  {
+    benefit: "Partner Hub Access",
+    basic: true,
+    growth: true,
+    loyalty: true,
+  },
+  {
+    benefit: "Tools hub Access",
+    basic: true,
+    growth: true,
+    loyalty: true,
+  },
+  {
+    benefit: "Standard Email Support",
+    basic: true,
+    growth: true,
+    loyalty: true,
+  },
+  {
+    benefit: "Premium Discord/Whatsapp support",
+    basic: false,
+    growth: true,
+    loyalty: true,
+  },
+  {
+    benefit: "10% Discount on Event Packages",
+    basic: false,
+    growth: true,
+    loyalty: true,
+  },
+  {
+    benefit: "5% Discount on AI Processing Credits",
+    basic: false,
+    growth: true,
+    loyalty: true,
+  },
+  {
+    benefit: "Free 1000 credits every 5 events",
+    basic: false,
+    growth: false,
+    loyalty: true,
+  },
+  {
+    benefit: "Access to beta features",
+    basic: false,
+    growth: false,
+    loyalty: true,
+  },
+  {
+    benefit: "Weekly strategy calls",
+    basic: false,
+    growth: false,
+    loyalty: true,
+  },
+  {
+    benefit: "Listed as \"Trusted Partner\"",
+    basic: false,
+    growth: false,
+    loyalty: true,
+  },
+  {
+    benefit: "influence on our product roadmap",
+    basic: false,
+    growth: false,
+    loyalty: true,
+  },
+  {
+    benefit: "Free landing page with optimized for conversion",
+    basic: false,
+    growth: false,
+    loyalty: true,
+  },
+  {
+    benefit: "Custom Domains",
+    basic: false,
+    growth: false,
+    loyalty: true,
+  },
+];
 
 const BenefitsTierTable = () => {
+  const CheckMark = () => (
+    <div className="flex justify-center">
+      <Check className="h-5 w-5 text-green-500" />
+    </div>
+  );
+
+  const Dash = () => (
+    <div className="flex justify-center">
+      <span className="text-gray-400">-</span>
+    </div>
+  );
+
   return (
-    <section className="relative overflow-hidden bg-background text-foreground">
-      <div className="relative z-10 mx-auto max-w-7xl px-4 py-20 md:px-8">
-        <div className="mb-12 space-y-3">
-          <h2 className="text-center text-3xl font-semibold leading-tight sm:text-4xl sm:leading-tight md:text-5xl md:leading-tight">
-            Partner Benefits by Tier
-          </h2>
-          <p className="text-center text-base text-muted-foreground md:text-lg">
-            Choose the partnership tier that best fits your business needs
-          </p>
-        </div>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          <PricingCard
-            tier="Basic"
-            price="1-5 Events"
-            bestFor="Best for getting started"
-            CTA="Get started"
-            benefits={[
-              { text: "Partner Hub Access", checked: true },
-              { text: "Standard Email Support", checked: true },
-              { text: "AI Playground Access", checked: true },
-              { text: "White Labeling ($130)", checked: true },
-              { text: "Lead Generation", checked: false },
-              { text: "Priority Support", checked: false },
-              { text: "Custom Co-marketing", checked: false },
-              { text: "Free Landing Page", checked: false },
-            ]}
-          />
-          <PricingCard
-            tier="Growth"
-            price="6-10 Events"
-            bestFor="Best for growing businesses"
-            CTA="Level up"
-            benefits={[
-              { text: "Partner Hub Access", checked: true },
-              { text: "Priority Email/Discord Support", checked: true },
-              { text: "AI Playground Access", checked: true },
-              { text: "White Labeling ($130)", checked: true },
-              { text: "Listed as Trusted Partner", checked: true },
-              { text: "Group Training Sessions", checked: true },
-              { text: "5% Discount on Packages", checked: true },
-              { text: "5% off AI Credits", checked: true },
-            ]}
-          />
-          <PricingCard
-            tier="Loyalty"
-            price="10+ Events"
-            bestFor="Best for established partners"
-            CTA="Join elite partners"
-            benefits={[
-              { text: "Partner Hub + Custom Co-marketing", checked: true },
-              { text: "Priority Discord/WhatsApp Support", checked: true },
-              { text: "AI Playground + Beta Features", checked: true },
-              { text: "1st Branded Event Free", checked: true },
-              { text: "Featured Partner Status", checked: true },
-              { text: "1-on-1 Strategy Calls", checked: true },
-              { text: "10% Discount on Packages", checked: true },
-              { text: "Free Landing Page & Domain", checked: true },
-            ]}
-          />
+    <div className="container mx-auto px-4 py-16">
+      <div className="mb-12">
+        <div className="flex items-center justify-center gap-4 mb-6">
+          <img src="/lovable-uploads/879070b2-a66d-419b-9a07-6e5ab90e68e4.png" alt="Target icon" className="w-8 h-8" />
+          <h2 className="text-3xl font-bold">Partner Benefits by Tier</h2>
         </div>
       </div>
-    </section>
+      <div className="rounded-xl border bg-card">
+        <Table>
+          <TableHeader>
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="w-[300px]">Benefit</TableHead>
+              <TableHead>Basic (1-5 Events)</TableHead>
+              <TableHead>Growth (6-10 Events)</TableHead>
+              <TableHead>Loyalty (10+ Events)</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {benefits.map((benefit, index) => (
+              <TableRow key={index}>
+                <TableCell className="font-medium">{benefit.benefit}</TableCell>
+                <TableCell>{benefit.basic ? <CheckMark /> : <Dash />}</TableCell>
+                <TableCell>{benefit.growth ? <CheckMark /> : <Dash />}</TableCell>
+                <TableCell>{benefit.loyalty ? <CheckMark /> : <Dash />}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
   );
 };
 
