@@ -104,7 +104,7 @@ const benefits = [
 const BenefitsTierTable = () => {
   const CheckMark = () => (
     <div className="flex justify-center">
-      <Check className="h-5 w-5 text-green-500" />
+      <Check className="h-4 w-4 text-green-500" />
     </div>
   );
 
@@ -115,30 +115,30 @@ const BenefitsTierTable = () => {
   );
 
   return (
-    <div className="container mx-auto px-4 py-16">
-      <div className="mb-12">
-        <div className="flex items-center justify-center gap-4 mb-6">
-          <img src="/lovable-uploads/879070b2-a66d-419b-9a07-6e5ab90e68e4.png" alt="Target icon" className="w-8 h-8" />
-          <h2 className="text-3xl font-bold">Partner Benefits by Tier</h2>
+    <div className="container mx-auto px-4 py-12">
+      <div className="mb-8">
+        <div className="flex items-center justify-center gap-4 mb-4">
+          <img src="/lovable-uploads/879070b2-a66d-419b-9a07-6e5ab90e68e4.png" alt="Target icon" className="w-6 h-6" />
+          <h2 className="text-2xl font-bold">Partner Benefits by Tier</h2>
         </div>
       </div>
       <div className="rounded-xl border bg-card">
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent">
-              <TableHead className="w-[300px]">Benefit</TableHead>
-              <TableHead>Basic (1-5 Events)</TableHead>
-              <TableHead>Growth (6-10 Events)</TableHead>
-              <TableHead>Loyalty (10+ Events)</TableHead>
+              <TableHead className="w-[250px]">Benefit</TableHead>
+              <TableHead className="px-2">Basic (1-5 Events)</TableHead>
+              <TableHead className="px-2">Growth (6-10 Events)</TableHead>
+              <TableHead className="px-2">Loyalty (10+ Events)</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {benefits.map((benefit, index) => (
               <TableRow key={index}>
-                <TableCell className="font-medium">{benefit.benefit}</TableCell>
-                <TableCell>{benefit.basic ? <CheckMark /> : <Dash />}</TableCell>
-                <TableCell>{benefit.growth ? <CheckMark /> : <Dash />}</TableCell>
-                <TableCell>{benefit.loyalty ? <CheckMark /> : <Dash />}</TableCell>
+                <TableCell className="font-medium py-2">{benefit.benefit}</TableCell>
+                <TableCell className="px-2 py-2">{benefit.basic ? <CheckMark /> : <Dash />}</TableCell>
+                <TableCell className="px-2 py-2">{benefit.growth ? <CheckMark /> : <Dash />}</TableCell>
+                <TableCell className="px-2 py-2">{benefit.loyalty ? <CheckMark /> : <Dash />}</TableCell>
               </TableRow>
             ))}
           </TableBody>
