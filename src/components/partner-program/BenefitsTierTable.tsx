@@ -83,7 +83,7 @@ const benefits = [
     loyalty: true,
   },
   {
-    benefit: "Free landing page with optimized for conversion",
+    benefit: "Free landing page optimized for conversion",
     basic: false,
     growth: false,
     loyalty: true,
