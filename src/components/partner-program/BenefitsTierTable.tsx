@@ -48,7 +48,7 @@ const benefits = [
   {
     benefit: "Lead Generation & Referrals",
     basic: "-",
-    growth: "Listed as "Trusted Partner"",
+    growth: 'Listed as "Trusted Partner"',
     loyalty: "Featured on website/socials",
   },
   {
