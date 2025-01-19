@@ -12,7 +12,7 @@ interface BenefitRowProps {
 
 export const BenefitRow = ({ benefit }: BenefitRowProps) => (
   <TableRow>
-    <TableCell className="font-medium">{benefit.benefit}</TableCell>
+    <TableCell className="font-medium text-left">{benefit.benefit}</TableCell>
     <TableCell className="text-center">
       <div className="flex items-center justify-center">
         {benefit.basic ? <CheckMark /> : <Dash />}
