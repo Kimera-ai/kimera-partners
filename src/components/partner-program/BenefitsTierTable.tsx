@@ -1,12 +1,7 @@
 import { Check } from "lucide-react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody } from "@/components/ui/table";
+import { BenefitsTableHeader } from "./table/BenefitsTableHeader";
+import { BenefitRow } from "./table/BenefitRow";
 
 const benefits = [
   {
@@ -102,18 +97,6 @@ const benefits = [
 ];
 
 const BenefitsTierTable = () => {
-  const CheckMark = () => (
-    <div className="flex items-center justify-center">
-      <Check className="h-4 w-4 text-green-500" />
-    </div>
-  );
-
-  const Dash = () => (
-    <div className="flex items-center justify-center">
-      <span className="text-gray-400">-</span>
-    </div>
-  );
-
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="mb-8">
@@ -124,34 +107,10 @@ const BenefitsTierTable = () => {
       </div>
       <div className="rounded-xl border bg-card">
         <Table>
-          <TableHeader>
-            <TableRow className="hover:bg-transparent">
-              <TableHead className="w-[250px]">Benefit</TableHead>
-              <TableHead className="text-center">Basic (1-5 Events)</TableHead>
-              <TableHead className="text-center">Growth (6-10 Events)</TableHead>
-              <TableHead className="text-center">Loyalty (10+ Events)</TableHead>
-            </TableRow>
-          </TableHeader>
+          <BenefitsTableHeader />
           <TableBody>
             {benefits.map((benefit, index) => (
-              <TableRow key={index}>
-                <TableCell className="font-medium">{benefit.benefit}</TableCell>
-                <TableCell className="text-center">
-                  <div className="flex items-center justify-center">
-                    {benefit.basic ? <CheckMark /> : <Dash />}
-                  </div>
-                </TableCell>
-                <TableCell className="text-center">
-                  <div className="flex items-center justify-center">
-                    {benefit.growth ? <CheckMark /> : <Dash />}
-                  </div>
-                </TableCell>
-                <TableCell className="text-center">
-                  <div className="flex items-center justify-center">
-                    {benefit.loyalty ? <CheckMark /> : <Dash />}
-                  </div>
-                </TableCell>
-              </TableRow>
+              <BenefitRow key={index} benefit={benefit} />
             ))}
           </TableBody>
         </Table>
