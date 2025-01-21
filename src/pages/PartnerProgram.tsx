@@ -11,16 +11,18 @@ const PartnershipsPage = () => {
 
   return (
     <BaseLayout>
-      <div className="relative min-h-screen bg-background pb-16">
+      <div className="relative min-h-screen bg-background">
         <div className="absolute inset-0 pointer-events-none">
           <DotPattern 
+            width={24}
+            height={24}
             className="[mask-image:radial-gradient(900px_circle_at_center,white,transparent)]"
             cy={1}
             cr={1}
             cx={1}
           />
         </div>
-        <div className="relative z-10">
+        <div className="relative">
           <Hero />
           <BenefitsGrid />
           <BenefitsTierTable />

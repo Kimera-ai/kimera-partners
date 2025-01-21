@@ -17,8 +17,8 @@ const Login = () => {
   }, [session, navigate]);
 
   return (
-    <div className="min-h-screen bg-[#100919] flex items-center justify-center px-4">
-      <Card className="relative z-10 w-full max-w-md p-8 bg-card">
+    <div className="fixed inset-0 flex items-center justify-center bg-[#100919] p-4">
+      <Card className="w-full max-w-md p-8 bg-card/95 backdrop-blur-sm">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white">Welcome to Kimera Partners</h1>
           <p className="text-gray-400 mt-2">Sign in to access your partner account</p>
@@ -58,13 +58,23 @@ const Login = () => {
             style: {
               button: {
                 cursor: 'pointer',
+                position: 'relative',
+                zIndex: 50
               },
               input: {
                 cursor: 'text',
+                position: 'relative',
+                zIndex: 50
               },
               anchor: {
                 cursor: 'pointer',
+                position: 'relative',
+                zIndex: 50
               },
+              container: {
+                position: 'relative',
+                zIndex: 50
+              }
             },
           }}
           providers={[]}
