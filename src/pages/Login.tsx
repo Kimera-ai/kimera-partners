@@ -12,7 +12,7 @@ const Login = () => {
 
   useEffect(() => {
     if (session) {
-      navigate("/marketing-kit");
+      navigate("/partner-program");
     }
   }, [session, navigate]);
 
