@@ -6,11 +6,6 @@ import Dashboard from "@/pages/Dashboard";
 import { useSession } from "@/hooks/useSession";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  // Temporarily bypass authentication check for development
-  return <>{children}</>;
-  
-  // Original authentication logic (commented out for now)
-  /*
   const session = useSession();
   
   if (!session) {
@@ -18,7 +13,6 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
   
   return <>{children}</>;
-  */
 };
 
 export const router = createBrowserRouter([
