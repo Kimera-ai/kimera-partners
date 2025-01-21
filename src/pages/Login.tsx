@@ -33,11 +33,28 @@ const Login = () => {
                 colors: {
                   brand: '#FF2B6E',
                   brandAccent: '#FF068B',
+                  inputBackground: '#1A1F2C',
+                  inputText: 'white',
+                  inputPlaceholder: '#4A5568',
+                },
+                borderWidths: {
+                  buttonBorderWidth: '1px',
+                  inputBorderWidth: '1px',
+                },
+                radii: {
+                  borderRadiusButton: '6px',
+                  buttonBorderRadius: '6px',
+                  inputBorderRadius: '6px',
                 },
               },
             },
+            className: {
+              input: 'bg-card border-input',
+              button: 'bg-primary hover:bg-primary-hover text-white',
+            },
           }}
           providers={[]}
+          theme="dark"
         />
       </Card>
     </div>
