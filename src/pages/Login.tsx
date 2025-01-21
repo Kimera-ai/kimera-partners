@@ -77,25 +77,18 @@ const Login = () => {
             style: {
               button: {
                 cursor: 'pointer',
-                '&:hover': {
-                  opacity: 0.8,
-                },
+                opacity: '1',
+                transition: 'opacity 0.2s ease',
               },
               input: {
                 cursor: 'text',
-                '&:hover': {
-                  borderColor: '#4A5568',
-                },
-                '&:focus': {
-                  borderColor: '#FF2B6E',
-                  outline: 'none',
-                },
+                borderColor: '#2D3748',
+                transition: 'border-color 0.2s ease',
               },
               anchor: {
                 cursor: 'pointer',
-                '&:hover': {
-                  opacity: 0.8,
-                },
+                opacity: '1',
+                transition: 'opacity 0.2s ease',
               },
               container: {
                 position: 'relative',
