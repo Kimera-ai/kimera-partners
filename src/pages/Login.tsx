@@ -18,7 +18,6 @@ const Login = () => {
     }
   }, [session, navigate]);
 
-  // Listen for auth state changes to handle errors
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT') {
@@ -31,7 +30,11 @@ const Login = () => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-[#100919] p-4">
-      <Card className="w-full max-w-md p-8 bg-card/95 backdrop-blur-sm">
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="w-full h-full bg-[#100919] opacity-95" />
+      </div>
+      
+      <Card className="relative w-full max-w-md p-8 bg-card">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white">Welcome to Kimera Partners</h1>
           <p className="text-gray-400 mt-2">Sign in to access your partner account</p>
@@ -78,21 +81,21 @@ const Login = () => {
               button: {
                 cursor: 'pointer',
                 position: 'relative',
-                zIndex: 50
+                zIndex: 1
               },
               input: {
                 cursor: 'text',
                 position: 'relative',
-                zIndex: 50
+                zIndex: 1
               },
               anchor: {
                 cursor: 'pointer',
                 position: 'relative',
-                zIndex: 50
+                zIndex: 1
               },
               container: {
                 position: 'relative',
-                zIndex: 50
+                zIndex: 1
               }
             },
           }}
