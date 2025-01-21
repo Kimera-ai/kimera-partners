@@ -1,20 +1,33 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/useSession";
+import { AuthError } from "@supabase/supabase-js";
 
 const Login = () => {
   const navigate = useNavigate();
   const session = useSession();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (session) {
       navigate("/partner-program");
     }
   }, [session, navigate]);
+
+  // Listen for auth state changes to handle errors
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        setError(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-[#100919] p-4">
@@ -24,6 +37,12 @@ const Login = () => {
           <p className="text-gray-400 mt-2">Sign in to access your partner account</p>
         </div>
         
+        {error && (
+          <div className="mb-4 p-3 text-sm text-red-500 bg-red-100/10 rounded-md">
+            {error}
+          </div>
+        )}
+
         <Auth
           supabaseClient={supabase}
           appearance={{
@@ -64,7 +83,8 @@ const Login = () => {
               input: {
                 cursor: 'text',
                 position: 'relative',
-                zIndex: 50
+                zIndex: 50,
+                required: true
               },
               anchor: {
                 cursor: 'pointer',
@@ -79,6 +99,18 @@ const Login = () => {
           }}
           providers={[]}
           theme="dark"
+          localization={{
+            variables: {
+              sign_in: {
+                email_label: 'Email *',
+                password_label: 'Password *'
+              },
+              sign_up: {
+                email_label: 'Email *',
+                password_label: 'Password *'
+              }
+            }
+          }}
         />
       </Card>
     </div>
