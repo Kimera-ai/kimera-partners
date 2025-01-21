@@ -18,7 +18,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-[#100919] flex items-center justify-center px-4">
-      <Card className="w-full max-w-md p-8 bg-card">
+      <Card className="relative z-10 w-full max-w-md p-8 bg-card">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white">Welcome to Kimera Partners</h1>
           <p className="text-gray-400 mt-2">Sign in to access your partner account</p>
@@ -56,14 +56,14 @@ const Login = () => {
               },
             },
             style: {
-              input: {
-                backgroundColor: '#1A1F2C',
-                color: 'white',
-                border: '1px solid #2D3748',
-              },
               button: {
-                backgroundColor: '#FF2B6E',
-                color: 'white',
+                cursor: 'pointer',
+              },
+              input: {
+                cursor: 'text',
+              },
+              anchor: {
+                cursor: 'pointer',
               },
             },
           }}

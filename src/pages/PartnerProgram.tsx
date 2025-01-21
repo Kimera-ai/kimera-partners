@@ -11,17 +11,21 @@ const PartnershipsPage = () => {
 
   return (
     <BaseLayout>
-      <div className="relative min-h-screen bg-background pt-24 pb-16 overflow-hidden">
-        <DotPattern 
-          className="[mask-image:radial-gradient(900px_circle_at_center,white,transparent)]"
-          cy={1}
-          cr={1}
-          cx={1}
-        />
-        <Hero />
-        <BenefitsGrid />
-        <BenefitsTierTable />
-        <ApplicationForm isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} />
+      <div className="relative min-h-screen bg-background pb-16">
+        <div className="absolute inset-0 pointer-events-none">
+          <DotPattern 
+            className="[mask-image:radial-gradient(900px_circle_at_center,white,transparent)]"
+            cy={1}
+            cr={1}
+            cx={1}
+          />
+        </div>
+        <div className="relative z-10">
+          <Hero />
+          <BenefitsGrid />
+          <BenefitsTierTable />
+          <ApplicationForm isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} />
+        </div>
       </div>
     </BaseLayout>
   );
