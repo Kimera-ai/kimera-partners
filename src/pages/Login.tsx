@@ -5,7 +5,6 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/useSession";
-import { AuthError } from "@supabase/supabase-js";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -19,7 +18,7 @@ const Login = () => {
   }, [session, navigate]);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_OUT') {
         setError(null);
       }
@@ -29,12 +28,10 @@ const Login = () => {
   }, []);
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-[#100919] p-4">
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="w-full h-full bg-[#100919] opacity-95" />
-      </div>
+    <div className="fixed inset-0 flex items-center justify-center">
+      <div className="absolute inset-0 bg-[#100919] opacity-95 pointer-events-none" />
       
-      <Card className="relative w-full max-w-md p-8 bg-card">
+      <Card className="relative w-full max-w-md p-8 bg-card z-50">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white">Welcome to Kimera Partners</h1>
           <p className="text-gray-400 mt-2">Sign in to access your partner account</p>
@@ -80,22 +77,28 @@ const Login = () => {
             style: {
               button: {
                 cursor: 'pointer',
-                position: 'relative',
-                zIndex: 1
+                '&:hover': {
+                  opacity: 0.8,
+                },
               },
               input: {
                 cursor: 'text',
-                position: 'relative',
-                zIndex: 1
+                '&:hover': {
+                  borderColor: '#4A5568',
+                },
+                '&:focus': {
+                  borderColor: '#FF2B6E',
+                  outline: 'none',
+                },
               },
               anchor: {
                 cursor: 'pointer',
-                position: 'relative',
-                zIndex: 1
+                '&:hover': {
+                  opacity: 0.8,
+                },
               },
               container: {
                 position: 'relative',
-                zIndex: 1
               }
             },
           }}
