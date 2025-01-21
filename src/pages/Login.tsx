@@ -83,8 +83,7 @@ const Login = () => {
               input: {
                 cursor: 'text',
                 position: 'relative',
-                zIndex: 50,
-                required: true
+                zIndex: 50
               },
               anchor: {
                 cursor: 'pointer',
@@ -103,11 +102,15 @@ const Login = () => {
             variables: {
               sign_in: {
                 email_label: 'Email *',
-                password_label: 'Password *'
+                password_label: 'Password *',
+                email_input_placeholder: 'Your email address',
+                password_input_placeholder: 'Your password'
               },
               sign_up: {
                 email_label: 'Email *',
-                password_label: 'Password *'
+                password_label: 'Password *',
+                email_input_placeholder: 'Your email address',
+                password_input_placeholder: 'Your password'
               }
             }
           }}
