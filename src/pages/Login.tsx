@@ -96,8 +96,21 @@ const Login = () => {
               }}
               view="sign_in"
               providers={[]}
-              showLinks={true}
+              showLinks={false}
             />
+            <div className="mt-6 text-center">
+              <p className="text-white text-lg">
+                Want to become a partner?{" "}
+                <a 
+                  href="https://kimera.ai/contact" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-primary hover:text-primary-hover underline"
+                >
+                  let us know
+                </a>
+              </p>
+            </div>
           </div>
         </div>
       </AuthContainer>
