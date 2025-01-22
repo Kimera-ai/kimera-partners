@@ -98,20 +98,20 @@ export function PricingCalculator() {
   };
 
   return (
-    <Card id="pricing-calculator" className="p-6 bg-background/50 backdrop-blur">
-      <h3 className="text-xl font-semibold mb-4">Pricing Calculator</h3>
+    <Card id="pricing-calculator" className="p-4 sm:p-6 bg-background/50 backdrop-blur">
+      <h3 className="text-lg sm:text-xl font-semibold mb-4">Pricing Calculator</h3>
 
       <div className="space-y-4 mb-6">
         <div className="space-y-2">
           <Label htmlFor="guestCount">Expected Number of Guests</Label>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
             <Input
               id="guestCount"
               type="number"
               min="1"
               value={guestCount}
               onChange={(e) => setGuestCount(Math.max(1, parseInt(e.target.value) || 1))}
-              className="w-32"
+              className="w-full sm:w-32"
             />
             <span className="text-sm text-muted-foreground">
               ({calculateExpectedUsage(guestCount)} expected runs)
@@ -121,7 +121,7 @@ export function PricingCalculator() {
 
         <h4 className="font-medium pt-4">Base Features</h4>
         {Object.entries(baseFeatures).map(([key, { label, price }]) => (
-          <div key={key} className="flex items-center justify-between">
+          <div key={key} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <Switch
                 checked={selectedBase === key}
@@ -131,7 +131,7 @@ export function PricingCalculator() {
               />
               <Label>{label}</Label>
             </div>
-            <span className="text-sm font-medium">
+            <span className="text-sm font-medium ml-8 sm:ml-0">
               <NumberFlow
                 format={{ style: "currency", currency: "USD" }}
                 value={price}
@@ -140,7 +140,7 @@ export function PricingCalculator() {
           </div>
         ))}
 
-        <div className="flex items-center justify-between mt-4">
+        <div className="flex flex-col sm:flex-row justify-between gap-4 mt-4">
           <div>
             <Label>Custom Workflow</Label>
             <div className="text-sm text-muted-foreground">
@@ -170,10 +170,10 @@ export function PricingCalculator() {
       <div className="space-y-4 mb-6">
         <h4 className="font-medium">Image Features (Credits per use)</h4>
         {imageQuantities.map((feature, index) => (
-          <div key={feature.name} className="flex items-center justify-between">
-            <div>
+          <div key={feature.name} className="flex flex-col sm:flex-row justify-between gap-3">
+            <div className="space-y-1">
               <Label>{feature.name}</Label>
-              <div className="text-sm text-muted-foreground text-left">
+              <div className="text-sm text-muted-foreground">
                 {feature.credits} credits × {feature.quantity > 0 ? feature.quantity * calculateExpectedUsage(guestCount) : 0} runs
               </div>
             </div>
@@ -201,10 +201,10 @@ export function PricingCalculator() {
       <div className="space-y-4 mb-6">
         <h4 className="font-medium">Video Features (Credits per use)</h4>
         {videoQuantities.map((feature, index) => (
-          <div key={feature.name} className="flex items-center justify-between">
-            <div>
+          <div key={feature.name} className="flex flex-col sm:flex-row justify-between gap-3">
+            <div className="space-y-1">
               <Label>{feature.name}</Label>
-              <div className="text-sm text-muted-foreground text-left">
+              <div className="text-sm text-muted-foreground">
                 {feature.credits} credits × {feature.quantity > 0 ? feature.quantity * calculateExpectedUsage(guestCount) : 0} runs
               </div>
             </div>
@@ -229,7 +229,7 @@ export function PricingCalculator() {
 
       <Separator className="my-6" />
 
-      <div className="flex justify-between items-center text-lg font-semibold">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-lg font-semibold">
         <span>Total Price:</span>
         <NumberFlow
           format={{ style: "currency", currency: "USD" }}
