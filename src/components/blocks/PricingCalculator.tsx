@@ -219,6 +219,15 @@ export function PricingCalculator() {
           value={calculateTotal()}
         />
       </div>
+      
+      <div className="mt-6">
+        <Button 
+          className="w-full bg-primary hover:bg-primary/90"
+          size="lg"
+        >
+          Submit Request
+        </Button>
+      </div>
     </Card>
   );
 }
