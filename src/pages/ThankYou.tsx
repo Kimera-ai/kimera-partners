@@ -1,6 +1,7 @@
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { Home } from "lucide-react";
 
 const ThankYou = () => {
   const navigate = useNavigate();
@@ -17,10 +18,11 @@ const ThankYou = () => {
           </p>
           <div className="pt-6">
             <Button 
-              onClick={() => navigate("/dashboard")}
+              onClick={() => navigate("/partner-program")}
               className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
             >
-              Return to Dashboard
+              <Home className="mr-2" />
+              Return to Home
             </Button>
           </div>
         </div>
