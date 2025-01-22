@@ -29,37 +29,44 @@ const Login = () => {
     <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
       <AuthBackground />
       <AuthContainer>
-        <Auth
-          supabaseClient={supabase}
-          appearance={{
-            theme: ThemeSupa,
-            variables: {
-              default: {
-                colors: {
-                  brand: "#FF2B6E",
-                  brandAccent: "#FF068B",
-                  inputText: "white",
-                  inputBackground: "transparent",
-                  inputBorder: "white",
-                  inputBorderHover: "#FF2B6E",
-                  inputBorderFocus: "#FF068B",
+        <div className="flex flex-col items-center space-y-8">
+          <img 
+            src="https://gerodpwicbuukllgkmzg.supabase.co/storage/v1/object/public/stuff/Partners%20logo.png?t=2025-01-15T17%3A24%3A57.611Z"
+            alt="Partners Logo"
+            className="w-48 md:w-64 h-auto animate-fade-in"
+          />
+          <Auth
+            supabaseClient={supabase}
+            appearance={{
+              theme: ThemeSupa,
+              variables: {
+                default: {
+                  colors: {
+                    brand: "#FF2B6E",
+                    brandAccent: "#FF068B",
+                    inputText: "white",
+                    inputBackground: "transparent",
+                    inputBorder: "white",
+                    inputBorderHover: "#FF2B6E",
+                    inputBorderFocus: "#FF068B",
+                  },
                 },
               },
-            },
-            className: {
-              container: "!text-white w-full",
-              label: "!text-white",
-              button: "!text-white w-full",
-              anchor: "!text-white",
-              divider: "!bg-white/20",
-              message: "!text-white",
-              input: "w-full",
-            },
-          }}
-          view="sign_in"
-          providers={[]}
-          showLinks={false}
-        />
+              className: {
+                container: "!text-white w-full",
+                label: "!text-white",
+                button: "!text-white w-full",
+                anchor: "!text-white",
+                divider: "!bg-white/20",
+                message: "!text-white",
+                input: "w-full",
+              },
+            }}
+            view="sign_in"
+            providers={[]}
+            showLinks={false}
+          />
+        </div>
       </AuthContainer>
     </div>
   );
