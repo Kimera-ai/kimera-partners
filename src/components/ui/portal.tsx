@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useSession } from "@/hooks/useSession";
+import { supabase } from "@/integrations/supabase/client";
 
 const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => {
   const location = useLocation();
@@ -37,6 +39,12 @@ export const SectionHeader = ({
 
 export const Navigation = () => {
   const navigate = useNavigate();
+  const { session } = useSession();
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate("/login");
+  };
 
   return (
     <nav className="border-b border-white/10 bg-[#100919]">
@@ -57,14 +65,29 @@ export const Navigation = () => {
               <NavLink href="/marketing-kit">Marketing Kit</NavLink>
             </div>
           </div>
-          <div className="flex items-center">
-            <Button 
-              variant="outline" 
-              className="border-white/20 hover:bg-white/20 text-white px-6"
-              onClick={() => navigate('/login')}
-            >
-              Sign In
-            </Button>
+          <div className="flex items-center gap-4">
+            {session ? (
+              <>
+                <span className="text-sm text-gray-300">
+                  {session.user.email}
+                </span>
+                <Button 
+                  variant="outline" 
+                  className="border-white/20 hover:bg-white/20 text-white px-6"
+                  onClick={handleSignOut}
+                >
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <Button 
+                variant="outline" 
+                className="border-white/20 hover:bg-white/20 text-white px-6"
+                onClick={() => navigate('/login')}
+              >
+                Sign In
+              </Button>
+            )}
           </div>
         </div>
       </div>
