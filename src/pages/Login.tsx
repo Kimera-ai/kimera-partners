@@ -101,7 +101,6 @@ const Login = () => {
                 variables: {
                   sign_up: {
                     link_text: "",
-                    text: "",
                   },
                 },
               }}
