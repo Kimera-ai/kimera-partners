@@ -6,12 +6,13 @@ import { useToast } from "@/hooks/use-toast";
 import { authStyles } from "@/components/auth/authStyles";
 import { AuthContainer } from "@/components/auth/AuthContainer";
 import { AuthBackground } from "@/components/auth/AuthBackground";
+import { AuthChangeEvent } from "@supabase/supabase-js";
 
 const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleAuthStateChange = (event: string) => {
+  const handleAuthStateChange = (event: AuthChangeEvent) => {
     if (event === "SIGNED_IN") {
       navigate("/partner-program");
       toast({
@@ -46,7 +47,7 @@ const Login = () => {
             },
           }}
           providers={["google"]}
-          onChange={handleAuthStateChange}
+          onAuthStateChange={handleAuthStateChange}
         />
       </AuthContainer>
     </div>
