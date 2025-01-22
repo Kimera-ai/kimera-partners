@@ -23,8 +23,8 @@ const baseFeatures = {
 };
 
 const imageFeatures: Feature[] = [
-  { name: "Standard HD Image ($0.14/image)", credits: 14, quantity: 0 },  // Updated from 7 to 14 credits
-  { name: "HQ Image for Print ($0.28/image)", credits: 28, quantity: 0 }, // Updated from 21 to 28 credits
+  { name: "Standard HD Image ($0.14/image)", credits: 14, quantity: 0 },
+  { name: "HQ Image for Print ($0.28/image)", credits: 28, quantity: 0 },
   { name: "Clothing Control", credits: 16, quantity: 0 },
 ];
 
@@ -78,9 +78,9 @@ export function PricingCalculator() {
         return acc + (feature.credits * feature.quantity * expectedUsage);
       }, 0) * CREDIT_COST;
 
-    const customPipelineTotal = customWorkflowQuantity * CUSTOM_PIPELINE_PRICE;
+    const customWorkflowTotal = customWorkflowQuantity * CUSTOM_WORKFLOW_PRICE;
     
-    return basePrice + imageCreditTotal + videoCreditTotal + customPipelineTotal;
+    return basePrice + imageCreditTotal + videoCreditTotal + customWorkflowTotal;
   };
 
   const getSelectedFeatures = () => {
@@ -93,7 +93,7 @@ export function PricingCalculator() {
       videoFeatures: videoQuantities
         .filter(f => f.quantity > 0)
         .map(f => f.name),
-      customPipelines: customWorkflowQuantity
+      customWorkflows: customWorkflowQuantity
     };
   };
 

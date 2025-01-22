@@ -225,7 +225,7 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
                 </div>
               )}
 
-              {selectedFeatures.customPipelines > 0 && (
+              {selectedFeatures.customWorkflows > 0 && (
                 <div className="pt-2">
                   <h4 className="text-sm font-medium text-gray-300 mb-2">Custom Workflows</h4>
                   <div className="text-sm flex justify-between">
