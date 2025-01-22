@@ -21,8 +21,8 @@ const baseFeatures = {
 };
 
 const imageFeatures: Feature[] = [
-  { name: "Standard HD Image ($0.07/image)", credits: 7, quantity: 0 },
-  { name: "HQ Image for Print ($0.21/image)", credits: 21, quantity: 0 },
+  { name: "Standard HD Image ($0.14/image)", credits: 14, quantity: 0 },  // Updated from 7 to 14 credits
+  { name: "HQ Image for Print ($0.28/image)", credits: 28, quantity: 0 }, // Updated from 21 to 28 credits
   { name: "Clothing Control", credits: 16, quantity: 0 },
 ];
 
