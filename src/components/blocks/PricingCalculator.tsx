@@ -80,8 +80,8 @@ export function PricingCalculator() {
         return acc + (feature.credits * totalRuns);
       }, 0) * CREDIT_COST;
 
-    // Calculate custom pipeline total based on quantity
-    const customPipelineTotal = customPipelineQuantity * CUSTOM_PIPELINE_PRICE * expectedUsage;
+    // Calculate custom pipeline total based on quantity and expected usage
+    const customPipelineTotal = customPipelineQuantity * CUSTOM_PIPELINE_PRICE;
     
     return basePrice + imageCreditTotal + videoCreditTotal + customPipelineTotal;
   };
