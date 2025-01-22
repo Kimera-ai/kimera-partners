@@ -11,8 +11,11 @@ const Login = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
+    console.log("Checking session...")
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("Session check result:", session)
       if (session) {
+        console.log("Session found, navigating to dashboard")
         navigate("/dashboard")
       }
     })
@@ -20,12 +23,17 @@ const Login = () => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("Auth state changed:", _event, session)
       if (session) {
+        console.log("New session detected, navigating to dashboard")
         navigate("/dashboard")
       }
     })
 
-    return () => subscription.unsubscribe()
+    return () => {
+      console.log("Cleaning up subscription")
+      subscription.unsubscribe()
+    }
   }, [navigate])
 
   return (
@@ -47,7 +55,7 @@ const Login = () => {
             },
           }}
           providers={["google"]}
-          redirectTo={`${window.location.origin}/auth/callback`}
+          redirectTo={window.location.origin + "/auth/callback"}
         />
       </AuthContainer>
     </div>

@@ -25,6 +25,10 @@ export const router = createBrowserRouter([
     element: <Login />,
   },
   {
+    path: "/auth/callback",
+    element: <Navigate to="/dashboard" replace />,
+  },
+  {
     path: "/partner-program",
     element: (
       <ProtectedRoute>
