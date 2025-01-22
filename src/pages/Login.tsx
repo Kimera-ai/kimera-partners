@@ -59,7 +59,7 @@ const Login = () => {
                 anchor: "!text-white",
                 divider: "!bg-white/20",
                 message: "!text-white",
-                input: "block w-full !bg-transparent !border !border-white/20 !text-white !rounded-md !px-2 !py-1.5 focus:!border-primary hover:!border-primary/80 transition-colors",
+                input: "supabase-auth-ui_ui-input !bg-transparent !border !border-white/20 !text-white !rounded-md !px-2 !py-1.5 focus:!border-primary hover:!border-primary/80 transition-colors w-full",
               },
             }}
             view="sign_in"
