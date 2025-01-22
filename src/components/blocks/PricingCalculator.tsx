@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import NumberFlow from "@number-flow/react";
+import PricingRequestForm from "../pricing/PricingRequestForm";
 
 interface Feature {
   name: string;
@@ -40,7 +41,8 @@ export function PricingCalculator() {
   const [imageQuantities, setImageQuantities] = useState(imageFeatures);
   const [videoQuantities, setVideoQuantities] = useState(videoFeatures);
   const [customPipelineQuantity, setCustomPipelineQuantity] = useState(0);
-  const [guestCount, setGuestCount] = useState(100); // Default to 100 guests
+  const [guestCount, setGuestCount] = useState(100);
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const updateQuantity = (
     features: Feature[],
@@ -79,6 +81,20 @@ export function PricingCalculator() {
     const customPipelineTotal = customPipelineQuantity * CUSTOM_PIPELINE_PRICE;
     
     return basePrice + imageCreditTotal + videoCreditTotal + customPipelineTotal;
+  };
+
+  const getSelectedFeatures = () => {
+    return {
+      basePackage: selectedBase ? baseFeatures[selectedBase].label : null,
+      guestCount,
+      imageFeatures: imageQuantities
+        .filter(f => f.quantity > 0)
+        .map(f => f.name),
+      videoFeatures: videoQuantities
+        .filter(f => f.quantity > 0)
+        .map(f => f.name),
+      customPipelines: customPipelineQuantity
+    };
   };
 
   return (
@@ -226,10 +242,18 @@ export function PricingCalculator() {
           className="w-full bg-primary hover:bg-primary/90"
           size="lg"
           variant="default"
+          onClick={() => setIsFormOpen(true)}
         >
           Submit Request
         </Button>
       </div>
+
+      <PricingRequestForm
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        totalPrice={calculateTotal()}
+        selectedFeatures={getSelectedFeatures()}
+      />
     </Card>
   );
 }
