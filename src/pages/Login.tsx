@@ -97,6 +97,14 @@ const Login = () => {
               view="sign_in"
               providers={[]}
               showLinks={true}
+              localization={{
+                variables: {
+                  sign_up: {
+                    link_text: "",
+                    text: "",
+                  },
+                },
+              }}
             />
             <div className="mt-6 text-center">
               <p className="text-white text-lg">
