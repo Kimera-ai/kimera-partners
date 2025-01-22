@@ -47,12 +47,13 @@ const Login = () => {
               },
             },
             className: {
-              container: "!text-white",
+              container: "!text-white w-full",
               label: "!text-white",
-              button: "!text-white",
+              button: "!text-white w-full",
               anchor: "!text-white",
               divider: "!bg-white/20",
               message: "!text-white",
+              input: "w-full",
             },
           }}
           providers={["google"]}
