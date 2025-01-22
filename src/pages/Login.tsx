@@ -11,34 +11,30 @@ const Login = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    // Initial session check
+    // Only check session once on mount
     const checkSession = async () => {
-      console.log("Initial session check...")
-      const { data: { session } } = await supabase.auth.getSession()
-      console.log("Initial session result:", session)
-      if (session) {
-        console.log("Valid session found, redirecting to dashboard")
+      const { data: { session }, error } = await supabase.auth.getSession()
+      if (error) {
+        console.error("Session check error:", error)
+        return
+      }
+      if (session?.user) {
         navigate("/dashboard", { replace: true })
       }
     }
     
     checkSession()
 
-    // Listen for auth changes
+    // Only listen for sign in events
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Auth state changed:", event, session)
-      if (session && event === "SIGNED_IN") {
-        console.log("User signed in, redirecting to dashboard")
+      if (event === "SIGNED_IN" && session?.user) {
         navigate("/dashboard", { replace: true })
       }
     })
 
-    return () => {
-      console.log("Cleaning up auth subscription")
-      subscription.unsubscribe()
-    }
+    return () => subscription.unsubscribe()
   }, [navigate])
 
   return (
