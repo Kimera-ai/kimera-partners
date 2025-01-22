@@ -33,6 +33,7 @@ interface PricingCardProps {
   CTA: string
   benefits: Array<{ text: string; checked: boolean }>
   className?: string
+  popular?: boolean
 }
 
 export const PricingCard = ({
@@ -42,6 +43,7 @@ export const PricingCard = ({
   CTA,
   benefits,
   className,
+  popular,
 }: PricingCardProps) => {
   const scrollToCalculator = () => {
     const calculator = document.querySelector('#pricing-calculator')
@@ -78,6 +80,11 @@ export const PricingCard = ({
           <span className="text-center text-sm text-zinc-400">
             {bestFor}
           </span>
+          {popular && (
+            <span className="absolute top-4 right-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm px-3 py-1 rounded-full">
+              Popular
+            </span>
+          )}
         </div>
         <div className="space-y-4 py-8 flex-grow">
           {benefits.map((benefit, index) => (
