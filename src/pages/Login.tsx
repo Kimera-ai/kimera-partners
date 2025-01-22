@@ -18,12 +18,6 @@ const Login = () => {
         navigate("/dashboard", { replace: true })
       } else if (event === "SIGNED_OUT") {
         navigate("/login", { replace: true })
-      } else if (event === "USER_DELETED") {
-        toast({
-          variant: "destructive",
-          title: "Account deleted",
-          description: "Your account has been deleted."
-        })
       } else if (event === "USER_UPDATED") {
         toast({
           title: "Account updated",
@@ -57,13 +51,6 @@ const Login = () => {
           }}
           providers={["google"]}
           redirectTo={`${window.location.origin}/auth/callback`}
-          onError={(error) => {
-            toast({
-              variant: "destructive",
-              title: "Authentication error",
-              description: error.message
-            })
-          }}
         />
       </AuthContainer>
     </div>
