@@ -13,7 +13,7 @@ const Pricing = () => {
         { text: "Basic event setup", checked: true },
         { text: "Standard support", checked: true },
         { text: "Basic analytics", checked: true },
-        { text: "Up to 100 guests", checked: true },
+        { text: "Kimera Branding", checked: true },
         { text: "Standard templates", checked: true },
         { text: "Basic customization", checked: true },
       ],
