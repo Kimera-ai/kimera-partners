@@ -77,11 +77,6 @@ const Footer = () => {
                 </a>
               </li>
               <li>
-                <a href="https://kimera.ai/careers" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
-                  Careers
-                </a>
-              </li>
-              <li>
                 <a href="https://kimera.ai/contact" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
                   Contact
                 </a>
