@@ -60,11 +60,11 @@ const Login = () => {
     <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
       <AuthBackground />
       <AuthContainer>
-        <div className="flex flex-col items-center space-y-6 w-full">
+        <div className="flex flex-col items-center space-y-8 w-full">
           <img 
             src="https://gerodpwicbuukllgkmzg.supabase.co/storage/v1/object/public/stuff/Partners%20logo.png?t=2025-01-15T17%3A24%3A57.611Z"
             alt="Partners Logo"
-            className="w-32 sm:w-40 md:w-48 h-auto animate-fade-in"
+            className="w-36 sm:w-44 md:w-52 h-auto animate-fade-in"
           />
           <div className="w-full min-h-[339px]">
             <Auth
