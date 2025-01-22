@@ -11,7 +11,8 @@ interface Feature {
   quantity: number;
 }
 
-const CREDIT_COST = 0.01; // 1 credit = $0.01
+const CREDIT_PACKAGE_SIZE = 100;
+const CREDIT_COST = 1; // $1 per 100 credits
 
 const baseFeatures = {
   baseEvent: { price: 79, label: "Base Event" },
@@ -37,6 +38,7 @@ export function PricingCalculator() {
   const [selectedBase, setSelectedBase] = useState<keyof typeof baseFeatures | null>(null);
   const [imageQuantities, setImageQuantities] = useState(imageFeatures);
   const [videoQuantities, setVideoQuantities] = useState(videoFeatures);
+  const [creditPackages, setCreditPackages] = useState(0);
 
   const updateQuantity = (
     features: Feature[],
@@ -53,15 +55,24 @@ export function PricingCalculator() {
     );
   };
 
+  const calculateRequiredCredits = () => {
+    const imageCredits = imageQuantities.reduce(
+      (acc, feature) => acc + feature.credits * feature.quantity,
+      0
+    );
+    const videoCredits = videoQuantities.reduce(
+      (acc, feature) => acc + feature.credits * feature.quantity,
+      0
+    );
+    return imageCredits + videoCredits;
+  };
+
   const calculateTotal = () => {
     const basePrice = selectedBase ? baseFeatures[selectedBase].price : 0;
-    const imageCreditTotal =
-      imageQuantities.reduce((acc, feature) => acc + feature.credits * feature.quantity, 0) *
-      CREDIT_COST;
-    const videoCreditTotal =
-      videoQuantities.reduce((acc, feature) => acc + feature.credits * feature.quantity, 0) *
-      CREDIT_COST;
-    return basePrice + imageCreditTotal + videoCreditTotal;
+    const requiredCredits = calculateRequiredCredits();
+    const requiredPackages = Math.ceil(requiredCredits / CREDIT_PACKAGE_SIZE);
+    const creditCost = requiredPackages * CREDIT_COST;
+    return basePrice + creditCost;
   };
 
   return (
@@ -94,7 +105,7 @@ export function PricingCalculator() {
       <Separator className="my-6" />
 
       <div className="space-y-4 mb-6">
-        <h4 className="font-medium">Image Features (Credits)</h4>
+        <h4 className="font-medium">Image Features (Credits per use)</h4>
         {imageQuantities.map((feature, index) => (
           <div key={feature.name} className="flex items-center justify-between">
             <div>
@@ -125,7 +136,7 @@ export function PricingCalculator() {
       <Separator className="my-6" />
 
       <div className="space-y-4 mb-6">
-        <h4 className="font-medium">Video Features (Credits)</h4>
+        <h4 className="font-medium">Video Features (Credits per use)</h4>
         {videoQuantities.map((feature, index) => (
           <div key={feature.name} className="flex items-center justify-between">
             <div>
@@ -155,12 +166,22 @@ export function PricingCalculator() {
 
       <Separator className="my-6" />
 
-      <div className="flex justify-between items-center text-lg font-semibold">
-        <span>Total Price:</span>
-        <NumberFlow
-          format={{ style: "currency", currency: "USD" }}
-          value={calculateTotal()}
-        />
+      <div className="space-y-4">
+        <div className="flex justify-between items-center text-sm">
+          <span>Required Credits:</span>
+          <span>{calculateRequiredCredits()} credits</span>
+        </div>
+        <div className="flex justify-between items-center text-sm">
+          <span>Credit Packages (100 credits each):</span>
+          <span>{Math.ceil(calculateRequiredCredits() / CREDIT_PACKAGE_SIZE)} packages</span>
+        </div>
+        <div className="flex justify-between items-center text-lg font-semibold">
+          <span>Total Price:</span>
+          <NumberFlow
+            format={{ style: "currency", currency: "USD" }}
+            value={calculateTotal()}
+          />
+        </div>
       </div>
     </Card>
   );
