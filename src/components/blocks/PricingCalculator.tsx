@@ -229,7 +229,7 @@ export function PricingCalculator() {
 
       <Separator className="my-6" />
 
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-lg font-semibold">
+      <div className="flex flex-col sm:flex-row justify-center sm:justify-between items-center sm:items-center gap-2 text-lg font-semibold">
         <span>Total Price:</span>
         <NumberFlow
           format={{ style: "currency", currency: "USD" }}
