@@ -60,7 +60,7 @@ const Footer = () => {
                 </a>
               </li>
               <li>
-                <a href="https://kimera.ai/support" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                <a href="mailto:support@kimera.ai" className="text-gray-400 hover:text-white">
                   Support
                 </a>
               </li>
