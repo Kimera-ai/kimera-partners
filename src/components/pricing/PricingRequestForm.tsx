@@ -13,6 +13,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from 'react-router-dom';
 
 interface PricingRequestFormProps {
   isOpen: boolean;
@@ -39,6 +40,7 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
   
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getSession = async () => {
@@ -77,6 +79,7 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
       });
       
       onClose();
+      navigate('/thank-you');
     } catch (error) {
       console.error('Error submitting form:', error);
       toast({
@@ -99,9 +102,6 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
   };
 
   if (!isOpen) return null;
-
-  // Calculate expected usage
-  const expectedUsage = Math.round(selectedFeatures.guestCount * 0.7);
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -191,7 +191,7 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-400">Expected Usage (70%)</span>
-                  <span className="text-white">{expectedUsage} uses</span>
+                  <span className="text-white">{Math.round(selectedFeatures.guestCount * 0.7)} uses</span>
                 </div>
               </div>
 

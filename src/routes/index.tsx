@@ -4,6 +4,7 @@ import Login from "@/pages/Login"
 import PartnerProgram from "@/pages/PartnerProgram"
 import Dashboard from "@/pages/Dashboard"
 import Pricing from "@/pages/Pricing"
+import ThankYou from "@/pages/ThankYou"
 import { useSession } from "@/hooks/useSession"
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -54,6 +55,14 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <Pricing />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/thank-you",
+    element: (
+      <ProtectedRoute>
+        <ThankYou />
       </ProtectedRoute>
     ),
   },
