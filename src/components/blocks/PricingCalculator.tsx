@@ -174,7 +174,7 @@ export function PricingCalculator() {
             <div>
               <Label>{feature.name}</Label>
               <div className="text-sm text-muted-foreground text-left">
-                {feature.credits} credits × {feature.quantity > 0 ? feature.quantity * calculateExpectedUsage(guestCount) : 0} uses
+                {feature.credits} credits × {feature.quantity > 0 ? feature.quantity * calculateExpectedUsage(guestCount) : 0} runs
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -205,7 +205,7 @@ export function PricingCalculator() {
             <div>
               <Label>{feature.name}</Label>
               <div className="text-sm text-muted-foreground text-left">
-                {feature.credits} credits × {feature.quantity > 0 ? feature.quantity * calculateExpectedUsage(guestCount) : 0} uses
+                {feature.credits} credits × {feature.quantity > 0 ? feature.quantity * calculateExpectedUsage(guestCount) : 0} runs
               </div>
             </div>
             <div className="flex items-center gap-2">
