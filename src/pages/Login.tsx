@@ -29,7 +29,7 @@ const Login = () => {
     <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
       <AuthBackground />
       <AuthContainer>
-        <div className="flex flex-col items-center space-y-8">
+        <div className="flex flex-col items-center space-y-8 w-full">
           <img 
             src="https://gerodpwicbuukllgkmzg.supabase.co/storage/v1/object/public/stuff/Partners%20logo.png?t=2025-01-15T17%3A24%3A57.611Z"
             alt="Partners Logo"
@@ -53,13 +53,13 @@ const Login = () => {
                 },
               },
               className: {
-                container: "!text-white w-full",
+                container: "w-full",
                 label: "!text-white !text-left block mb-2",
-                button: "!text-white w-full",
+                button: "!bg-primary hover:!bg-primary-hover !text-white w-full",
                 anchor: "!text-white",
                 divider: "!bg-white/20",
                 message: "!text-white",
-                input: "supabase-auth-ui_ui-input w-full !bg-transparent !border !border-white/20 !text-white !rounded-md !px-2 !py-1.5 focus:!border-primary hover:!border-primary/80 transition-colors !min-w-full",
+                input: "block w-full !bg-transparent !border !border-white/20 !text-white !rounded-md !px-2 !py-1.5 focus:!border-primary hover:!border-primary/80 transition-colors",
               },
             }}
             view="sign_in"
