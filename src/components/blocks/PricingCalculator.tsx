@@ -156,7 +156,7 @@ export function PricingCalculator() {
           <div key={feature.name} className="flex items-center justify-between">
             <div>
               <Label>{feature.name}</Label>
-              <div className="text-sm text-muted-foreground">
+              <div className="text-sm text-muted-foreground text-left">
                 {feature.credits} credits × {feature.quantity > 0 ? feature.quantity * calculateExpectedUsage(guestCount) : 0} uses
               </div>
             </div>
@@ -187,7 +187,7 @@ export function PricingCalculator() {
           <div key={feature.name} className="flex items-center justify-between">
             <div>
               <Label>{feature.name}</Label>
-              <div className="text-sm text-muted-foreground">
+              <div className="text-sm text-muted-foreground text-left">
                 {feature.credits} credits × {feature.quantity > 0 ? feature.quantity * calculateExpectedUsage(guestCount) : 0} uses
               </div>
             </div>
