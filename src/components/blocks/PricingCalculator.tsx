@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
 import NumberFlow from "@number-flow/react";
 
 interface Feature {
@@ -12,6 +13,7 @@ interface Feature {
 }
 
 const CREDIT_COST = 0.01; // 1 credit = $0.01
+const USAGE_RATE = 0.7; // 70% of guests are expected to use features
 
 const baseFeatures = {
   baseEvent: { price: 79, label: "Base Event" },
@@ -39,6 +41,7 @@ export function PricingCalculator() {
   const [imageQuantities, setImageQuantities] = useState(imageFeatures);
   const [videoQuantities, setVideoQuantities] = useState(videoFeatures);
   const [customPipelineQuantity, setCustomPipelineQuantity] = useState(0);
+  const [guestCount, setGuestCount] = useState(100); // Default to 100 guests
 
   const updateQuantity = (
     features: Feature[],
@@ -55,15 +58,30 @@ export function PricingCalculator() {
     );
   };
 
+  const calculateExpectedUsage = (baseCount: number) => {
+    return Math.round(baseCount * USAGE_RATE);
+  };
+
   const calculateTotal = () => {
     const basePrice = selectedBase ? baseFeatures[selectedBase].price : 0;
+    
+    // Calculate expected usage per feature based on guest count
+    const expectedUsage = calculateExpectedUsage(guestCount);
+    
     const imageCreditTotal =
-      imageQuantities.reduce((acc, feature) => acc + feature.credits * feature.quantity, 0) *
-      CREDIT_COST;
+      imageQuantities.reduce((acc, feature) => {
+        const totalRuns = feature.quantity > 0 ? expectedUsage : 0;
+        return acc + (feature.credits * totalRuns);
+      }, 0) * CREDIT_COST;
+
     const videoCreditTotal =
-      videoQuantities.reduce((acc, feature) => acc + feature.credits * feature.quantity, 0) *
-      CREDIT_COST;
+      videoQuantities.reduce((acc, feature) => {
+        const totalRuns = feature.quantity > 0 ? expectedUsage : 0;
+        return acc + (feature.credits * totalRuns);
+      }, 0) * CREDIT_COST;
+
     const customPipelineTotal = customPipelineQuantity * CUSTOM_PIPELINE_PRICE;
+    
     return basePrice + imageCreditTotal + videoCreditTotal + customPipelineTotal;
   };
 
@@ -72,7 +90,24 @@ export function PricingCalculator() {
       <h3 className="text-xl font-semibold mb-4">Pricing Calculator</h3>
 
       <div className="space-y-4 mb-6">
-        <h4 className="font-medium">Base Features</h4>
+        <div className="space-y-2">
+          <Label htmlFor="guestCount">Expected Number of Guests</Label>
+          <div className="flex items-center gap-2">
+            <Input
+              id="guestCount"
+              type="number"
+              min="1"
+              value={guestCount}
+              onChange={(e) => setGuestCount(Math.max(1, parseInt(e.target.value) || 1))}
+              className="w-32"
+            />
+            <span className="text-sm text-muted-foreground">
+              (~{calculateExpectedUsage(guestCount)} expected uses)
+            </span>
+          </div>
+        </div>
+
+        <h4 className="font-medium pt-4">Base Features</h4>
         {Object.entries(baseFeatures).map(([key, { label, price }]) => (
           <div key={key} className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -121,13 +156,13 @@ export function PricingCalculator() {
       <Separator className="my-6" />
 
       <div className="space-y-4 mb-6">
-        <h4 className="font-medium">Image Features (Credits)</h4>
+        <h4 className="font-medium">Image Features (Credits per use)</h4>
         {imageQuantities.map((feature, index) => (
           <div key={feature.name} className="flex items-center justify-between">
             <div>
               <Label>{feature.name}</Label>
               <div className="text-sm text-muted-foreground">
-                {feature.credits} credits per use
+                {feature.credits} credits × ~{calculateExpectedUsage(guestCount)} uses
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -152,13 +187,13 @@ export function PricingCalculator() {
       <Separator className="my-6" />
 
       <div className="space-y-4 mb-6">
-        <h4 className="font-medium">Video Features (Credits)</h4>
+        <h4 className="font-medium">Video Features (Credits per use)</h4>
         {videoQuantities.map((feature, index) => (
           <div key={feature.name} className="flex items-center justify-between">
             <div>
               <Label>{feature.name}</Label>
               <div className="text-sm text-muted-foreground">
-                {feature.credits} credits per use
+                {feature.credits} credits × ~{calculateExpectedUsage(guestCount)} uses
               </div>
             </div>
             <div className="flex items-center gap-2">
