@@ -54,12 +54,12 @@ const Login = () => {
               },
               className: {
                 container: "w-full",
-                label: "!text-white !text-left block mb-2",
-                button: "!bg-primary hover:!bg-primary-hover !text-white w-full",
+                label: "!text-white !text-left block mb-2 text-base",
+                button: "!bg-primary hover:!bg-primary-hover !text-white w-full h-12 text-base",
                 anchor: "!text-white",
                 divider: "!bg-white/20",
                 message: "!text-white",
-                input: "supabase-auth-ui_ui-input !bg-transparent !border !border-white/20 !text-white !rounded-md !px-2 !py-1.5 focus:!border-primary hover:!border-primary/80 transition-colors w-full",
+                input: "supabase-auth-ui_ui-input !bg-transparent !border !border-white/20 !text-white !rounded-md !px-4 !py-3 focus:!border-primary hover:!border-primary/80 transition-colors w-full text-base h-12",
               },
             }}
             view="sign_in"
