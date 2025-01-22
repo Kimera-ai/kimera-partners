@@ -46,7 +46,7 @@ const Login = () => {
             },
           }}
           providers={["google"]}
-          onStateChange={({ event }) => handleAuthStateChange(event)}
+          onAuthStateChange={handleAuthStateChange}
         />
       </AuthContainer>
     </div>
