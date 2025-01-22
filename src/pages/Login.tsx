@@ -60,13 +60,13 @@ const Login = () => {
     <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
       <AuthBackground />
       <AuthContainer>
-        <div className="flex flex-col items-center space-y-12 w-full">
+        <div className="flex flex-col items-center space-y-16 w-full">
           <img 
             src="https://gerodpwicbuukllgkmzg.supabase.co/storage/v1/object/public/stuff/Partners%20logo.png?t=2025-01-15T17%3A24%3A57.611Z"
             alt="Partners Logo"
-            className="w-52 sm:w-64 md:w-72 h-auto animate-fade-in"
+            className="w-64 sm:w-80 md:w-96 h-auto animate-fade-in"
           />
-          <div className="w-full max-w-4xl mx-auto">
+          <div className="w-full max-w-5xl mx-auto">
             <Auth
               supabaseClient={supabase}
               appearance={{
@@ -86,12 +86,12 @@ const Login = () => {
                 },
                 className: {
                   container: "supabase-auth-ui_ui-container w-full",
-                  label: "!text-white !text-left block mb-2 text-base",
-                  button: "!bg-primary hover:!bg-primary-hover !text-white w-full h-12 text-base",
-                  anchor: "!text-white text-base",
+                  label: "!text-white !text-left block mb-3 text-lg",
+                  button: "!bg-primary hover:!bg-primary-hover !text-white w-full h-14 text-lg",
+                  anchor: "!text-white text-lg",
                   divider: "!bg-white/20",
-                  message: "!text-red-500 !bg-black/50 !p-3 !rounded-md !mb-4 text-base",
-                  input: "supabase-auth-ui_ui-input !bg-transparent !border !border-white/20 !text-white !rounded-md !px-4 !py-3 focus:!border-primary hover:!border-primary/80 transition-colors w-full text-base h-12",
+                  message: "!text-red-500 !bg-black/50 !p-4 !rounded-md !mb-6 text-lg",
+                  input: "supabase-auth-ui_ui-input !bg-transparent !border !border-white/20 !text-white !rounded-md !px-6 !py-4 focus:!border-primary hover:!border-primary/80 transition-colors w-full text-lg h-14",
                 },
               }}
               view="sign_in"

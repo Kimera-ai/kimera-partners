@@ -7,8 +7,8 @@ interface AuthContainerProps {
 
 export const AuthContainer = ({ children }: AuthContainerProps) => (
   <div className="min-h-screen flex items-center justify-center p-4">
-    <Card className="w-full max-w-[1200px] relative z-50 bg-background/80 backdrop-blur-xl border-white/10 p-8 sm:p-10">
-      <div className="w-full mx-auto">
+    <Card className="w-full max-w-[1400px] relative z-50 bg-background/80 backdrop-blur-xl border-white/10 p-12 sm:p-16">
+      <div className="w-full max-w-6xl mx-auto">
         {children}
       </div>
     </Card>
