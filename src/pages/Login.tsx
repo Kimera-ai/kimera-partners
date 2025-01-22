@@ -11,27 +11,32 @@ const Login = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    console.log("Checking session...")
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("Session check result:", session)
+    // Initial session check
+    const checkSession = async () => {
+      console.log("Initial session check...")
+      const { data: { session } } = await supabase.auth.getSession()
+      console.log("Initial session result:", session)
       if (session) {
-        console.log("Session found, navigating to dashboard")
-        navigate("/dashboard")
+        console.log("Valid session found, redirecting to dashboard")
+        navigate("/dashboard", { replace: true })
       }
-    })
+    }
+    
+    checkSession()
 
+    // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log("Auth state changed:", _event, session)
-      if (session) {
-        console.log("New session detected, navigating to dashboard")
-        navigate("/dashboard")
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth state changed:", event, session)
+      if (session && event === "SIGNED_IN") {
+        console.log("User signed in, redirecting to dashboard")
+        navigate("/dashboard", { replace: true })
       }
     })
 
     return () => {
-      console.log("Cleaning up subscription")
+      console.log("Cleaning up auth subscription")
       subscription.unsubscribe()
     }
   }, [navigate])
