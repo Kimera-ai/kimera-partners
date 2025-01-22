@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 interface PricingRequestFormProps {
   isOpen: boolean;
@@ -37,6 +38,7 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
   });
   
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     const getSession = async () => {
@@ -57,9 +59,34 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setLoading(false);
-    onClose();
+
+    try {
+      const { error } = await supabase.functions.invoke('send-pricing-request', {
+        body: {
+          ...formData,
+          selectedFeatures,
+          totalPrice
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Request Submitted Successfully",
+        description: "We'll be in touch with you shortly!",
+      });
+      
+      onClose();
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      toast({
+        title: "Error Submitting Request",
+        description: "Please try again later or contact support.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const formatPrice = (price: number) => {
