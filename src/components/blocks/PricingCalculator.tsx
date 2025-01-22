@@ -141,13 +141,13 @@ export function PricingCalculator() {
         ))}
 
         <div className="flex flex-col sm:flex-row justify-between gap-4 mt-4">
-          <div>
+          <div className="text-center sm:text-left">
             <Label>Custom Workflow</Label>
             <div className="text-sm text-muted-foreground">
               ${CUSTOM_WORKFLOW_PRICE} per workflow
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-center sm:justify-start gap-2">
             <button
               onClick={() => setCustomWorkflowQuantity(Math.max(0, customWorkflowQuantity - 1))}
               className="w-8 h-8 flex items-center justify-center rounded-md border"
