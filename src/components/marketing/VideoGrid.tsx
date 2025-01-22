@@ -19,10 +19,14 @@ export const VideoGrid = () => {
 
       const formattedVideos: Video[] = await Promise.all(
         (data || []).map(async (video) => {
-          // Get the video URL
-          const { data: { publicUrl: videoUrl } } = supabase.storage
-            .from('videos')
-            .getPublicUrl(video.video_path);
+          // Get the video URL - check if it's an external URL or from Supabase storage
+          let videoUrl = video.video_path;
+          if (!videoUrl.startsWith('http')) {
+            const { data: { publicUrl } } = supabase.storage
+              .from('videos')
+              .getPublicUrl(video.video_path);
+            videoUrl = publicUrl;
+          }
 
           // Get the thumbnail URL if it exists, otherwise use a placeholder
           let thumbnailUrl;
