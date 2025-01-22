@@ -56,7 +56,6 @@ const Login = () => {
               input: "w-full",
             },
           }}
-          providers={["google"]}
           view="sign_in"
         />
       </AuthContainer>
