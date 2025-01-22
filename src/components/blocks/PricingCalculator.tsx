@@ -122,14 +122,14 @@ export function PricingCalculator() {
         <h4 className="font-medium pt-4">Base Features</h4>
         {Object.entries(baseFeatures).map(([key, { label, price }]) => (
           <div key={key} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div className="flex items-center justify-center sm:justify-start gap-2">
+            <div className="flex flex-col sm:flex-row items-center sm:items-center justify-center sm:justify-start gap-2">
+              <Label className="mb-2 sm:mb-0">{label}</Label>
               <Switch
                 checked={selectedBase === key}
                 onCheckedChange={() =>
                   setSelectedBase(selectedBase === key ? null : (key as keyof typeof baseFeatures))
                 }
               />
-              <Label>{label}</Label>
             </div>
             <span className="text-sm font-medium text-center sm:text-left">
               <NumberFlow
