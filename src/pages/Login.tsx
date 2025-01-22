@@ -11,25 +11,16 @@ const Login = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    // Only check session once on mount
-    const checkSession = async () => {
-      const { data: { session }, error } = await supabase.auth.getSession()
-      if (error) {
-        console.error("Session check error:", error)
-        return
-      }
+    // Check if user is already logged in
+    supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         navigate("/dashboard", { replace: true })
       }
-    }
-    
-    checkSession()
+    })
 
-    // Only listen for sign in events
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN" && session?.user) {
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN") {
         navigate("/dashboard", { replace: true })
       }
     })
@@ -56,7 +47,7 @@ const Login = () => {
             },
           }}
           providers={["google"]}
-          redirectTo={window.location.origin + "/auth/callback"}
+          redirectTo={`${window.location.origin}/auth/callback`}
         />
       </AuthContainer>
     </div>
