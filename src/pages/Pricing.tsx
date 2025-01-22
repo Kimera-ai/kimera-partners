@@ -35,8 +35,8 @@ const Pricing = () => {
     },
     {
       tier: "Custom Pipelines",
-      price: "$150",
-      bestFor: "For unique AI experiences and custom workflows",
+      price: "+$150",
+      bestFor: "Add custom AI workflows to any event package",
       CTA: "Calculate My Pricing",
       benefits: [
         { text: "Custom AI pipeline", checked: true },
