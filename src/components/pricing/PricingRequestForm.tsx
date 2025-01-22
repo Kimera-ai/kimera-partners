@@ -62,7 +62,19 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
     onClose();
   };
 
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(price);
+  };
+
   if (!isOpen) return null;
+
+  // Calculate expected usage
+  const expectedUsage = Math.round(selectedFeatures.guestCount * 0.7);
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -134,47 +146,79 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
             />
           </div>
 
-          <div className="bg-white/5 border border-white/10 p-6 rounded-xl space-y-3">
-            <h3 className="text-lg font-semibold text-white">Selected Package Details</h3>
-            <div className="space-y-2 text-sm">
-              <p className="flex justify-between">
-                <span className="text-gray-400">Base Package:</span>
-                <span className="text-white">{selectedFeatures.basePackage || 'None selected'}</span>
-              </p>
-              <p className="flex justify-between">
-                <span className="text-gray-400">Guest Count:</span>
-                <span className="text-white">{selectedFeatures.guestCount}</span>
-              </p>
-              <p className="flex justify-between">
-                <span className="text-gray-400">Custom Pipelines:</span>
-                <span className="text-white">{selectedFeatures.customPipelines}</span>
-              </p>
-              <div className="pt-3 mt-3 border-t border-white/10">
-                <p className="flex justify-between items-center">
-                  <span className="text-gray-400">Total Price:</span>
-                  <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                    ${totalPrice.toFixed(2)}
-                  </span>
-                </p>
+          <div className="bg-white/5 border border-white/10 p-6 rounded-xl space-y-4">
+            <h3 className="text-lg font-semibold text-white">Package Details</h3>
+            
+            {/* Base Package */}
+            <div className="space-y-3">
+              <div className="flex justify-between items-center pb-2 border-b border-white/10">
+                <span className="text-gray-400">Base Package</span>
+                <span className="text-white font-medium">{selectedFeatures.basePackage || 'None selected'}</span>
               </div>
+
+              {/* Guest Information */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Total Guests</span>
+                  <span className="text-white">{selectedFeatures.guestCount}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Expected Usage (70%)</span>
+                  <span className="text-white">{expectedUsage} uses</span>
+                </div>
+              </div>
+
+              {/* Selected Features */}
+              {selectedFeatures.imageFeatures.length > 0 && (
+                <div className="pt-2">
+                  <h4 className="text-sm font-medium text-gray-300 mb-2">Image Features</h4>
+                  <ul className="space-y-1">
+                    {selectedFeatures.imageFeatures.map((feature, index) => (
+                      <li key={index} className="text-sm flex justify-between">
+                        <span className="text-gray-400">{feature}</span>
+                        <span className="text-white">✓</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {selectedFeatures.videoFeatures.length > 0 && (
+                <div className="pt-2">
+                  <h4 className="text-sm font-medium text-gray-300 mb-2">Video Features</h4>
+                  <ul className="space-y-1">
+                    {selectedFeatures.videoFeatures.map((feature, index) => (
+                      <li key={index} className="text-sm flex justify-between">
+                        <span className="text-gray-400">{feature}</span>
+                        <span className="text-white">✓</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {selectedFeatures.customPipelines > 0 && (
+                <div className="pt-2">
+                  <h4 className="text-sm font-medium text-gray-300 mb-2">Custom Pipelines</h4>
+                  <div className="text-sm flex justify-between">
+                    <span className="text-gray-400">Number of Custom Pipelines</span>
+                    <span className="text-white">{selectedFeatures.customPipelines}</span>
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
-          
-          <div>
-            <label className="block text-white mb-2 font-medium">
-              Additional Notes
-            </label>
-            <div className="relative">
-              <MessageSquare className="absolute top-3 left-3 w-5 h-5 text-gray-400" />
-              <textarea
-                name="additionalNotes"
-                value={formData.additionalNotes}
-                onChange={(e) => setFormData({...formData, additionalNotes: e.target.value})}
-                className="w-full bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 py-2 
-                  text-white placeholder:text-gray-500 focus:ring-2 focus:ring-[#FF2B6E] focus:border-transparent
-                  transition-all h-32 resize-none"
-                placeholder="Any specific requirements or questions..."
-              />
+
+            {/* Total Price */}
+            <div className="pt-4 mt-4 border-t border-white/10">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-400">Total Investment</span>
+                <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  {formatPrice(totalPrice)}
+                </span>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                *Final pricing may vary based on specific requirements and customizations
+              </p>
             </div>
           </div>
           
