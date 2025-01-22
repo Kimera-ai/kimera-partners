@@ -245,8 +245,8 @@ export function PricingCalculator() {
           onClick={() => setIsFormOpen(true)}
           disabled={!selectedBase}
         >
-          <div className="w-full flex items-center justify-center px-2">
-            <span className="truncate">
+          <div className="w-full flex items-center justify-center px-4 text-center">
+            <span className="truncate text-center">
               {!selectedBase ? "Please select a base feature" : "Submit Request"}
             </span>
           </div>
