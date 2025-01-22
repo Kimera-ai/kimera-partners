@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Send,
   X,
   Loader
 } from 'lucide-react';
+import { supabase } from "@/integrations/supabase/client";
 
 interface PricingRequestFormProps {
   isOpen: boolean;
@@ -29,6 +30,22 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
   });
   
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.email) {
+        setFormData(prev => ({
+          ...prev,
+          email: session.user.email
+        }));
+      }
+    };
+
+    if (isOpen) {
+      getSession();
+    }
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,6 +96,7 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
               value={formData.email}
               onChange={(e) => setFormData({...formData, email: e.target.value})}
               required
+              disabled
             />
             
             <FormField
@@ -164,9 +182,10 @@ interface FormFieldProps {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   required?: boolean;
+  disabled?: boolean;
 }
 
-const FormField = ({ label, name, type = 'text', value, onChange, required }: FormFieldProps) => (
+const FormField = ({ label, name, type = 'text', value, onChange, required, disabled }: FormFieldProps) => (
   <div>
     <label htmlFor={name} className="block text-foreground mb-2">
       {label}
@@ -178,9 +197,10 @@ const FormField = ({ label, name, type = 'text', value, onChange, required }: Fo
       value={value}
       onChange={onChange}
       required={required}
+      disabled={disabled}
       className="w-full bg-background border border-input rounded-lg px-4 py-2 
         placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:border-transparent
-        transition-all"
+        transition-all disabled:opacity-50 disabled:cursor-not-allowed"
     />
   </div>
 );
