@@ -60,13 +60,13 @@ const Login = () => {
     <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
       <AuthBackground />
       <AuthContainer>
-        <div className="flex flex-col items-center space-y-8 w-full">
+        <div className="flex flex-col items-center space-y-12 w-full">
           <img 
             src="https://gerodpwicbuukllgkmzg.supabase.co/storage/v1/object/public/stuff/Partners%20logo.png?t=2025-01-15T17%3A24%3A57.611Z"
             alt="Partners Logo"
-            className="w-36 sm:w-44 md:w-52 h-auto animate-fade-in"
+            className="w-52 sm:w-64 md:w-72 h-auto animate-fade-in"
           />
-          <div className="w-full min-h-[339px]">
+          <div className="w-full max-w-3xl mx-auto">
             <Auth
               supabaseClient={supabase}
               appearance={{
@@ -86,12 +86,12 @@ const Login = () => {
                 },
                 className: {
                   container: "supabase-auth-ui_ui-container w-full",
-                  label: "!text-white !text-left block mb-2 text-sm sm:text-base",
-                  button: "!bg-primary hover:!bg-primary-hover !text-white w-full h-10 sm:h-12 text-sm sm:text-base",
-                  anchor: "!text-white text-sm sm:text-base",
+                  label: "!text-white !text-left block mb-2 text-base",
+                  button: "!bg-primary hover:!bg-primary-hover !text-white w-full h-12 text-base",
+                  anchor: "!text-white text-base",
                   divider: "!bg-white/20",
-                  message: "!text-red-500 !bg-black/50 !p-2 sm:!p-3 !rounded-md !mb-4 text-sm sm:text-base",
-                  input: "supabase-auth-ui_ui-input !bg-transparent !border !border-white/20 !text-white !rounded-md !px-3 sm:!px-4 !py-2 sm:!py-3 focus:!border-primary hover:!border-primary/80 transition-colors w-full text-sm sm:text-base h-10 sm:h-12",
+                  message: "!text-red-500 !bg-black/50 !p-3 !rounded-md !mb-4 text-base",
+                  input: "supabase-auth-ui_ui-input !bg-transparent !border !border-white/20 !text-white !rounded-md !px-4 !py-3 focus:!border-primary hover:!border-primary/80 transition-colors w-full text-base h-12",
                 },
               }}
               view="sign_in"
