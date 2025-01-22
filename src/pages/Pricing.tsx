@@ -8,7 +8,7 @@ const Pricing = () => {
       tier: "Basic Event",
       price: "$79",
       bestFor: "Perfect for small events and gatherings",
-      CTA: "Get Started",
+      CTA: "Calculate My Pricing",
       benefits: [
         { text: "Basic event setup", checked: true },
         { text: "Standard support", checked: true },
@@ -22,7 +22,7 @@ const Pricing = () => {
       tier: "Branded Event",
       price: "$130",
       bestFor: "Ideal for corporate events and brand activations",
-      CTA: "Get Started",
+      CTA: "Calculate My Pricing",
       benefits: [
         { text: "Everything in Basic", checked: true },
         { text: "Custom branding", checked: true },
@@ -36,7 +36,7 @@ const Pricing = () => {
       tier: "Custom Pipelines",
       price: "$150",
       bestFor: "For unique AI experiences and custom workflows",
-      CTA: "Contact Us",
+      CTA: "Calculate My Pricing",
       benefits: [
         { text: "Custom AI pipeline", checked: true },
         { text: "Dedicated support", checked: true },
