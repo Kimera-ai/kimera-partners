@@ -51,7 +51,7 @@ const Pricing = () => {
 
   return (
     <BaseLayout>
-      <div className="relative min-h-screen bg-[#100919] pb-20">
+      <div className="relative min-h-screen bg-[#100919]">
         {/* Background gradient effect */}
         <div className="absolute inset-0 bg-gradient-to-b from-purple-900/20 to-transparent pointer-events-none" />
         
