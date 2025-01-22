@@ -239,15 +239,17 @@ export function PricingCalculator() {
       
       <div className="mt-6">
         <Button 
-          className="w-full bg-primary hover:bg-primary/90 text-center"
+          className="w-full bg-primary hover:bg-primary/90"
           size="lg"
           variant="default"
           onClick={() => setIsFormOpen(true)}
           disabled={!selectedBase}
         >
-          <span className="w-full text-center">
-            {!selectedBase ? "Please select a base feature" : "Submit Request"}
-          </span>
+          <div className="w-full flex items-center justify-center">
+            <span>
+              {!selectedBase ? "Please select a base feature" : "Submit Request"}
+            </span>
+          </div>
         </Button>
       </div>
 
