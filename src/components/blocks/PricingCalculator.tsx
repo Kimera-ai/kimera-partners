@@ -122,7 +122,7 @@ export function PricingCalculator() {
         <h4 className="font-medium pt-4">Base Features</h4>
         {Object.entries(baseFeatures).map(([key, { label, price }]) => (
           <div key={key} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center sm:justify-start gap-2">
               <Switch
                 checked={selectedBase === key}
                 onCheckedChange={() =>
@@ -131,7 +131,7 @@ export function PricingCalculator() {
               />
               <Label>{label}</Label>
             </div>
-            <span className="text-sm font-medium ml-8 sm:ml-0">
+            <span className="text-sm font-medium text-center sm:text-left">
               <NumberFlow
                 format={{ style: "currency", currency: "USD" }}
                 value={price}
