@@ -96,7 +96,7 @@ const Login = () => {
               }}
               view="sign_in"
               providers={[]}
-              showLinks={false}
+              showLinks={true}
             />
             <div className="mt-6 text-center">
               <p className="text-white text-lg">
