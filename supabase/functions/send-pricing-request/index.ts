@@ -89,7 +89,7 @@ const handler = async (req: Request): Promise<Response> => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Kimera Partners <partners@kimera.ai>",
+        from: "Kimera <onboarding@resend.dev>",
         to: ["daniel@kimera.ai"],
         subject: `New Pricing Request from ${pricingRequest.companyName}`,
         html: emailHtml,
