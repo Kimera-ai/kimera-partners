@@ -1,0 +1,40 @@
+name: 🚀 Kimera Partners
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-artifacts:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [ 18.x ]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build dist artifacts
+        id: build-dist-artifacts
+        run: |
+          npm i
+          npm run build
+          npm run pack
+
+      - name: Push to Netlify
+        run: |
+          curl -H "Content-Type: application/zip" \
+              -H "Authorization: Bearer ${{ secrets.NETLIFY_AUTH_TOKEN }}" \
+              --data-binary "@dist.zip" \
+              https://api.netlify.com/api/v1/sites/${{ secrets.NETLIFY_WEBSITE_SITE_ID }}/deploys
+
+
+#      - name: Report Status
+#        if: always()
+#        uses: ravsamhq/notify-slack-action@v1
+#        with:
+#          status: ${{ job.status }}
+#          notification_title: '{workflow} has {status_message}'
+#          message_format: '{emoji} *{workflow}* {status_message}! Last commit: "${{ github.event.head_commit.message }}" by ${{ github.event.head_commit.author.name }}'
+#        env:
+#          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
