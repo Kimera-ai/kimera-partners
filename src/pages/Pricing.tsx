@@ -50,25 +50,33 @@ const Pricing = () => {
 
   return (
     <BaseLayout>
-      <div className="py-12">
-        <h1 className="text-4xl font-bold text-center mb-8">Pricing Plans</h1>
-        <p className="text-lg text-center text-gray-400 mb-12 max-w-2xl mx-auto">
-          Choose the perfect plan for your business. All plans include access to our core features.
-        </p>
-        
-        {/* Pricing Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto px-4 mb-24">
-          {pricingCards.map((card, index) => (
-            <PricingCard
-              key={card.tier}
-              {...card}
-              className={index === 1 ? "md:scale-105" : ""}
-            />
-          ))}
-        </div>
+      <div className="min-h-screen bg-gradient-to-b from-background to-background/80 pb-20">
+        <div className="container px-4 py-16 md:py-24">
+          <div className="text-center space-y-4 mb-16">
+            <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/80">
+              Simple, Transparent Pricing
+            </h1>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Choose the perfect plan for your event. All plans include access to our core AI features.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto mb-24">
+            {pricingCards.map((card, index) => (
+              <PricingCard
+                key={card.tier}
+                {...card}
+                className={index === 1 ? "md:scale-105 md:-mt-4" : ""}
+              />
+            ))}
+          </div>
 
-        <div className="max-w-3xl mx-auto w-full">
-          <PricingCalculator />
+          <div className="max-w-3xl mx-auto w-full backdrop-blur-sm bg-background/50 rounded-xl p-6">
+            <h2 className="text-2xl font-bold text-center mb-8">
+              Customize Your Package
+            </h2>
+            <PricingCalculator />
+          </div>
         </div>
       </div>
     </BaseLayout>
