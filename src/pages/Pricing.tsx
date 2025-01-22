@@ -1,4 +1,3 @@
-import { PricingTableDemo } from "@/components/blocks/PricingTableDemo";
 import { PricingCalculator } from "@/components/blocks/PricingCalculator";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { PricingCard } from "@/components/ui/dark-gradient-pricing";
@@ -68,11 +67,8 @@ const Pricing = () => {
           ))}
         </div>
 
-        <div className="grid gap-12">
-          <PricingTableDemo />
-          <div className="max-w-3xl mx-auto w-full">
-            <PricingCalculator />
-          </div>
+        <div className="max-w-3xl mx-auto w-full">
+          <PricingCalculator />
         </div>
       </div>
     </BaseLayout>
