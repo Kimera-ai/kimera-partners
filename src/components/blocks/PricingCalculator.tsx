@@ -70,17 +70,16 @@ export function PricingCalculator() {
     
     const imageCreditTotal =
       imageQuantities.reduce((acc, feature) => {
-        const totalRuns = feature.quantity > 0 ? expectedUsage : 0;
-        return acc + (feature.credits * totalRuns);
+        // Multiply credits by quantity AND expected usage
+        return acc + (feature.credits * feature.quantity * expectedUsage);
       }, 0) * CREDIT_COST;
 
     const videoCreditTotal =
       videoQuantities.reduce((acc, feature) => {
-        const totalRuns = feature.quantity > 0 ? expectedUsage : 0;
-        return acc + (feature.credits * totalRuns);
+        // Multiply credits by quantity AND expected usage
+        return acc + (feature.credits * feature.quantity * expectedUsage);
       }, 0) * CREDIT_COST;
 
-    // Calculate custom pipeline total based on quantity and expected usage
     const customPipelineTotal = customPipelineQuantity * CUSTOM_PIPELINE_PRICE;
     
     return basePrice + imageCreditTotal + videoCreditTotal + customPipelineTotal;
