@@ -34,13 +34,13 @@ const videoFeatures: Feature[] = [
   { name: "Basic transition video", credits: 4, quantity: 0 },
 ];
 
-const CUSTOM_PIPELINE_PRICE = 150;
+const CUSTOM_WORKFLOW_PRICE = 150;
 
 export function PricingCalculator() {
   const [selectedBase, setSelectedBase] = useState<keyof typeof baseFeatures | null>(null);
   const [imageQuantities, setImageQuantities] = useState(imageFeatures);
   const [videoQuantities, setVideoQuantities] = useState(videoFeatures);
-  const [customPipelineQuantity, setCustomPipelineQuantity] = useState(0);
+  const [customWorkflowQuantity, setCustomWorkflowQuantity] = useState(0);
   const [guestCount, setGuestCount] = useState(100);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
@@ -78,7 +78,7 @@ export function PricingCalculator() {
         return acc + (feature.credits * feature.quantity * expectedUsage);
       }, 0) * CREDIT_COST;
 
-    const customPipelineTotal = customPipelineQuantity * CUSTOM_PIPELINE_PRICE;
+    const customPipelineTotal = customWorkflowQuantity * CUSTOM_PIPELINE_PRICE;
     
     return basePrice + imageCreditTotal + videoCreditTotal + customPipelineTotal;
   };
@@ -93,7 +93,7 @@ export function PricingCalculator() {
       videoFeatures: videoQuantities
         .filter(f => f.quantity > 0)
         .map(f => f.name),
-      customPipelines: customPipelineQuantity
+      customPipelines: customWorkflowQuantity
     };
   };
 
@@ -142,21 +142,21 @@ export function PricingCalculator() {
 
         <div className="flex items-center justify-between mt-4">
           <div>
-            <Label>Custom Pipeline</Label>
+            <Label>Custom Workflow</Label>
             <div className="text-sm text-muted-foreground">
-              ${CUSTOM_PIPELINE_PRICE} per pipeline
+              ${CUSTOM_WORKFLOW_PRICE} per workflow
             </div>
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setCustomPipelineQuantity(Math.max(0, customPipelineQuantity - 1))}
+              onClick={() => setCustomWorkflowQuantity(Math.max(0, customWorkflowQuantity - 1))}
               className="w-8 h-8 flex items-center justify-center rounded-md border"
             >
               -
             </button>
-            <span className="w-8 text-center">{customPipelineQuantity}</span>
+            <span className="w-8 text-center">{customWorkflowQuantity}</span>
             <button
-              onClick={() => setCustomPipelineQuantity(customPipelineQuantity + 1)}
+              onClick={() => setCustomWorkflowQuantity(customWorkflowQuantity + 1)}
               className="w-8 h-8 flex items-center justify-center rounded-md border"
             >
               +

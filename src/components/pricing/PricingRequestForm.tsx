@@ -24,7 +24,7 @@ interface PricingRequestFormProps {
     guestCount: number;
     imageFeatures: string[];
     videoFeatures: string[];
-    customPipelines: number;
+    customWorkflows: number;
   };
 }
 
@@ -227,10 +227,10 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
 
               {selectedFeatures.customPipelines > 0 && (
                 <div className="pt-2">
-                  <h4 className="text-sm font-medium text-gray-300 mb-2">Custom Pipelines</h4>
+                  <h4 className="text-sm font-medium text-gray-300 mb-2">Custom Workflows</h4>
                   <div className="text-sm flex justify-between">
-                    <span className="text-gray-400">Number of Custom Pipelines</span>
-                    <span className="text-white">{selectedFeatures.customPipelines}</span>
+                    <span className="text-gray-400">Number of Custom Workflows</span>
+                    <span className="text-white">{selectedFeatures.customWorkflows}</span>
                   </div>
                 </div>
               )}
