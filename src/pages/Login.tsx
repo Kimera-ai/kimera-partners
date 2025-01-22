@@ -68,7 +68,7 @@ const Login = () => {
             alt="Partners Logo"
             className="w-36 sm:w-48 md:w-64 h-auto animate-fade-in"
           />
-          <div className="w-full max-w-[600px] min-h-[339px]">
+          <div className="w-full min-h-[339px]">
             <Auth
               supabaseClient={supabase}
               appearance={{
