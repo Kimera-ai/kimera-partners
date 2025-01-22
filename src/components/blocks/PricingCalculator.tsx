@@ -245,7 +245,9 @@ export function PricingCalculator() {
           onClick={() => setIsFormOpen(true)}
           disabled={!selectedBase}
         >
-          {!selectedBase ? "Please select a base feature" : "Submit Request"}
+          <span className="w-full text-center">
+            {!selectedBase ? "Please select a base feature" : "Submit Request"}
+          </span>
         </Button>
       </div>
 
