@@ -10,4 +10,3 @@ port = 54322
 
 [studio]
 enabled = true
-port = 54323

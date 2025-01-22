@@ -90,7 +90,7 @@ const handler = async (req: Request): Promise<Response> => {
       },
       body: JSON.stringify({
         from: "Kimera Partners <partners@kimera.ai>",
-        to: ["partners@kimera.ai"],
+        to: ["daniel@kimera.ai"],
         subject: `New Pricing Request from ${pricingRequest.companyName}`,
         html: emailHtml,
         reply_to: pricingRequest.email
