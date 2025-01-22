@@ -114,7 +114,7 @@ export function PricingCalculator() {
               className="w-32"
             />
             <span className="text-sm text-muted-foreground">
-              ({calculateExpectedUsage(guestCount)} expected uses)
+              ({calculateExpectedUsage(guestCount)} expected runs)
             </span>
           </div>
         </div>
