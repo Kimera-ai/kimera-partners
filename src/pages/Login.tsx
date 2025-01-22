@@ -12,25 +12,46 @@ const Login = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check current session on mount
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        navigate("/partner-program");
-        toast({
-          title: "Welcome back!",
-          description: "You have successfully signed in.",
-        });
-      }
-    });
+    const handleSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error("Session error:", error);
+          // Clear any invalid session data
+          await supabase.auth.signOut();
+          return;
+        }
 
-    // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        if (session) {
+          navigate("/partner-program");
+          toast({
+            title: "Welcome back!",
+            description: "You have successfully signed in.",
+          });
+        }
+      } catch (error) {
+        console.error("Auth error:", error);
+        // Clear any invalid session data
+        await supabase.auth.signOut();
+      }
+    };
+
+    handleSession();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
         navigate("/partner-program");
         toast({
           title: "Welcome back!",
           description: "You have successfully signed in.",
         });
+      } else if (event === 'TOKEN_REFRESHED') {
+        console.log('Token was refreshed successfully');
+      } else if (event === 'SIGNED_OUT') {
+        console.log('User signed out');
       }
     });
 
