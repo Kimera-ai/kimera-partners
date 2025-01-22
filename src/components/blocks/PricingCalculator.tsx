@@ -11,8 +11,8 @@ interface Feature {
   quantity: number;
 }
 
-const CREDIT_PACKAGE_SIZE = 100;
-const CREDIT_COST = 1; // $1 per 100 credits
+const CREDIT_PACKAGE_SIZE = 1;
+const CREDIT_COST = 0.01; // $0.01 per credit
 
 const baseFeatures = {
   baseEvent: { price: 79, label: "Base Event" },
