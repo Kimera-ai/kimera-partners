@@ -243,8 +243,9 @@ export function PricingCalculator() {
           size="lg"
           variant="default"
           onClick={() => setIsFormOpen(true)}
+          disabled={!selectedBase}
         >
-          Submit Request
+          {!selectedBase ? "Please select a base feature" : "Submit Request"}
         </Button>
       </div>
 
