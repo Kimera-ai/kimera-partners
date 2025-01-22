@@ -3,6 +3,7 @@ import MarketingKit from "@/pages/MarketingKit"
 import Login from "@/pages/Login"
 import PartnerProgram from "@/pages/PartnerProgram"
 import Dashboard from "@/pages/Dashboard"
+import Pricing from "@/pages/Pricing"
 import { useSession } from "@/hooks/useSession"
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -45,6 +46,14 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <MarketingKit />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/pricing",
+    element: (
+      <ProtectedRoute>
+        <Pricing />
       </ProtectedRoute>
     ),
   },
