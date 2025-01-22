@@ -16,7 +16,6 @@ const CREDIT_COST = 0.01; // 1 credit = $0.01
 const baseFeatures = {
   baseEvent: { price: 79, label: "Base Event" },
   brandedEvent: { price: 130, label: "Branded Event" },
-  customPipeline: { price: 150, label: "Custom Pipeline" },
 };
 
 const imageFeatures: Feature[] = [
@@ -33,10 +32,13 @@ const videoFeatures: Feature[] = [
   { name: "Basic transition video", credits: 4, quantity: 0 },
 ];
 
+const CUSTOM_PIPELINE_PRICE = 150;
+
 export function PricingCalculator() {
   const [selectedBase, setSelectedBase] = useState<keyof typeof baseFeatures | null>(null);
   const [imageQuantities, setImageQuantities] = useState(imageFeatures);
   const [videoQuantities, setVideoQuantities] = useState(videoFeatures);
+  const [customPipelineQuantity, setCustomPipelineQuantity] = useState(0);
 
   const updateQuantity = (
     features: Feature[],
@@ -61,7 +63,8 @@ export function PricingCalculator() {
     const videoCreditTotal =
       videoQuantities.reduce((acc, feature) => acc + feature.credits * feature.quantity, 0) *
       CREDIT_COST;
-    return basePrice + imageCreditTotal + videoCreditTotal;
+    const customPipelineTotal = customPipelineQuantity * CUSTOM_PIPELINE_PRICE;
+    return basePrice + imageCreditTotal + videoCreditTotal + customPipelineTotal;
   };
 
   return (
@@ -89,6 +92,30 @@ export function PricingCalculator() {
             </span>
           </div>
         ))}
+
+        <div className="flex items-center justify-between mt-4">
+          <div>
+            <Label>Custom Pipeline</Label>
+            <div className="text-sm text-muted-foreground">
+              ${CUSTOM_PIPELINE_PRICE} per pipeline
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCustomPipelineQuantity(Math.max(0, customPipelineQuantity - 1))}
+              className="w-8 h-8 flex items-center justify-center rounded-md border"
+            >
+              -
+            </button>
+            <span className="w-8 text-center">{customPipelineQuantity}</span>
+            <button
+              onClick={() => setCustomPipelineQuantity(customPipelineQuantity + 1)}
+              className="w-8 h-8 flex items-center justify-center rounded-md border"
+            >
+              +
+            </button>
+          </div>
+        </div>
       </div>
 
       <Separator className="my-6" />
