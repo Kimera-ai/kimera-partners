@@ -75,7 +75,7 @@ const Pricing = () => {
             ))}
           </div>
 
-          <div className="max-w-3xl mx-auto w-full">
+          <div className="w-full max-w-5xl mx-auto">
             <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-8">
               <h2 className="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
                 Customize Your Package
