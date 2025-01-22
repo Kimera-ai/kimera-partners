@@ -237,7 +237,7 @@ export function PricingCalculator() {
         />
       </div>
       
-      <div className="mt-6">
+      <div className="mt-6 flex justify-center">
         <Button 
           className="w-full bg-primary hover:bg-primary/90"
           size="lg"
