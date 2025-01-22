@@ -60,11 +60,11 @@ const Login = () => {
     <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
       <AuthBackground />
       <AuthContainer>
-        <div className="flex flex-col items-center space-y-8 w-full">
+        <div className="flex flex-col items-center space-y-6 w-full">
           <img 
             src="https://gerodpwicbuukllgkmzg.supabase.co/storage/v1/object/public/stuff/Partners%20logo.png?t=2025-01-15T17%3A24%3A57.611Z"
             alt="Partners Logo"
-            className="w-36 sm:w-48 md:w-64 h-auto animate-fade-in"
+            className="w-32 sm:w-40 md:w-48 h-auto animate-fade-in"
           />
           <div className="w-full min-h-[339px]">
             <Auth
@@ -85,7 +85,7 @@ const Login = () => {
                   },
                 },
                 className: {
-                  container: "supabase-auth-ui_ui-container w-full max-w-none",
+                  container: "supabase-auth-ui_ui-container w-full",
                   label: "!text-white !text-left block mb-2 text-sm sm:text-base",
                   button: "!bg-primary hover:!bg-primary-hover !text-white w-full h-10 sm:h-12 text-sm sm:text-base",
                   anchor: "!text-white text-sm sm:text-base",
