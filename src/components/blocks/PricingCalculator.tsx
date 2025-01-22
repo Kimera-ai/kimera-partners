@@ -21,17 +21,17 @@ const baseFeatures = {
 };
 
 const imageFeatures: Feature[] = [
-  { name: "Face Swap", credits: 5, quantity: 0 },
-  { name: "Standard HD Image", credits: 7, quantity: 0 },
-  { name: "HQ Image for Print", credits: 21, quantity: 0 },
-  { name: "Background Removal", credits: 2, quantity: 0 },
-  { name: "Clothing Control", credits: 16, quantity: 0 },
+  { name: "Face Swap", credits: 100, quantity: 0 },
+  { name: "Standard HD Image", credits: 100, quantity: 0 },
+  { name: "HQ Image for Print", credits: 200, quantity: 0 },
+  { name: "Background Removal", credits: 100, quantity: 0 },
+  { name: "Clothing Control", credits: 200, quantity: 0 },
 ];
 
 const videoFeatures: Feature[] = [
-  { name: "AI Video Generation (5 seconds)", credits: 36, quantity: 0 },
-  { name: "Video Template Generation (10 seconds)", credits: 36, quantity: 0 },
-  { name: "Basic transition video", credits: 4, quantity: 0 },
+  { name: "AI Video Generation (5 seconds)", credits: 400, quantity: 0 },
+  { name: "Video Template Generation (10 seconds)", credits: 400, quantity: 0 },
+  { name: "Basic transition video", credits: 100, quantity: 0 },
 ];
 
 export function PricingCalculator() {
