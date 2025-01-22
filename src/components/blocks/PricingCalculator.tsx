@@ -239,7 +239,7 @@ export function PricingCalculator() {
       
       <div className="mt-6">
         <Button 
-          className="w-full bg-primary hover:bg-primary/90"
+          className="w-full bg-primary hover:bg-primary/90 text-center"
           size="lg"
           variant="default"
           onClick={() => setIsFormOpen(true)}
