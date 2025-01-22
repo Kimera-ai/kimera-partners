@@ -2,7 +2,7 @@ import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { authStyles } from "@/components/auth/authStyles";
 import { AuthContainer } from "@/components/auth/AuthContainer";
 import { AuthBackground } from "@/components/auth/AuthBackground";
@@ -46,7 +46,7 @@ const Login = () => {
             },
           }}
           providers={["google"]}
-          onAuthStateChange={handleAuthStateChange}
+          onChange={handleAuthStateChange}
         />
       </AuthContainer>
     </div>
