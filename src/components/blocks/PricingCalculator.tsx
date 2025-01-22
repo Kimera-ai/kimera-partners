@@ -225,6 +225,7 @@ export function PricingCalculator() {
         <Button 
           className="w-full bg-primary hover:bg-primary/90"
           size="lg"
+          variant="default"
         >
           Submit Request
         </Button>
