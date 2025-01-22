@@ -1,19 +1,23 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
-import MarketingKit from "@/pages/MarketingKit";
-import Login from "@/pages/Login";
-import PartnerProgram from "@/pages/PartnerProgram";
-import Dashboard from "@/pages/Dashboard";
-import { useSession } from "@/hooks/useSession";
+import { createBrowserRouter, Navigate } from "react-router-dom"
+import MarketingKit from "@/pages/MarketingKit"
+import Login from "@/pages/Login"
+import PartnerProgram from "@/pages/PartnerProgram"
+import Dashboard from "@/pages/Dashboard"
+import { useSession } from "@/hooks/useSession"
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const session = useSession();
+  const { session, loading } = useSession()
   
-  if (!session) {
-    return <Navigate to="/login" replace />;
+  if (loading) {
+    return <div>Loading...</div>
   }
   
-  return <>{children}</>;
-};
+  if (!session) {
+    return <Navigate to="/login" replace />
+  }
+  
+  return <>{children}</>
+}
 
 export const router = createBrowserRouter([
   {
@@ -52,4 +56,4 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
-]);
+])

@@ -6,19 +6,36 @@ import { AuthBackground } from "@/components/auth/AuthBackground"
 import { AuthContainer } from "@/components/auth/AuthContainer"
 import { authStyles } from "@/components/auth/authStyles"
 import { useEffect } from "react"
+import { useToast } from "@/components/ui/use-toast"
 
 const Login = () => {
   const navigate = useNavigate()
+  const { toast } = useToast()
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_IN") {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" && session?.user) {
         navigate("/dashboard", { replace: true })
+      } else if (event === "SIGNED_OUT") {
+        navigate("/login", { replace: true })
+      } else if (event === "USER_DELETED") {
+        toast({
+          variant: "destructive",
+          title: "Account deleted",
+          description: "Your account has been deleted."
+        })
+      } else if (event === "USER_UPDATED") {
+        toast({
+          title: "Account updated",
+          description: "Your account has been updated."
+        })
       }
     })
 
-    return () => subscription.unsubscribe()
-  }, [navigate])
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [navigate, toast])
 
   return (
     <div className="relative">
@@ -40,6 +57,13 @@ const Login = () => {
           }}
           providers={["google"]}
           redirectTo={`${window.location.origin}/auth/callback`}
+          onError={(error) => {
+            toast({
+              variant: "destructive",
+              title: "Authentication error",
+              description: error.message
+            })
+          }}
         />
       </AuthContainer>
     </div>
