@@ -64,7 +64,7 @@ export const PricingCard = ({
           "hover:border-white/10 hover:from-white/[0.05] hover:to-white/[0.02]",
           "before:absolute before:inset-0 before:-translate-y-full before:animate-[shimmer_2s_infinite] before:bg-gradient-to-t before:from-transparent before:via-white/10 before:to-transparent",
           "after:absolute after:inset-0 after:translate-y-full after:animate-[shimmer_2s_infinite] before:bg-gradient-to-b after:from-transparent after:via-white/10 after:to-transparent",
-          "p-8",
+          "p-8 flex flex-col",
           className
         )}
       >
@@ -79,7 +79,7 @@ export const PricingCard = ({
             {bestFor}
           </span>
         </div>
-        <div className="space-y-4 py-8">
+        <div className="space-y-4 py-8 flex-grow">
           {benefits.map((benefit, index) => (
             <Benefit key={index} {...benefit} />
           ))}
@@ -89,7 +89,7 @@ export const PricingCard = ({
           className={cn(
             "w-full transition-all duration-300",
             "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600",
-            "text-white font-medium"
+            "text-white font-medium mt-auto"
           )}
           variant="default"
         >
