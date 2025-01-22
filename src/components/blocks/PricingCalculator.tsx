@@ -21,10 +21,8 @@ const baseFeatures = {
 };
 
 const imageFeatures: Feature[] = [
-  { name: "Face Swap", credits: 5, quantity: 0 },
-  { name: "Standard HD Image", credits: 7, quantity: 0 },
-  { name: "HQ Image for Print", credits: 21, quantity: 0 },
-  { name: "Background Removal", credits: 2, quantity: 0 },
+  { name: "Standard HD Image ($0.07/image)", credits: 7, quantity: 0 },
+  { name: "HQ Image for Print ($0.21/image)", credits: 21, quantity: 0 },
   { name: "Clothing Control", credits: 16, quantity: 0 },
 ];
 
