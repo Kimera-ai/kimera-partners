@@ -47,7 +47,7 @@ const Login = () => {
             },
           }}
           providers={["google"]}
-          onSuccess={handleSession}
+          view="sign_in"
         />
       </AuthContainer>
     </div>
