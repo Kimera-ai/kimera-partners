@@ -65,18 +65,15 @@ export function PricingCalculator() {
   const calculateTotal = () => {
     const basePrice = selectedBase ? baseFeatures[selectedBase].price : 0;
     
-    // Calculate expected usage per feature based on guest count
     const expectedUsage = calculateExpectedUsage(guestCount);
     
     const imageCreditTotal =
       imageQuantities.reduce((acc, feature) => {
-        // Multiply credits by quantity AND expected usage
         return acc + (feature.credits * feature.quantity * expectedUsage);
       }, 0) * CREDIT_COST;
 
     const videoCreditTotal =
       videoQuantities.reduce((acc, feature) => {
-        // Multiply credits by quantity AND expected usage
         return acc + (feature.credits * feature.quantity * expectedUsage);
       }, 0) * CREDIT_COST;
 
@@ -162,7 +159,7 @@ export function PricingCalculator() {
             <div>
               <Label>{feature.name}</Label>
               <div className="text-sm text-muted-foreground">
-                {feature.credits} credits × ~{calculateExpectedUsage(guestCount)} uses
+                {feature.credits} credits × {feature.quantity > 0 ? feature.quantity * calculateExpectedUsage(guestCount) : 0} uses
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -193,7 +190,7 @@ export function PricingCalculator() {
             <div>
               <Label>{feature.name}</Label>
               <div className="text-sm text-muted-foreground">
-                {feature.credits} credits × ~{calculateExpectedUsage(guestCount)} uses
+                {feature.credits} credits × {feature.quantity > 0 ? feature.quantity * calculateExpectedUsage(guestCount) : 0} uses
               </div>
             </div>
             <div className="flex items-center gap-2">
