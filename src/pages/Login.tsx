@@ -47,37 +47,39 @@ const Login = () => {
             alt="Partners Logo"
             className="w-48 md:w-64 h-auto animate-fade-in"
           />
-          <Auth
-            supabaseClient={supabase}
-            appearance={{
-              theme: ThemeSupa,
-              variables: {
-                default: {
-                  colors: {
-                    brand: "#FF2B6E",
-                    brandAccent: "#FF068B",
-                    inputText: "white",
-                    inputBackground: "transparent",
-                    inputBorder: "white",
-                    inputBorderHover: "#FF2B6E",
-                    inputBorderFocus: "#FF068B",
+          <div className="min-w-[400px] min-h-[339px]">
+            <Auth
+              supabaseClient={supabase}
+              appearance={{
+                theme: ThemeSupa,
+                variables: {
+                  default: {
+                    colors: {
+                      brand: "#FF2B6E",
+                      brandAccent: "#FF068B",
+                      inputText: "white",
+                      inputBackground: "transparent",
+                      inputBorder: "white",
+                      inputBorderHover: "#FF2B6E",
+                      inputBorderFocus: "#FF068B",
+                    },
                   },
                 },
-              },
-              className: {
-                container: "w-full",
-                label: "!text-white !text-left block mb-2 text-base",
-                button: "!bg-primary hover:!bg-primary-hover !text-white w-full h-12 text-base",
-                anchor: "!text-white",
-                divider: "!bg-white/20",
-                message: "!text-red-500 !bg-black/50 !p-3 !rounded-md !mb-4",
-                input: "supabase-auth-ui_ui-input !bg-transparent !border !border-white/20 !text-white !rounded-md !px-4 !py-3 focus:!border-primary hover:!border-primary/80 transition-colors w-full text-base h-12",
-              },
-            }}
-            view="sign_in"
-            providers={[]}
-            showLinks={true}
-          />
+                className: {
+                  container: "supabase-auth-ui_ui-container w-full c-jTXIoq c-jTXIoq-bsgKCL-direction-vertical c-jTXIoq-bXHFxK-gap-large",
+                  label: "!text-white !text-left block mb-2 text-base",
+                  button: "!bg-primary hover:!bg-primary-hover !text-white w-full h-12 text-base",
+                  anchor: "!text-white",
+                  divider: "!bg-white/20",
+                  message: "!text-red-500 !bg-black/50 !p-3 !rounded-md !mb-4",
+                  input: "supabase-auth-ui_ui-input !bg-transparent !border !border-white/20 !text-white !rounded-md !px-4 !py-3 focus:!border-primary hover:!border-primary/80 transition-colors w-full text-base h-12",
+                },
+              }}
+              view="sign_in"
+              providers={[]}
+              showLinks={true}
+            />
+          </div>
         </div>
       </AuthContainer>
     </div>
