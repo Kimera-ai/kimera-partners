@@ -57,6 +57,7 @@ const Login = () => {
             },
           }}
           view="sign_in"
+          providers={[]}
           showLinks={false}
         />
       </AuthContainer>
