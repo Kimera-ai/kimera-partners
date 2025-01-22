@@ -43,6 +43,13 @@ export const PricingCard = ({
   benefits,
   className,
 }: PricingCardProps) => {
+  const scrollToCalculator = () => {
+    const calculator = document.querySelector('#pricing-calculator')
+    if (calculator) {
+      calculator.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -56,7 +63,7 @@ export const PricingCard = ({
           "border-white/5 bg-gradient-to-br from-white/[0.03] to-white/[0.01]",
           "hover:border-white/10 hover:from-white/[0.05] hover:to-white/[0.02]",
           "before:absolute before:inset-0 before:-translate-y-full before:animate-[shimmer_2s_infinite] before:bg-gradient-to-t before:from-transparent before:via-white/10 before:to-transparent",
-          "after:absolute after:inset-0 after:translate-y-full after:animate-[shimmer_2s_infinite] after:bg-gradient-to-b after:from-transparent after:via-white/10 after:to-transparent",
+          "after:absolute after:inset-0 after:translate-y-full after:animate-[shimmer_2s_infinite] before:bg-gradient-to-b after:from-transparent after:via-white/10 after:to-transparent",
           "p-8",
           className
         )}
@@ -78,6 +85,7 @@ export const PricingCard = ({
           ))}
         </div>
         <Button
+          onClick={scrollToCalculator}
           className={cn(
             "w-full transition-all duration-300",
             "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600",

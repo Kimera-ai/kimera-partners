@@ -83,7 +83,7 @@ export function PricingCalculator() {
   };
 
   return (
-    <Card className="p-6 bg-background/50 backdrop-blur">
+    <Card id="pricing-calculator" className="p-6 bg-background/50 backdrop-blur">
       <h3 className="text-xl font-semibold mb-4">Pricing Calculator</h3>
 
       <div className="space-y-4 mb-6">
