@@ -54,12 +54,12 @@ const Login = () => {
               },
               className: {
                 container: "!text-white w-full",
-                label: "!text-white",
+                label: "!text-white !text-left block mb-2",
                 button: "!text-white w-full",
                 anchor: "!text-white",
                 divider: "!bg-white/20",
                 message: "!text-white",
-                input: "w-full",
+                input: "w-full !bg-transparent !border !border-white/20 !text-white !rounded-md !px-3 !py-2 focus:!border-primary hover:!border-primary/80 transition-colors",
               },
             }}
             view="sign_in"
