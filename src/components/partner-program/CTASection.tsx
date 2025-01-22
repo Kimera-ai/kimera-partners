@@ -1,11 +1,14 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 interface CTASectionProps {
   setIsFormOpen: (open: boolean) => void;
 }
 
 const CTASection = ({ setIsFormOpen }: CTASectionProps) => {
+  const navigate = useNavigate();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -24,7 +27,7 @@ const CTASection = ({ setIsFormOpen }: CTASectionProps) => {
         <Button 
           size="lg"
           className="bg-[#9F9EA1] hover:bg-[#C8C8C9] text-background font-semibold px-8 py-6 h-auto"
-          onClick={() => setIsFormOpen(true)}
+          onClick={() => navigate("/login")}
         >
           Apply Now
         </Button>
