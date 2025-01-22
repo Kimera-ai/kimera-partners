@@ -12,6 +12,18 @@ const Login = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    // Check current session on mount
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        navigate("/partner-program");
+        toast({
+          title: "Welcome back!",
+          description: "You have successfully signed in.",
+        });
+      }
+    });
+
+    // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
         navigate("/partner-program");
