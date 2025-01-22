@@ -171,13 +171,13 @@ export function PricingCalculator() {
         <h4 className="font-medium">Image Features (Credits per use)</h4>
         {imageQuantities.map((feature, index) => (
           <div key={feature.name} className="flex flex-col sm:flex-row justify-between gap-3">
-            <div className="space-y-1">
+            <div className="space-y-1 text-center sm:text-left">
               <Label>{feature.name}</Label>
               <div className="text-sm text-muted-foreground">
                 {feature.credits} credits × {feature.quantity > 0 ? feature.quantity * calculateExpectedUsage(guestCount) : 0} runs
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center sm:justify-start gap-2">
               <button
                 onClick={() => updateQuantity(imageQuantities, setImageQuantities, index, false)}
                 className="w-8 h-8 flex items-center justify-center rounded-md border"
@@ -202,13 +202,13 @@ export function PricingCalculator() {
         <h4 className="font-medium">Video Features (Credits per use)</h4>
         {videoQuantities.map((feature, index) => (
           <div key={feature.name} className="flex flex-col sm:flex-row justify-between gap-3">
-            <div className="space-y-1">
+            <div className="space-y-1 text-center sm:text-left">
               <Label>{feature.name}</Label>
               <div className="text-sm text-muted-foreground">
                 {feature.credits} credits × {feature.quantity > 0 ? feature.quantity * calculateExpectedUsage(guestCount) : 0} runs
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center sm:justify-start gap-2">
               <button
                 onClick={() => updateQuantity(videoQuantities, setVideoQuantities, index, false)}
                 className="w-8 h-8 flex items-center justify-center rounded-md border"
