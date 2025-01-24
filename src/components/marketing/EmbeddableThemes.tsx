@@ -8,7 +8,7 @@ const themes = [
     id: 1,
     title: "Vintage Hollywood",
     description: "Transform guests into classic movie stars with a timeless black and white aesthetic.",
-    image: supabase.storage.from('themes').getPublicUrl('vintage.jpg').data.publicUrl,
+    imageName: "vintage.jpg",
     features: [
       "Black & white film aesthetics",
       "Classic Hollywood lighting",
@@ -20,7 +20,7 @@ const themes = [
     id: 2,
     title: "Cyberpunk Future",
     description: "Transport attendees to a neon-lit future with vibrant colors, digital glitches, and futuristic elements inspired by sci-fi aesthetics.",
-    image: supabase.storage.from('themes').getPublicUrl('cyberpunk.jpg').data.publicUrl,
+    imageName: "cyberpunk.jpg",
     features: [
       "Neon color effects",
       "Digital glitch overlays",
@@ -32,7 +32,7 @@ const themes = [
     id: 3,
     title: "Fantasy Realms",
     description: "Create magical transformations with ethereal lighting, mystical backgrounds, and fantasy-inspired elements that transport guests to enchanted worlds.",
-    image: supabase.storage.from('themes').getPublicUrl('fantasy.jpg').data.publicUrl,
+    imageName: "fantasy.jpg",
     features: [
       "Magical light effects",
       "Mystical backgrounds",
@@ -44,7 +44,7 @@ const themes = [
     id: 4,
     title: "Pop Art",
     description: "Transform photos into vibrant pop art masterpieces with bold colors, comic book-style effects, and artistic filters inspired by Andy Warhol.",
-    image: supabase.storage.from('themes').getPublicUrl('pop-art.jpg').data.publicUrl,
+    imageName: "pop-art.jpg",
     features: [
       "Bold color palettes",
       "Comic book effects",
@@ -56,7 +56,7 @@ const themes = [
     id: 5,
     title: "Minimalist",
     description: "Create elegant transformations with clean lines, subtle effects, and refined aesthetics that emphasize simplicity and sophistication.",
-    image: supabase.storage.from('themes').getPublicUrl('minimal.jpg').data.publicUrl,
+    imageName: "minimal.jpg",
     features: [
       "Clean compositions",
       "Subtle color effects",
@@ -68,7 +68,7 @@ const themes = [
     id: 6,
     title: "Retro Gaming",
     description: "Transform photos with pixelated effects, 8-bit styling, and classic gaming aesthetics that appeal to nostalgia and gaming culture.",
-    image: supabase.storage.from('themes').getPublicUrl('gaming.jpg').data.publicUrl,
+    imageName: "gaming.jpg",
     features: [
       "8-bit pixel effects",
       "Retro game aesthetics",
@@ -79,7 +79,14 @@ const themes = [
 ];
 
 const EmbeddableThemes = () => {
-  console.log('Theme URLs:', themes.map(theme => ({ title: theme.title, url: theme.image })));
+  const getThemeImageUrl = (imageName: string) => {
+    const { data } = supabase.storage
+      .from('themes')
+      .getPublicUrl(imageName);
+    
+    console.log(`Generated URL for ${imageName}:`, data.publicUrl);
+    return data.publicUrl;
+  };
   
   return (
     <div className="w-full bg-[#100919] text-gray-300 p-8">
@@ -101,7 +108,7 @@ const EmbeddableThemes = () => {
           >
             <div className="aspect-[4/3] relative">
               <img
-                src={theme.image}
+                src={getThemeImageUrl(theme.imageName)}
                 alt={theme.title}
                 className="object-cover w-full h-full"
               />
