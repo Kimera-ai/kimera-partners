@@ -2,61 +2,62 @@ import React from 'react';
 import { Palette } from 'lucide-react';
 import BaseLayout from '@/components/layouts/BaseLayout';
 import { Card } from '@/components/ui/card';
+import { supabase } from '@/integrations/supabase/client';
 
 const themes = [
   {
     id: 1,
     title: "Vintage Hollywood",
     description: "Transform guests into classic movie stars with a timeless black and white aesthetic, complete with dramatic lighting and iconic Hollywood glamour.",
-    image: "https://kimera.ai/wp-content/uploads/2023/12/Vintage-Hollywood.jpg",
+    image: "/lovable-uploads/0eb27d24-43c9-4358-af69-fdc6fae4b440.png",
   },
   {
     id: 2,
     title: "Cyberpunk Future",
     description: "Transport attendees to a neon-lit future with vibrant colors, digital glitches, and futuristic elements inspired by sci-fi aesthetics.",
-    image: "https://kimera.ai/wp-content/uploads/2023/12/Cyberpunk.jpg",
+    image: "/lovable-uploads/879070b2-a66d-419b-9a07-6e5ab90e68e4.png",
   },
   {
     id: 3,
     title: "Fantasy Realms",
     description: "Create magical transformations with ethereal lighting, mystical backgrounds, and fantasy-inspired elements that transport guests to enchanted worlds.",
-    image: "https://kimera.ai/wp-content/uploads/2023/12/Fantasy.jpg",
+    image: "/lovable-uploads/fc399ff4-d2a5-4b8f-bf6c-9266055b7b0d.png",
   },
   {
     id: 4,
     title: "Pop Art",
     description: "Transform photos into vibrant pop art masterpieces with bold colors, comic book-style effects, and artistic filters inspired by Andy Warhol.",
-    image: "https://kimera.ai/wp-content/uploads/2023/12/Pop-Art.jpg",
+    image: "/lovable-uploads/0eb27d24-43c9-4358-af69-fdc6fae4b440.png",
   },
   {
     id: 5,
     title: "Minimalist",
     description: "Create elegant transformations with clean lines, subtle effects, and refined aesthetics that emphasize simplicity and sophistication.",
-    image: "https://kimera.ai/wp-content/uploads/2023/12/Minimalist.jpg",
+    image: "/lovable-uploads/879070b2-a66d-419b-9a07-6e5ab90e68e4.png",
   },
   {
     id: 6,
     title: "Retro Gaming",
     description: "Transform photos with pixelated effects, 8-bit styling, and classic gaming aesthetics that appeal to nostalgia and gaming culture.",
-    image: "https://kimera.ai/wp-content/uploads/2023/12/Retro-Gaming.jpg",
+    image: "/lovable-uploads/fc399ff4-d2a5-4b8f-bf6c-9266055b7b0d.png",
   },
   {
     id: 7,
     title: "Anime Style",
     description: "Convert photos into anime-inspired artwork with characteristic big eyes, expressive features, and distinctive Japanese animation styling.",
-    image: "https://kimera.ai/wp-content/uploads/2023/12/Anime.jpg",
+    image: "/lovable-uploads/0eb27d24-43c9-4358-af69-fdc6fae4b440.png",
   },
   {
     id: 8,
     title: "Street Art",
     description: "Transform photos with urban art styles, graffiti elements, and street culture aesthetics for a bold, contemporary look.",
-    image: "https://kimera.ai/wp-content/uploads/2023/12/Street-Art.jpg",
+    image: "/lovable-uploads/879070b2-a66d-419b-9a07-6e5ab90e68e4.png",
   },
   {
     id: 9,
     title: "Watercolor Dreams",
     description: "Convert photos into delicate watercolor paintings with soft colors, artistic brush strokes, and dreamy, flowing effects.",
-    image: "https://kimera.ai/wp-content/uploads/2023/12/Watercolor.jpg",
+    image: "/lovable-uploads/fc399ff4-d2a5-4b8f-bf6c-9266055b7b0d.png",
   }
 ];
 
