@@ -16,6 +16,61 @@ import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
 import { Card } from '@/components/ui/card';
 
+const EmbedCodeSection = () => {
+  const [copied, setCopied] = useState(false);
+  const { toast } = useToast();
+  
+  const embedCode = `<iframe
+  src="${window.location.origin}/embed/themes"
+  width="100%"
+  height="800px"
+  frameborder="0"
+  style="border: none; border-radius: 8px;"
+></iframe>`;
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(embedCode);
+    setCopied(true);
+    toast({
+      title: "Copied!",
+      description: "Embed code has been copied to clipboard",
+    });
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="mt-8 space-y-4">
+      <Card className="p-6 bg-white/5 border border-white/10">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-medium text-white flex items-center gap-2">
+            <Code className="w-5 h-5" />
+            Embed Code
+          </h3>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={copyToClipboard}
+            className="flex items-center gap-2"
+          >
+            {copied ? (
+              <Check className="w-4 h-4" />
+            ) : (
+              <Copy className="w-4 h-4" />
+            )}
+            {copied ? 'Copied!' : 'Copy'}
+          </Button>
+        </div>
+        <pre className="bg-black/50 p-4 rounded-lg overflow-x-auto text-sm text-gray-300">
+          {embedCode}
+        </pre>
+        <p className="mt-4 text-sm text-gray-400">
+          Copy and paste this code into your website to embed the themes gallery.
+        </p>
+      </Card>
+    </div>
+  );
+};
+
 const TemplatesSection = () => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
     {templates.map(template => (
@@ -75,61 +130,6 @@ const EventPhotosSection = () => (
   </div>
 );
 
-const EmbedCodeSection = () => {
-  const [copied, setCopied] = useState(false);
-  const { toast } = useToast();
-  
-  const embedCode = `<iframe
-  src="${window.location.origin}/embed/themes"
-  width="100%"
-  height="800px"
-  frameborder="0"
-  style="border: none; border-radius: 8px;"
-></iframe>`;
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(embedCode);
-    setCopied(true);
-    toast({
-      title: "Copied!",
-      description: "Embed code has been copied to clipboard",
-    });
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  return (
-    <div className="mt-8 space-y-4">
-      <Card className="p-6 bg-white/5 border border-white/10">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-medium text-white flex items-center gap-2">
-            <Code className="w-5 h-5" />
-            Embed Code
-          </h3>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={copyToClipboard}
-            className="flex items-center gap-2"
-          >
-            {copied ? (
-              <Check className="w-4 h-4" />
-            ) : (
-              <Copy className="w-4 h-4" />
-            )}
-            {copied ? 'Copied!' : 'Copy'}
-          </Button>
-        </div>
-        <pre className="bg-black/50 p-4 rounded-lg overflow-x-auto text-sm text-gray-300">
-          {embedCode}
-        </pre>
-        <p className="mt-4 text-sm text-gray-400">
-          Copy and paste this code into your website to embed the themes gallery.
-        </p>
-      </Card>
-    </div>
-  );
-};
-
 const MarketingKit = () => {
   const [activeTab, setActiveTab] = useState('themes');
   const [searchTerm, setSearchTerm] = useState('');
@@ -142,6 +142,8 @@ const MarketingKit = () => {
           Access ready-to-use marketing materials to promote Kimera AI
         </p>
       </header>
+
+      <EmbedCodeSection />
 
       <div className="flex flex-col md:flex-row gap-4 mb-8">
         <div className="relative flex-1">
@@ -207,7 +209,6 @@ const MarketingKit = () => {
       {activeTab === 'themes' && (
         <>
           <EmbeddableThemes />
-          <EmbedCodeSection />
         </>
       )}
 
