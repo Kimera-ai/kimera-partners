@@ -21,11 +21,7 @@ const EmbeddableThemes = () => {
       try {
         const { data: files, error: listError } = await supabase.storage
           .from('themes')
-          .list('', {
-            limit: 100,
-            offset: 0,
-            sortBy: { column: 'name', order: 'asc' }
-          });
+          .list('');
 
         if (listError) {
           console.error('Error fetching themes:', listError);
@@ -49,27 +45,23 @@ const EmbeddableThemes = () => {
         }
 
         // Generate themes from image files
-        const generatedThemes = imageFiles.map((file, index) => {
-          const title = file.name
+        const generatedThemes = imageFiles.map((file, index) => ({
+          id: index + 1,
+          title: file.name
             .replace(/\.(jpg|jpeg|png|gif|webp)$/i, '')
             .replace(/[-_]/g, ' ')
             .split(' ')
             .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ');
-
-          return {
-            id: index + 1,
-            title,
-            description: `Transform your photos with our ${title.toLowerCase()} theme, creating stunning and unique visual experiences.`,
-            imageName: file.name,
-            features: [
-              `${title} style effects`,
-              'Professional filters',
-              'Custom overlays',
-              'Unique aesthetics'
-            ]
-          };
-        });
+            .join(' '),
+          description: `Transform your photos with our unique theme, creating stunning and professional visual experiences.`,
+          imageName: file.name,
+          features: [
+            'Professional filters',
+            'Custom overlays',
+            'Unique aesthetics',
+            'High-quality output'
+          ]
+        }));
 
         setThemes(generatedThemes);
       } catch (err) {
@@ -109,7 +101,7 @@ const EmbeddableThemes = () => {
       <div className="text-center py-12 space-y-4">
         <div className="flex items-center justify-center gap-2 text-red-400">
           <AlertCircle className="w-5 h-5" />
-          <p>{error || 'No themes found in the bucket'}</p>
+          <p>{error || 'No themes found'}</p>
         </div>
         <p className="text-gray-400">Please make sure there are image files in the themes bucket.</p>
       </div>
