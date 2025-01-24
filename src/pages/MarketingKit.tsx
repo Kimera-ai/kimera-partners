@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, FileText, Video, Star, Camera, Palette, Package, Code, AlertCircle } from 'lucide-react';
+import { Search, Filter, FileText, Video, Star, Camera, Palette, Package, Code, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import BaseLayout from '@/components/layouts/BaseLayout';
@@ -41,15 +41,14 @@ const generateThemeFromImage = (imageName: string, index: number): Theme => {
     'Unique aesthetics'
   ];
 
-  // Use the proper method to get the public URL
-  const publicUrl = supabase.storage.from('themes').getPublicUrl(imageName).data.publicUrl;
-  console.log('Generated public URL for image:', publicUrl); // Debug log
+  const { data } = supabase.storage.from('themes').getPublicUrl(imageName);
+  console.log('Generated theme for image:', imageName, 'URL:', data.publicUrl);
 
   return {
     id: index + 1,
     title,
     description,
-    image: publicUrl,
+    image: data.publicUrl,
     features
   };
 };
@@ -138,8 +137,9 @@ const ThemesSection = () => {
 
   if (isLoading) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-400">Loading themes...</p>
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <p className="ml-2 text-gray-400">Loading themes...</p>
       </div>
     );
   }
