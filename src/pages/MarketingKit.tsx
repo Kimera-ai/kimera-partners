@@ -174,17 +174,17 @@ const ThemesSection = () => {
 
   return (
     <div className="space-y-8">
+      <div className="flex justify-center mb-4">
+        <Button
+          variant="outline"
+          className="border-white/20 hover:bg-white/20 text-white"
+          onClick={handleCopyEmbed}
+        >
+          <Code className="w-4 h-4 mr-2" />
+          Place In Your Website
+        </Button>
+      </div>
       <header className="text-center max-w-3xl mx-auto mb-16">
-        <div className="flex justify-end mb-4">
-          <Button
-            variant="outline"
-            className="border-white/20 hover:bg-white/20 text-white"
-            onClick={handleCopyEmbed}
-          >
-            <Code className="w-4 h-4 mr-2" />
-            Place In Your Website
-          </Button>
-        </div>
         <h2 className="text-4xl font-bold text-white mb-6 flex items-center justify-center gap-4">
           <Palette className="w-8 h-8" />
           AI Photobooth Themes
@@ -317,4 +317,3 @@ const MarketingKit = () => {
 };
 
 export default MarketingKit;
-
