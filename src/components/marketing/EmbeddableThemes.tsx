@@ -11,6 +11,82 @@ interface Theme {
   features: string[];
 }
 
+const getThemeDescription = (imageName: string): { description: string, features: string[] } => {
+  // Remove file extension and convert to lowercase for matching
+  const name = imageName.toLowerCase().replace(/\.(jpg|jpeg|png|gif|webp)$/i, '');
+
+  const themeDetails: Record<string, { description: string, features: string[] }> = {
+    'vintage': {
+      description: 'Transport your guests to the golden age of cinema with our vintage filter that adds classic film grain, subtle vignetting, and warm tones reminiscent of old Hollywood glamour.',
+      features: [
+        'Classic film grain',
+        'Warm color grading',
+        'Vintage vignetting',
+        'Timeless aesthetics'
+      ]
+    },
+    'cyberpunk': {
+      description: 'Create futuristic portraits with neon-inspired color grading, digital glitch effects, and high-contrast lighting that brings a sci-fi edge to every photo.',
+      features: [
+        'Neon highlights',
+        'Digital glitch effects',
+        'Cybernetic overlays',
+        'Future-tech aesthetic'
+      ]
+    },
+    'noir': {
+      description: 'Dramatic black and white transformation with enhanced contrast and moody shadows that capture the essence of film noir photography.',
+      features: [
+        'High contrast B&W',
+        'Film noir shadows',
+        'Dramatic lighting',
+        'Classic aesthetics'
+      ]
+    },
+    'pop-art': {
+      description: 'Transform photos into vibrant pop art masterpieces with bold colors, halftone patterns, and comic book-style effects inspired by Andy Warhol.',
+      features: [
+        'Bold color palettes',
+        'Halftone patterns',
+        'Comic book effects',
+        'Pop culture style'
+      ]
+    },
+    'ethereal': {
+      description: 'Create dreamlike portraits with soft, ethereal lighting effects, delicate color grading, and subtle glow that adds a magical quality to every image.',
+      features: [
+        'Soft light effects',
+        'Dreamy atmosphere',
+        'Ethereal glow',
+        'Magical elements'
+      ]
+    },
+    'retro': {
+      description: 'Capture the nostalgic charm of decades past with vintage color palettes, light leaks, and subtle grain that brings back memories of analog photography.',
+      features: [
+        'Vintage colors',
+        'Light leak effects',
+        'Film grain texture',
+        'Nostalgic mood'
+      ]
+    },
+    // Default theme details for any unmatched images
+    'default': {
+      description: 'Transform your photos with our unique AI-powered theme, creating stunning and professional visual experiences that will make your event unforgettable.',
+      features: [
+        'Professional filters',
+        'Custom overlays',
+        'Unique aesthetics',
+        'High-quality output'
+      ]
+    }
+  };
+
+  // Find the matching theme or return default
+  const matchedTheme = Object.keys(themeDetails).find(key => name.includes(key));
+  return matchedTheme ? themeDetails[matchedTheme] : themeDetails['default'];
+};
+
 const EmbeddableThemes = () => {
   const [themes, setThemes] = useState<Theme[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -61,6 +137,8 @@ const EmbeddableThemes = () => {
 
           console.log(`Generated URL for ${file.name}:`, urlData.publicUrl);
 
+          const themeDetails = getThemeDescription(file.name);
+
           return {
             id: index + 1,
             title: file.name
@@ -69,14 +147,9 @@ const EmbeddableThemes = () => {
               .split(' ')
               .map(word => word.charAt(0).toUpperCase() + word.slice(1))
               .join(' '),
-            description: 'Transform your photos with our unique theme, creating stunning and professional visual experiences.',
+            description: themeDetails.description,
             imageName: urlData.publicUrl,
-            features: [
-              'Professional filters',
-              'Custom overlays',
-              'Unique aesthetics',
-              'High-quality output'
-            ]
+            features: themeDetails.features
           };
         }));
 
