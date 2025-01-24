@@ -1,15 +1,17 @@
 import React from 'react';
-import { Palette } from 'lucide-react';
+import { Palette, Package } from 'lucide-react';
 import BaseLayout from '@/components/layouts/BaseLayout';
 import { Card } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const themes = [
   {
     id: 1,
     title: "Vintage Hollywood",
     description: "Transform guests into classic movie stars with a timeless black and white aesthetic, complete with dramatic lighting and iconic Hollywood glamour.",
-    image: supabase.storage.from('themes').getPublicUrl('vintage.jpg').data.publicUrl,
+    image: `${supabase.storage.from('themes').getPublicUrl('vintage.jpg').data.publicUrl}`,
     features: [
       "Black & white film aesthetics",
       "Classic Hollywood lighting",
@@ -80,9 +82,22 @@ const themes = [
 ];
 
 const Themes = () => {
+  const navigate = useNavigate();
+
   return (
     <BaseLayout>
       <div className="space-y-12">
+        <div className="flex items-center justify-between">
+          <Button 
+            variant="ghost" 
+            className="text-white hover:text-primary flex items-center gap-2"
+            onClick={() => navigate('/marketing-kit')}
+          >
+            <Package className="w-5 h-5" />
+            Back to Marketing Kit
+          </Button>
+        </div>
+
         <header className="text-center max-w-3xl mx-auto mb-16">
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 flex items-center justify-center gap-4">
             <Palette className="w-12 h-12" />
