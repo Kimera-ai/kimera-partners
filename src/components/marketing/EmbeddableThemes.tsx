@@ -1,102 +1,120 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
-import { Palette } from 'lucide-react';
+import { Palette, Loader2, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
-const themes = [
-  {
-    id: 1,
-    title: "Vintage Hollywood",
-    description: "Transform guests into classic movie stars with a timeless black and white aesthetic.",
-    imageName: "vintage.jpg",
-    features: [
-      "Black & white film aesthetics",
-      "Classic Hollywood lighting",
-      "Vintage film grain effects",
-      "Glamorous portrait styles"
-    ]
-  },
-  {
-    id: 2,
-    title: "Cyberpunk Future",
-    description: "Transport attendees to a neon-lit future with vibrant colors, digital glitches, and futuristic elements inspired by sci-fi aesthetics.",
-    imageName: "cyberpunk.jpg",
-    features: [
-      "Neon color effects",
-      "Digital glitch overlays",
-      "Futuristic backgrounds",
-      "Sci-fi inspired filters"
-    ]
-  },
-  {
-    id: 3,
-    title: "Fantasy Realms",
-    description: "Create magical transformations with ethereal lighting, mystical backgrounds, and fantasy-inspired elements that transport guests to enchanted worlds.",
-    imageName: "fantasy.jpg",
-    features: [
-      "Magical light effects",
-      "Mystical backgrounds",
-      "Fantasy-inspired elements",
-      "Ethereal color grading"
-    ]
-  },
-  {
-    id: 4,
-    title: "Pop Art",
-    description: "Transform photos into vibrant pop art masterpieces with bold colors, comic book-style effects, and artistic filters inspired by Andy Warhol.",
-    imageName: "pop-art.jpg",
-    features: [
-      "Bold color palettes",
-      "Comic book effects",
-      "Warhol-inspired filters",
-      "Retro pop styling"
-    ]
-  },
-  {
-    id: 5,
-    title: "Minimalist",
-    description: "Create elegant transformations with clean lines, subtle effects, and refined aesthetics that emphasize simplicity and sophistication.",
-    imageName: "minimal.jpg",
-    features: [
-      "Clean compositions",
-      "Subtle color effects",
-      "Elegant lighting",
-      "Modern aesthetics"
-    ]
-  },
-  {
-    id: 6,
-    title: "Retro Gaming",
-    description: "Transform photos with pixelated effects, 8-bit styling, and classic gaming aesthetics that appeal to nostalgia and gaming culture.",
-    imageName: "gaming.jpg",
-    features: [
-      "8-bit pixel effects",
-      "Retro game aesthetics",
-      "Classic gaming overlays",
-      "Nostalgic color schemes"
-    ]
-  }
-];
+interface Theme {
+  id: number;
+  title: string;
+  description: string;
+  imageName: string;
+  features: string[];
+}
 
 const EmbeddableThemes = () => {
+  const [themes, setThemes] = useState<Theme[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchThemes = async () => {
+      try {
+        console.log('Fetching themes from Supabase storage...');
+        const { data: files, error: listError } = await supabase.storage
+          .from('themes')
+          .list();
+
+        if (listError) {
+          console.error('Error fetching themes:', listError);
+          setError(listError.message);
+          return;
+        }
+
+        console.log('Files from bucket:', files);
+
+        if (!files || files.length === 0) {
+          setError('No themes found in the bucket');
+          return;
+        }
+
+        // Filter for image files only
+        const imageFiles = files.filter(file => 
+          file.name.match(/\.(jpg|jpeg|png|gif)$/i)
+        );
+
+        console.log('Filtered image files:', imageFiles);
+
+        // Generate themes from image files
+        const generatedThemes = imageFiles.map((file, index) => {
+          const title = file.name
+            .replace(/\.(jpg|jpeg|png|gif)$/i, '')
+            .replace(/[-_]/g, ' ')
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+
+          return {
+            id: index + 1,
+            title,
+            description: `Transform your photos with our ${title.toLowerCase()} theme, creating stunning and unique visual experiences.`,
+            imageName: file.name,
+            features: [
+              `${title} style effects`,
+              'Professional filters',
+              'Custom overlays',
+              'Unique aesthetics'
+            ]
+          };
+        });
+
+        console.log('Generated themes:', generatedThemes);
+        setThemes(generatedThemes);
+      } catch (err) {
+        console.error('Unexpected error:', err);
+        setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchThemes();
+  }, []);
+
   const getThemeImageUrl = (imageName: string) => {
     try {
-      // Get the public URL without any additional path manipulation
       const { data } = supabase.storage
         .from('themes')
         .getPublicUrl(imageName);
       
-      // Log the URL for debugging
-      console.log(`Raw URL from Supabase for ${imageName}:`, data.publicUrl);
-      
-      // Return the unmodified URL from Supabase
+      console.log(`Generated URL for ${imageName}:`, data.publicUrl);
       return data.publicUrl;
     } catch (error) {
       console.error('Error generating URL for', imageName, error);
-      return ''; // Return empty string if there's an error
+      return '';
     }
   };
-  
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <p className="ml-2 text-gray-400">Loading themes...</p>
+      </div>
+    );
+  }
+
+  if (error || themes.length === 0) {
+    return (
+      <div className="text-center py-12 space-y-4">
+        <div className="flex items-center justify-center gap-2 text-red-400">
+          <AlertCircle className="w-5 h-5" />
+          <p>{error || 'No themes found in the bucket'}</p>
+        </div>
+        <p className="text-gray-400">Please make sure there are image files in the themes bucket.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full bg-[#100919] text-gray-300 p-8">
       <header className="text-center max-w-3xl mx-auto mb-16">
@@ -112,7 +130,7 @@ const EmbeddableThemes = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {themes.map((theme) => {
           const imageUrl = getThemeImageUrl(theme.imageName);
-          console.log(`Final image URL for ${theme.title}:`, imageUrl); // Additional logging
+          console.log(`Final image URL for ${theme.title}:`, imageUrl);
           
           return (
             <Card 
@@ -126,7 +144,7 @@ const EmbeddableThemes = () => {
                   className="object-cover w-full h-full"
                   onError={(e) => {
                     console.error(`Error loading image for ${theme.title}`);
-                    e.currentTarget.src = '/placeholder.svg'; // Fallback image
+                    e.currentTarget.src = '/placeholder.svg';
                   }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
