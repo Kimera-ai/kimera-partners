@@ -19,18 +19,21 @@ const EmbeddableThemes = () => {
   useEffect(() => {
     const fetchThemes = async () => {
       try {
+        console.log('Fetching themes from storage...');
         const { data: files, error: listError } = await supabase.storage
           .from('themes')
           .list('');
 
         if (listError) {
-          console.error('Error fetching themes:', listError);
-          setError(listError.message);
+          console.error('Error listing files:', listError);
+          setError('Failed to fetch themes');
           return;
         }
 
+        console.log('Files from storage:', files);
+
         if (!files || files.length === 0) {
-          setError('No themes found in the bucket');
+          setError('No files found in themes bucket');
           return;
         }
 
@@ -39,30 +42,41 @@ const EmbeddableThemes = () => {
           file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)
         );
 
+        console.log('Filtered image files:', imageFiles);
+
         if (imageFiles.length === 0) {
-          setError('No image files found in the themes bucket');
+          setError('No image files found in themes bucket');
           return;
         }
 
         // Generate themes from image files
-        const generatedThemes = imageFiles.map((file, index) => ({
-          id: index + 1,
-          title: file.name
-            .replace(/\.(jpg|jpeg|png|gif|webp)$/i, '')
-            .replace(/[-_]/g, ' ')
-            .split(' ')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' '),
-          description: `Transform your photos with our unique theme, creating stunning and professional visual experiences.`,
-          imageName: file.name,
-          features: [
-            'Professional filters',
-            'Custom overlays',
-            'Unique aesthetics',
-            'High-quality output'
-          ]
+        const generatedThemes = await Promise.all(imageFiles.map(async (file, index) => {
+          const { data: urlData } = supabase.storage
+            .from('themes')
+            .getPublicUrl(file.name);
+
+          console.log(`Generated URL for ${file.name}:`, urlData.publicUrl);
+
+          return {
+            id: index + 1,
+            title: file.name
+              .replace(/\.(jpg|jpeg|png|gif|webp)$/i, '')
+              .replace(/[-_]/g, ' ')
+              .split(' ')
+              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(' '),
+            description: 'Transform your photos with our unique theme, creating stunning and professional visual experiences.',
+            imageName: urlData.publicUrl,
+            features: [
+              'Professional filters',
+              'Custom overlays',
+              'Unique aesthetics',
+              'High-quality output'
+            ]
+          };
         }));
 
+        console.log('Generated themes:', generatedThemes);
         setThemes(generatedThemes);
       } catch (err) {
         console.error('Unexpected error:', err);
@@ -74,18 +88,6 @@ const EmbeddableThemes = () => {
 
     fetchThemes();
   }, []);
-
-  const getThemeImageUrl = (imageName: string) => {
-    try {
-      const { data } = supabase.storage
-        .from('themes')
-        .getPublicUrl(imageName);
-      return data.publicUrl;
-    } catch (error) {
-      console.error('Error generating URL for:', imageName, error);
-      return '/placeholder.svg';
-    }
-  };
 
   if (isLoading) {
     return (
@@ -128,7 +130,7 @@ const EmbeddableThemes = () => {
           >
             <div className="aspect-[4/3] relative">
               <img
-                src={getThemeImageUrl(theme.imageName)}
+                src={theme.imageName}
                 alt={theme.title}
                 className="object-cover w-full h-full"
                 onError={(e) => {
