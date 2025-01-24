@@ -21,7 +21,7 @@ const Benefit = ({ text, checked }: BenefitProps) => {
           <X className="size-3" />
         </span>
       )}
-      <span className="text-sm text-zinc-300">{text}</span>
+      <span className="text-sm text-zinc-300 text-left">{text}</span>
     </div>
   )
 }
