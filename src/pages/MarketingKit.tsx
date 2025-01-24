@@ -60,28 +60,48 @@ const ThemesSection = () => {
 
   useEffect(() => {
     const fetchThemes = async () => {
-      const { data: files, error } = await supabase.storage.from('themes').list();
-      
-      if (error) {
-        console.error('Error fetching themes:', error);
-        return;
+      try {
+        const { data: files, error } = await supabase.storage.from('themes').list();
+        
+        if (error) {
+          console.error('Error fetching themes:', error);
+          toast({
+            title: "Error",
+            description: "Failed to load themes",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        console.log('Files from bucket:', files); // Debug log
+
+        // Filter for image files only
+        const imageFiles = files.filter(file => 
+          file.name.match(/\.(jpg|jpeg|png|gif)$/i)
+        );
+
+        console.log('Filtered image files:', imageFiles); // Debug log
+
+        // Generate themes from image files
+        const generatedThemes = imageFiles.map((file, index) => 
+          generateThemeFromImage(file.name, index)
+        );
+
+        console.log('Generated themes:', generatedThemes); // Debug log
+
+        setThemes(generatedThemes);
+      } catch (err) {
+        console.error('Error in fetchThemes:', err);
+        toast({
+          title: "Error",
+          description: "Failed to load themes",
+          variant: "destructive",
+        });
       }
-
-      // Filter for image files only
-      const imageFiles = files.filter(file => 
-        file.name.match(/\.(jpg|jpeg|png|gif)$/i)
-      );
-
-      // Generate themes from image files
-      const generatedThemes = imageFiles.map((file, index) => 
-        generateThemeFromImage(file.name, index)
-      );
-
-      setThemes(generatedThemes);
     };
 
     fetchThemes();
-  }, []);
+  }, [toast]);
 
   const handleCopyEmbed = async () => {
     try {
@@ -100,6 +120,14 @@ const ThemesSection = () => {
       });
     }
   };
+
+  if (themes.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-gray-400">Loading themes...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -219,7 +247,7 @@ const EventPhotosSection = () => (
 );
 
 const MarketingKit = () => {
-  const [activeTab, setActiveTab] = useState('event-photos');
+  const [activeTab, setActiveTab] = useState('themes');
   const [searchTerm, setSearchTerm] = useState('');
 
   return (
