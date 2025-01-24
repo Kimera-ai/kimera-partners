@@ -11,13 +11,13 @@ interface BenefitProps {
 
 const Benefit = ({ text, checked }: BenefitProps) => {
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-start gap-3">
       {checked ? (
-        <span className="grid size-4 place-content-center rounded-full bg-primary text-sm text-primary-foreground">
+        <span className="grid size-4 place-content-center rounded-full bg-primary text-sm text-primary-foreground mt-0.5">
           <Check className="size-3" />
         </span>
       ) : (
-        <span className="grid size-4 place-content-center rounded-full bg-zinc-800 text-sm text-zinc-400">
+        <span className="grid size-4 place-content-center rounded-full bg-zinc-800 text-sm text-zinc-400 mt-0.5">
           <X className="size-3" />
         </span>
       )}
@@ -70,14 +70,14 @@ export const PricingCard = ({
           className
         )}
       >
-        <div className="flex flex-col items-center border-b border-white/5 pb-8">
+        <div className="flex flex-col border-b border-white/5 pb-8">
           <span className="mb-6 inline-block text-lg font-medium text-white">
             {tier}
           </span>
           <span className="mb-3 inline-block text-5xl font-bold text-white">
             {price}
           </span>
-          <span className="text-center text-sm text-zinc-400">
+          <span className="text-left text-sm text-zinc-400">
             {bestFor}
           </span>
           {popular && (
