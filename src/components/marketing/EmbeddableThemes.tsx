@@ -22,7 +22,11 @@ const EmbeddableThemes = () => {
         console.log('Fetching themes from Supabase storage...');
         const { data: files, error: listError } = await supabase.storage
           .from('themes')
-          .list();
+          .list('', {
+            limit: 100,
+            offset: 0,
+            sortBy: { column: 'name', order: 'asc' }
+          });
 
         if (listError) {
           console.error('Error fetching themes:', listError);
@@ -39,7 +43,7 @@ const EmbeddableThemes = () => {
 
         // Filter for image files only
         const imageFiles = files.filter(file => 
-          file.name.match(/\.(jpg|jpeg|png|gif)$/i)
+          file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)
         );
 
         console.log('Filtered image files:', imageFiles);
@@ -47,7 +51,7 @@ const EmbeddableThemes = () => {
         // Generate themes from image files
         const generatedThemes = imageFiles.map((file, index) => {
           const title = file.name
-            .replace(/\.(jpg|jpeg|png|gif)$/i, '')
+            .replace(/\.(jpg|jpeg|png|gif|webp)$/i, '')
             .replace(/[-_]/g, ' ')
             .split(' ')
             .map(word => word.charAt(0).toUpperCase() + word.slice(1))
