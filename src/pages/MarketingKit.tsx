@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, FileText, Video, Star, Camera } from 'lucide-react';
+import { Search, Filter, FileText, Video, Star, Camera, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import BaseLayout from '@/components/layouts/BaseLayout';
@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { CaseStudy } from '@/types/marketing';
 import { EventPhotoGrid } from '@/components/marketing/EventPhotoGrid';
 import { VideoGrid } from '@/components/marketing/VideoGrid';
+import { useNavigate } from 'react-router-dom';
 
 const TemplatesSection = () => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -75,6 +76,7 @@ const EventPhotosSection = () => (
 const MarketingKit = () => {
   const [activeTab, setActiveTab] = useState('event-photos');
   const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
 
   return (
     <BaseLayout>
@@ -106,7 +108,7 @@ const MarketingKit = () => {
 
       {/* Navigation Tabs */}
       <div className="border-b border-white/10 mb-8">
-        <nav className="flex gap-8">
+        <nav className="flex gap-8 overflow-x-auto">
           <TabButton 
             active={activeTab === 'event-photos'} 
             onClick={() => setActiveTab('event-photos')}
@@ -134,6 +136,13 @@ const MarketingKit = () => {
             icon={Video}
           >
             Videos
+          </TabButton>
+          <TabButton 
+            active={false}
+            onClick={() => navigate('/marketing-kit/themes')}
+            icon={Palette}
+          >
+            Themes
           </TabButton>
         </nav>
       </div>
