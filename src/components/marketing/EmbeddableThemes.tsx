@@ -17,43 +17,43 @@ const getThemeDescription = (imageName: string): { description: string, features
 
   const themeDetails: Record<string, { description: string, features: string[] }> = {
     'vintage': {
-      description: 'Transport your guests to the golden age of cinema with our vintage filter that adds classic film grain, subtle vignetting, and warm tones reminiscent of old Hollywood glamour.',
+      description: 'A classic film-inspired theme that adds warm tones and subtle grain, perfect for creating timeless portraits with a nostalgic feel.',
       features: [
-        'Classic film grain',
         'Warm color grading',
+        'Film grain effect',
         'Vintage vignetting',
-        'Timeless aesthetics'
+        'Classic aesthetics'
       ]
     },
     'cyberpunk': {
-      description: 'Create futuristic portraits with neon-inspired color grading, digital glitch effects, and high-contrast lighting that brings a sci-fi edge to every photo.',
+      description: 'Bold neon colors and futuristic effects transform your photos into stunning cyberpunk-style portraits with a high-tech edge.',
       features: [
         'Neon highlights',
-        'Digital glitch effects',
-        'Cybernetic overlays',
-        'Future-tech aesthetic'
+        'Digital effects',
+        'Tech overlays',
+        'Future aesthetic'
       ]
     },
     'noir': {
-      description: 'Dramatic black and white transformation with enhanced contrast and moody shadows that capture the essence of film noir photography.',
+      description: 'Dramatic black and white processing with enhanced contrast creates moody, film noir-style portraits with timeless appeal.',
       features: [
         'High contrast B&W',
         'Film noir shadows',
         'Dramatic lighting',
-        'Classic aesthetics'
+        'Classic mood'
       ]
     },
     'pop-art': {
-      description: 'Transform photos into vibrant pop art masterpieces with bold colors, halftone patterns, and comic book-style effects inspired by Andy Warhol.',
+      description: 'Vibrant colors and bold patterns inspired by pop art create eye-catching portraits with a fun, artistic twist.',
       features: [
-        'Bold color palettes',
-        'Halftone patterns',
-        'Comic book effects',
-        'Pop culture style'
+        'Bold colors',
+        'Pop art patterns',
+        'Artistic effects',
+        'Retro style'
       ]
     },
     'ethereal': {
-      description: 'Create dreamlike portraits with soft, ethereal lighting effects, delicate color grading, and subtle glow that adds a magical quality to every image.',
+      description: 'Soft, dreamy effects and delicate color grading create ethereal portraits with a magical, otherworldly quality.',
       features: [
         'Soft light effects',
         'Dreamy atmosphere',
@@ -62,21 +62,30 @@ const getThemeDescription = (imageName: string): { description: string, features
       ]
     },
     'retro': {
-      description: 'Capture the nostalgic charm of decades past with vintage color palettes, light leaks, and subtle grain that brings back memories of analog photography.',
+      description: 'Vintage color palettes and subtle light leaks capture the charm of analog photography from decades past.',
       features: [
-        'Vintage colors',
+        'Retro colors',
         'Light leak effects',
-        'Film grain texture',
+        'Film texture',
         'Nostalgic mood'
+      ]
+    },
+    'minimal': {
+      description: 'Clean, refined processing that enhances natural beauty while maintaining elegant simplicity.',
+      features: [
+        'Clean aesthetics',
+        'Subtle effects',
+        'Natural enhancement',
+        'Modern style'
       ]
     },
     // Default theme details for any unmatched images
     'default': {
-      description: 'Transform your photos with our unique AI-powered theme, creating stunning and professional visual experiences that will make your event unforgettable.',
+      description: 'A unique AI-powered transformation that creates stunning portraits with professional quality effects.',
       features: [
-        'Professional filters',
-        'Custom overlays',
-        'Unique aesthetics',
+        'AI enhancement',
+        'Professional effects',
+        'Custom processing',
         'High-quality output'
       ]
     }
@@ -86,6 +95,8 @@ const getThemeDescription = (imageName: string): { description: string, features
   const matchedTheme = Object.keys(themeDetails).find(key => name.includes(key));
   return matchedTheme ? themeDetails[matchedTheme] : themeDetails['default'];
 };
+
+// ... keep existing code (fetchThemes function and other utilities)
 
 const EmbeddableThemes = () => {
   const [themes, setThemes] = useState<Theme[]>([]);
@@ -110,32 +121,24 @@ const EmbeddableThemes = () => {
           return;
         }
 
-        console.log('Total files found in bucket:', files?.length);
-
         if (!files || files.length === 0) {
           setError('No themes found in the bucket');
           return;
         }
 
-        // Filter for image files only
         const imageFiles = files.filter(file => 
           file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)
         );
-
-        console.log('Filtered image files count:', imageFiles.length);
 
         if (imageFiles.length === 0) {
           setError('No image files found in themes bucket');
           return;
         }
 
-        // Generate themes from image files
         const generatedThemes = await Promise.all(imageFiles.map(async (file, index) => {
           const { data: urlData } = supabase.storage
             .from('themes')
             .getPublicUrl(file.name);
-
-          console.log(`Generated URL for ${file.name}:`, urlData.publicUrl);
 
           const themeDetails = getThemeDescription(file.name);
 
@@ -153,7 +156,6 @@ const EmbeddableThemes = () => {
           };
         }));
 
-        console.log('Number of themes generated:', generatedThemes.length);
         setThemes(generatedThemes);
       } catch (err) {
         console.error('Unexpected error in fetchThemes:', err);
