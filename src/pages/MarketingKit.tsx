@@ -14,6 +14,7 @@ import { EventPhotoGrid } from '@/components/marketing/EventPhotoGrid';
 import { VideoGrid } from '@/components/marketing/VideoGrid';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { Toaster } from '@/components/ui/toaster';
 
 const themes = [
   {
@@ -309,6 +310,8 @@ const MarketingKit = () => {
       {activeTab === 'case-studies' && <CaseStudiesSection />}
       {activeTab === 'videos' && <VideosSection />}
       {activeTab === 'themes' && <ThemesSection />}
+
+      <Toaster />
     </BaseLayout>
   );
 };
