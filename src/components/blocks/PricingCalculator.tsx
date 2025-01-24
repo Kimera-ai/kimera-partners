@@ -184,7 +184,9 @@ export function PricingCalculator() {
               >
                 -
               </button>
-              <span className="w-8 text-center">{feature.quantity}</span>
+              <span className="w-24 text-center">
+                {feature.quantity > 0 ? `${feature.quantity * calculateExpectedUsage(guestCount)} runs` : '0 runs'}
+              </span>
               <button
                 onClick={() => updateQuantity(imageQuantities, setImageQuantities, index, true)}
                 className="w-8 h-8 flex items-center justify-center rounded-md border"
@@ -215,7 +217,9 @@ export function PricingCalculator() {
               >
                 -
               </button>
-              <span className="w-8 text-center">{feature.quantity}</span>
+              <span className="w-24 text-center">
+                {feature.quantity > 0 ? `${feature.quantity * calculateExpectedUsage(guestCount)} runs` : '0 runs'}
+              </span>
               <button
                 onClick={() => updateQuantity(videoQuantities, setVideoQuantities, index, true)}
                 className="w-8 h-8 flex items-center justify-center rounded-md border"
