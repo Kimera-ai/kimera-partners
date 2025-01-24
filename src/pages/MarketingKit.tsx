@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Search, Filter, FileText, Video, Star, Camera, Palette, Package, Code } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,7 +20,7 @@ const themes = [
   {
     id: 1,
     title: "Vintage Hollywood",
-    description: "Transform guests into classic movie stars with a timeless black and white aesthetic, complete with dramatic lighting and iconic Hollywood glamour.",
+    description: "Transform guests into classic movie stars with a timeless black and white aesthetic.",
     image: `${supabase.storage.from('themes').getPublicUrl('vintage.jpg').data.publicUrl}`,
     features: [
       "Black & white film aesthetics",
@@ -32,8 +32,8 @@ const themes = [
   {
     id: 2,
     title: "Cyberpunk Future",
-    description: "Transport attendees to a neon-lit future with vibrant colors, digital glitches, and futuristic elements inspired by sci-fi aesthetics.",
-    image: `${supabase.storage.from('themes').getPublicUrl('cyberpunk.jpg').data.publicUrl}`,
+    description: "Transport attendees to a neon-lit future with vibrant colors and digital glitches.",
+    image: supabase.storage.from('themes').getPublicUrl('cyberpunk.jpg').data.publicUrl,
     features: [
       "Neon color effects",
       "Digital glitch overlays",
@@ -44,8 +44,8 @@ const themes = [
   {
     id: 3,
     title: "Fantasy Realms",
-    description: "Create magical transformations with ethereal lighting, mystical backgrounds, and fantasy-inspired elements that transport guests to enchanted worlds.",
-    image: `${supabase.storage.from('themes').getPublicUrl('fantasy.jpg').data.publicUrl}`,
+    description: "Create magical transformations with ethereal lighting and mystical elements.",
+    image: supabase.storage.from('themes').getPublicUrl('fantasy.jpg').data.publicUrl,
     features: [
       "Magical light effects",
       "Mystical backgrounds",
@@ -56,8 +56,8 @@ const themes = [
   {
     id: 4,
     title: "Pop Art",
-    description: "Transform photos into vibrant pop art masterpieces with bold colors, comic book-style effects, and artistic filters inspired by Andy Warhol.",
-    image: `${supabase.storage.from('themes').getPublicUrl('pop-art.jpg').data.publicUrl}`,
+    description: "Transform photos into vibrant pop art masterpieces with bold colors.",
+    image: supabase.storage.from('themes').getPublicUrl('pop-art.jpg').data.publicUrl,
     features: [
       "Bold color palettes",
       "Comic book effects",
@@ -68,8 +68,8 @@ const themes = [
   {
     id: 5,
     title: "Minimalist",
-    description: "Create elegant transformations with clean lines, subtle effects, and refined aesthetics that emphasize simplicity and sophistication.",
-    image: `${supabase.storage.from('themes').getPublicUrl('minimal.jpg').data.publicUrl}`,
+    description: "Create elegant transformations with clean lines and refined aesthetics.",
+    image: supabase.storage.from('themes').getPublicUrl('minimal.jpg').data.publicUrl,
     features: [
       "Clean compositions",
       "Subtle color effects",
@@ -80,13 +80,49 @@ const themes = [
   {
     id: 6,
     title: "Retro Gaming",
-    description: "Transform photos with pixelated effects, 8-bit styling, and classic gaming aesthetics that appeal to nostalgia and gaming culture.",
-    image: `${supabase.storage.from('themes').getPublicUrl('gaming.jpg').data.publicUrl}`,
+    description: "Transform photos with pixelated effects and classic gaming aesthetics.",
+    image: supabase.storage.from('themes').getPublicUrl('gaming.jpg').data.publicUrl,
     features: [
       "8-bit pixel effects",
       "Retro game aesthetics",
       "Classic gaming overlays",
       "Nostalgic color schemes"
+    ]
+  },
+  {
+    id: 7,
+    title: "Neon Dreams",
+    description: "Create stunning neon-lit portraits with vibrant color effects.",
+    image: supabase.storage.from('themes').getPublicUrl('neon.jpg').data.publicUrl,
+    features: [
+      "Neon light effects",
+      "Vibrant color schemes",
+      "Atmospheric glow",
+      "Urban night aesthetics"
+    ]
+  },
+  {
+    id: 8,
+    title: "Watercolor Art",
+    description: "Transform photos into beautiful watercolor paintings.",
+    image: supabase.storage.from('themes').getPublicUrl('watercolor.jpg').data.publicUrl,
+    features: [
+      "Watercolor effects",
+      "Artistic brushstrokes",
+      "Soft color blending",
+      "Painterly textures"
+    ]
+  },
+  {
+    id: 9,
+    title: "Anime Style",
+    description: "Convert photos into anime-inspired artwork with distinctive styling.",
+    image: supabase.storage.from('themes').getPublicUrl('anime.jpg').data.publicUrl,
+    features: [
+      "Anime aesthetics",
+      "Cell shading",
+      "Character styling",
+      "Manga-inspired effects"
     ]
   }
 ];
@@ -190,8 +226,7 @@ const ThemesSection = () => {
           AI Photobooth Themes
         </h2>
         <p className="text-xl text-gray-300">
-          Transform your events with our collection of stunning AI-powered photo themes. 
-          Each theme offers unique visual effects and artistic transformations.
+          Transform your events with our collection of stunning AI-powered photo themes.
         </p>
       </header>
 
