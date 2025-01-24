@@ -175,20 +175,20 @@ const ThemesSection = () => {
   return (
     <div className="space-y-8">
       <header className="text-center max-w-3xl mx-auto mb-16">
-        <div className="flex justify-end mb-4">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-4xl font-bold text-white flex items-center gap-4">
+          <Palette className="w-8 h-8" />
+            AI Photobooth Themes
+          </h2>
           <Button
             variant="outline"
             className="border-white/20 hover:bg-white/20 text-white"
             onClick={handleCopyEmbed}
           >
             <Code className="w-4 h-4 mr-2" />
-            Get Embed Code
+            Place In Your Website
           </Button>
         </div>
-        <h2 className="text-4xl font-bold text-white mb-6 flex items-center justify-center gap-4">
-          <Palette className="w-8 h-8" />
-          AI Photobooth Themes
-        </h2>
         <p className="text-xl text-gray-300">
           Transform your events with our collection of stunning AI-powered photo themes. 
           Each theme offers unique visual effects and artistic transformations.
