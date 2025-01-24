@@ -20,7 +20,7 @@ const themes = [
     id: 2,
     title: "Cyberpunk Future",
     description: "Transport attendees to a neon-lit future with vibrant colors, digital glitches, and futuristic elements inspired by sci-fi aesthetics.",
-    image: supabase.storage.from('themes').getPublicUrl('cyberpunk.jpg').data.publicUrl,
+    image: `${supabase.storage.from('themes').getPublicUrl('cyberpunk.jpg').data.publicUrl}`,
     features: [
       "Neon color effects",
       "Digital glitch overlays",
@@ -32,7 +32,7 @@ const themes = [
     id: 3,
     title: "Fantasy Realms",
     description: "Create magical transformations with ethereal lighting, mystical backgrounds, and fantasy-inspired elements that transport guests to enchanted worlds.",
-    image: supabase.storage.from('themes').getPublicUrl('fantasy.jpg').data.publicUrl,
+    image: `${supabase.storage.from('themes').getPublicUrl('fantasy.jpg').data.publicUrl}`,
     features: [
       "Magical light effects",
       "Mystical backgrounds",
@@ -44,7 +44,7 @@ const themes = [
     id: 4,
     title: "Pop Art",
     description: "Transform photos into vibrant pop art masterpieces with bold colors, comic book-style effects, and artistic filters inspired by Andy Warhol.",
-    image: supabase.storage.from('themes').getPublicUrl('pop-art.jpg').data.publicUrl,
+    image: `${supabase.storage.from('themes').getPublicUrl('pop-art.jpg').data.publicUrl}`,
     features: [
       "Bold color palettes",
       "Comic book effects",
@@ -56,7 +56,7 @@ const themes = [
     id: 5,
     title: "Minimalist",
     description: "Create elegant transformations with clean lines, subtle effects, and refined aesthetics that emphasize simplicity and sophistication.",
-    image: supabase.storage.from('themes').getPublicUrl('minimal.jpg').data.publicUrl,
+    image: `${supabase.storage.from('themes').getPublicUrl('minimal.jpg').data.publicUrl}`,
     features: [
       "Clean compositions",
       "Subtle color effects",
@@ -68,7 +68,7 @@ const themes = [
     id: 6,
     title: "Retro Gaming",
     description: "Transform photos with pixelated effects, 8-bit styling, and classic gaming aesthetics that appeal to nostalgia and gaming culture.",
-    image: supabase.storage.from('themes').getPublicUrl('gaming.jpg').data.publicUrl,
+    image: `${supabase.storage.from('themes').getPublicUrl('gaming.jpg').data.publicUrl}`,
     features: [
       "8-bit pixel effects",
       "Retro game aesthetics",
