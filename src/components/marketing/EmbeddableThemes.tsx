@@ -43,6 +43,11 @@ const EmbeddableThemes = () => {
           file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)
         );
 
+        if (imageFiles.length === 0) {
+          setError('No image files found in the themes bucket');
+          return;
+        }
+
         // Generate themes from image files
         const generatedThemes = imageFiles.map((file, index) => {
           const title = file.name
@@ -79,10 +84,15 @@ const EmbeddableThemes = () => {
   }, []);
 
   const getThemeImageUrl = (imageName: string) => {
-    const { data } = supabase.storage
-      .from('themes')
-      .getPublicUrl(imageName);
-    return data.publicUrl;
+    try {
+      const { data } = supabase.storage
+        .from('themes')
+        .getPublicUrl(imageName);
+      return data.publicUrl;
+    } catch (error) {
+      console.error('Error generating URL for:', imageName, error);
+      return '/placeholder.svg';
+    }
   };
 
   if (isLoading) {
