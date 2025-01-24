@@ -80,12 +80,21 @@ const themes = [
 
 const EmbeddableThemes = () => {
   const getThemeImageUrl = (imageName: string) => {
-    const { data } = supabase.storage
-      .from('themes')
-      .getPublicUrl(imageName);
-    
-    console.log(`Generated URL for ${imageName}:`, data.publicUrl);
-    return data.publicUrl;
+    try {
+      // Get the public URL without any additional path manipulation
+      const { data } = supabase.storage
+        .from('themes')
+        .getPublicUrl(imageName);
+      
+      // Log the URL for debugging
+      console.log(`Raw URL from Supabase for ${imageName}:`, data.publicUrl);
+      
+      // Return the unmodified URL from Supabase
+      return data.publicUrl;
+    } catch (error) {
+      console.error('Error generating URL for', imageName, error);
+      return ''; // Return empty string if there's an error
+    }
   };
   
   return (
@@ -101,36 +110,45 @@ const EmbeddableThemes = () => {
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {themes.map((theme) => (
-          <Card 
-            key={theme.id} 
-            className="overflow-hidden bg-white/5 border border-white/10 hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 backdrop-blur-sm"
-          >
-            <div className="aspect-[4/3] relative">
-              <img
-                src={getThemeImageUrl(theme.imageName)}
-                alt={theme.title}
-                className="object-cover w-full h-full"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-            </div>
-            <div className="p-6 space-y-4">
-              <h3 className="text-2xl font-semibold text-white">{theme.title}</h3>
-              <p className="text-gray-300">{theme.description}</p>
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium text-primary">Key Features:</h4>
-                <ul className="grid grid-cols-2 gap-2">
-                  {theme.features.map((feature, index) => (
-                    <li key={index} className="text-sm text-gray-400 flex items-center">
-                      <span className="w-1.5 h-1.5 bg-primary/50 rounded-full mr-2" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
+        {themes.map((theme) => {
+          const imageUrl = getThemeImageUrl(theme.imageName);
+          console.log(`Final image URL for ${theme.title}:`, imageUrl); // Additional logging
+          
+          return (
+            <Card 
+              key={theme.id} 
+              className="overflow-hidden bg-white/5 border border-white/10 hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 backdrop-blur-sm"
+            >
+              <div className="aspect-[4/3] relative">
+                <img
+                  src={imageUrl}
+                  alt={theme.title}
+                  className="object-cover w-full h-full"
+                  onError={(e) => {
+                    console.error(`Error loading image for ${theme.title}`);
+                    e.currentTarget.src = '/placeholder.svg'; // Fallback image
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               </div>
-            </div>
-          </Card>
-        ))}
+              <div className="p-6 space-y-4">
+                <h3 className="text-2xl font-semibold text-white">{theme.title}</h3>
+                <p className="text-gray-300">{theme.description}</p>
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium text-primary">Key Features:</h4>
+                  <ul className="grid grid-cols-2 gap-2">
+                    {theme.features.map((feature, index) => (
+                      <li key={index} className="text-sm text-gray-400 flex items-center">
+                        <span className="w-1.5 h-1.5 bg-primary/50 rounded-full mr-2" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );
