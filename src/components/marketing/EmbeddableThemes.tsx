@@ -17,76 +17,75 @@ const getThemeDescription = (imageName: string): { description: string, features
 
   const themeDetails: Record<string, { description: string, features: string[] }> = {
     'vintage': {
-      description: 'A classic film-inspired theme that adds warm tones and subtle grain, perfect for creating timeless portraits with a nostalgic feel.',
+      description: 'Step back in time with our Vintage theme. This classic film-inspired filter adds warm, golden tones and subtle grain texture to create timeless portraits that feel like they were shot on analog film.',
       features: [
-        'Warm color grading',
-        'Film grain effect',
-        'Vintage vignetting',
-        'Classic aesthetics'
+        'Warm sepia tones',
+        'Film grain overlay',
+        'Light leaks effect',
+        'Vintage color grading'
       ]
     },
     'cyberpunk': {
-      description: 'Bold neon colors and futuristic effects transform your photos into stunning cyberpunk-style portraits with a high-tech edge.',
+      description: 'Enter the digital future with our Cyberpunk theme. This bold transformation adds electric neon highlights and futuristic glitch effects for portraits that look straight out of a sci-fi masterpiece.',
       features: [
-        'Neon highlights',
-        'Digital effects',
-        'Tech overlays',
-        'Future aesthetic'
+        'Neon color accents',
+        'Digital glitch effects',
+        'Holographic overlays',
+        'Futuristic lighting'
       ]
     },
     'noir': {
-      description: 'Dramatic black and white processing with enhanced contrast creates moody, film noir-style portraits with timeless appeal.',
+      description: 'Channel the mystery of classic film noir with our Noir theme. Dramatic shadows and high contrast black and white processing create moody, cinematic portraits with timeless sophistication.',
       features: [
-        'High contrast B&W',
-        'Film noir shadows',
-        'Dramatic lighting',
-        'Classic mood'
+        'Rich monochrome tones',
+        'Deep shadow contrast',
+        'Film noir lighting',
+        'Dramatic vignette'
       ]
     },
     'pop-art': {
-      description: 'Vibrant colors and bold patterns inspired by pop art create eye-catching portraits with a fun, artistic twist.',
+      description: 'Make a bold statement with our Pop Art theme. Inspired by iconic 60s art, this vibrant transformation uses bold colors and graphic patterns to turn portraits into eye-catching contemporary artwork.',
       features: [
-        'Bold colors',
-        'Pop art patterns',
-        'Artistic effects',
-        'Retro style'
+        'Vivid color blocks',
+        'Halftone patterns',
+        'Comic book style',
+        'Pop culture aesthetic'
       ]
     },
     'ethereal': {
-      description: 'Soft, dreamy effects and delicate color grading create ethereal portraits with a magical, otherworldly quality.',
+      description: 'Create dreamlike portraits with our Ethereal theme. Soft, luminous effects and delicate color grading combine to produce otherworldly images with a magical, floating quality.',
       features: [
-        'Soft light effects',
-        'Dreamy atmosphere',
-        'Ethereal glow',
-        'Magical elements'
+        'Soft light diffusion',
+        'Ethereal glow effect',
+        'Dreamy color palette',
+        'Subtle sparkle'
       ]
     },
     'retro': {
-      description: 'Vintage color palettes and subtle light leaks capture the charm of analog photography from decades past.',
+      description: 'Capture the charm of decades past with our Retro theme. This nostalgic filter adds vintage color shifts and subtle imperfections to create photos that feel like cherished memories.',
       features: [
-        'Retro colors',
-        'Light leak effects',
-        'Film texture',
-        'Nostalgic mood'
+        'Vintage color shifts',
+        'Authentic film effects',
+        'Period-correct tones',
+        'Retro light leaks'
       ]
     },
     'minimal': {
-      description: 'Clean, refined processing that enhances natural beauty while maintaining elegant simplicity.',
+      description: 'Embrace elegant simplicity with our Minimal theme. Clean lines and subtle enhancements create sophisticated portraits that let natural beauty shine through.',
       features: [
-        'Clean aesthetics',
-        'Subtle effects',
-        'Natural enhancement',
-        'Modern style'
+        'Refined contrast',
+        'Clean color grading',
+        'Elegant highlights',
+        'Modern simplicity'
       ]
     },
-    // Default theme details for any unmatched images
     'default': {
-      description: 'A unique AI-powered transformation that creates stunning portraits with professional quality effects.',
+      description: 'Transform your photos with our signature AI effects. This versatile theme enhances your portraits with professional-quality processing and artistic flourishes.',
       features: [
-        'AI enhancement',
-        'Professional effects',
-        'Custom processing',
-        'High-quality output'
+        'Smart enhancement',
+        'Custom effects',
+        'Professional finish',
+        'Artistic touches'
       ]
     }
   };
@@ -252,3 +251,4 @@ const EmbeddableThemes = () => {
 };
 
 export default EmbeddableThemes;
+
