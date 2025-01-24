@@ -15,7 +15,6 @@ const Pricing = () => {
         { text: "Multi-language support", checked: true },
         { text: "Image delivery via email, WhatsApp, and SMS", checked: true },
         { text: "Unmatched live event Support", checked: true },
-        { text: "Up to 500 images per activation", checked: true },
         { text: "Unlimited device usage for your devices", checked: true },
         { text: "Access to our theme library with 100+ themes", checked: true },
       ],
