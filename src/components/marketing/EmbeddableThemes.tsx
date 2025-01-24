@@ -35,10 +35,8 @@ const EmbeddableThemes = () => {
         }
 
         console.log('Total files found in bucket:', files?.length);
-        console.log('Raw files data:', files);
 
         if (!files || files.length === 0) {
-          console.log('No files found in themes bucket');
           setError('No themes found in the bucket');
           return;
         }
@@ -49,7 +47,6 @@ const EmbeddableThemes = () => {
         );
 
         console.log('Filtered image files count:', imageFiles.length);
-        console.log('First few image files:', imageFiles.slice(0, 3));
 
         if (imageFiles.length === 0) {
           setError('No image files found in themes bucket');
@@ -84,8 +81,6 @@ const EmbeddableThemes = () => {
         }));
 
         console.log('Number of themes generated:', generatedThemes.length);
-        console.log('First generated theme:', generatedThemes[0]);
-        
         setThemes(generatedThemes);
       } catch (err) {
         console.error('Unexpected error in fetchThemes:', err);
