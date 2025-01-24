@@ -41,8 +41,8 @@ const generateThemeFromImage = (imageName: string, index: number): Theme => {
     'Unique aesthetics'
   ];
 
-  // Construct the URL directly using the Supabase project URL and bucket name
-  const publicUrl = `${supabase.supabaseUrl}/storage/v1/object/public/themes/${imageName}`;
+  // Use the proper method to get the public URL
+  const publicUrl = supabase.storage.from('themes').getPublicUrl(imageName).data.publicUrl;
   console.log('Generated public URL for image:', publicUrl); // Debug log
 
   return {
