@@ -18,6 +18,11 @@ const Login = () => {
         
         if (error) {
           console.error("Session error:", error);
+          toast({
+            variant: "destructive",
+            title: "Authentication Error",
+            description: "There was an error checking your session. Please try again.",
+          });
           await supabase.auth.signOut();
           return;
         }
@@ -31,6 +36,11 @@ const Login = () => {
         }
       } catch (error) {
         console.error("Auth error:", error);
+        toast({
+          variant: "destructive",
+          title: "Authentication Error",
+          description: "There was an error during authentication. Please try again.",
+        });
         await supabase.auth.signOut();
       }
     };
@@ -50,6 +60,8 @@ const Login = () => {
         console.log('Token was refreshed successfully');
       } else if (event === 'SIGNED_OUT') {
         console.log('User signed out');
+      } else if (event === 'USER_UPDATED') {
+        console.log('User updated');
       }
     });
 
