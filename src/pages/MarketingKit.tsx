@@ -13,7 +13,7 @@ import type { CaseStudy } from '@/types/marketing';
 import { EventPhotoGrid } from '@/components/marketing/EventPhotoGrid';
 import { VideoGrid } from '@/components/marketing/VideoGrid';
 import { Card } from '@/components/ui/card';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 const themes = [
   {
@@ -153,13 +153,22 @@ const ThemesSection = () => {
   const { toast } = useToast();
   const embedCode = `<iframe src="${window.location.origin}/embed/themes" width="100%" height="800" frameborder="0"></iframe>`;
 
-  const handleCopyEmbed = () => {
-    navigator.clipboard.writeText(embedCode);
-    toast({
-      title: "Success!",
-      description: "Embed code copied to clipboard",
-      duration: 3000,
-    });
+  const handleCopyEmbed = async () => {
+    try {
+      await navigator.clipboard.writeText(embedCode);
+      toast({
+        title: "Success!",
+        description: "Embed code copied to clipboard",
+        duration: 3000,
+      });
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to copy embed code",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
   };
 
   return (
