@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, FileText, Video, Star, Camera, Palette, Package, Code } from 'lucide-react';
+import { Search, Filter, FileText, Video, Star, Camera, Palette, Package, Code, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import BaseLayout from '@/components/layouts/BaseLayout';
@@ -25,7 +25,6 @@ interface Theme {
 }
 
 const generateThemeFromImage = (imageName: string, index: number): Theme => {
-  // Remove file extension and replace underscores/hyphens with spaces
   const title = imageName
     .replace(/\.(jpg|jpeg|png|gif)$/i, '')
     .replace(/[-_]/g, ' ')
@@ -33,10 +32,8 @@ const generateThemeFromImage = (imageName: string, index: number): Theme => {
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 
-  // Generate a description based on the theme name
   const description = `Transform your photos with our ${title.toLowerCase()} theme, creating stunning and unique visual experiences.`;
 
-  // Generate generic features based on the theme
   const features = [
     `${title} style effects`,
     'Professional filters',
@@ -44,27 +41,34 @@ const generateThemeFromImage = (imageName: string, index: number): Theme => {
     'Unique aesthetics'
   ];
 
+  const publicUrl = supabase.storage.from('themes').getPublicUrl(imageName).data.publicUrl;
+  console.log('Generated public URL for image:', publicUrl); // Debug log
+
   return {
     id: index + 1,
     title,
     description,
-    image: supabase.storage.from('themes').getPublicUrl(imageName).data.publicUrl,
+    image: publicUrl,
     features
   };
 };
 
 const ThemesSection = () => {
   const [themes, setThemes] = useState<Theme[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const embedCode = `<iframe src="${window.location.origin}/embed/themes" width="100%" height="800" frameborder="0"></iframe>`;
 
   useEffect(() => {
     const fetchThemes = async () => {
       try {
-        const { data: files, error } = await supabase.storage.from('themes').list();
+        console.log('Starting to fetch themes...'); // Debug log
+        const { data: files, error: listError } = await supabase.storage.from('themes').list();
         
-        if (error) {
-          console.error('Error fetching themes:', error);
+        if (listError) {
+          console.error('Error fetching themes:', listError);
+          setError(listError.message);
           toast({
             title: "Error",
             description: "Failed to load themes",
@@ -73,7 +77,13 @@ const ThemesSection = () => {
           return;
         }
 
-        console.log('Files from bucket:', files); // Debug log
+        console.log('Raw files from bucket:', files); // Debug log
+
+        if (!files || files.length === 0) {
+          console.log('No files found in themes bucket'); // Debug log
+          setError('No themes found');
+          return;
+        }
 
         // Filter for image files only
         const imageFiles = files.filter(file => 
@@ -83,20 +93,24 @@ const ThemesSection = () => {
         console.log('Filtered image files:', imageFiles); // Debug log
 
         // Generate themes from image files
-        const generatedThemes = imageFiles.map((file, index) => 
-          generateThemeFromImage(file.name, index)
-        );
+        const generatedThemes = imageFiles.map((file, index) => {
+          const theme = generateThemeFromImage(file.name, index);
+          console.log('Generated theme:', theme); // Debug log
+          return theme;
+        });
 
-        console.log('Generated themes:', generatedThemes); // Debug log
-
+        console.log('Final generated themes:', generatedThemes); // Debug log
         setThemes(generatedThemes);
       } catch (err) {
-        console.error('Error in fetchThemes:', err);
+        console.error('Unexpected error in fetchThemes:', err);
+        setError(err instanceof Error ? err.message : 'An unexpected error occurred');
         toast({
           title: "Error",
           description: "Failed to load themes",
           variant: "destructive",
         });
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -121,10 +135,22 @@ const ThemesSection = () => {
     }
   };
 
-  if (themes.length === 0) {
+  if (isLoading) {
     return (
       <div className="text-center py-12">
         <p className="text-gray-400">Loading themes...</p>
+      </div>
+    );
+  }
+
+  if (error || themes.length === 0) {
+    return (
+      <div className="text-center py-12 space-y-4">
+        <div className="flex items-center justify-center gap-2 text-red-400">
+          <AlertCircle className="w-5 h-5" />
+          <p>{error || 'No themes found in the bucket'}</p>
+        </div>
+        <p className="text-gray-400">Please make sure there are image files in the themes bucket.</p>
       </div>
     );
   }
