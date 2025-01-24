@@ -156,8 +156,9 @@ const ThemesSection = () => {
   const handleCopyEmbed = () => {
     navigator.clipboard.writeText(embedCode);
     toast({
-      title: "Embed code copied!",
-      description: "The embed code has been copied to your clipboard.",
+      title: "Success!",
+      description: "Embed code copied to clipboard",
+      duration: 3000,
     });
   };
 
