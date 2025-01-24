@@ -7,33 +7,57 @@ const themes = [
   {
     id: 1,
     title: "Vintage Hollywood",
-    description: "Transform guests into classic movie stars with a timeless black and white aesthetic.",
-    image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7",
+    description: "Transform guests into classic movie stars with a timeless black and white aesthetic, complete with dramatic lighting and iconic Hollywood glamour.",
+    image: "https://kimera.ai/wp-content/uploads/2023/12/Vintage-Hollywood.jpg",
   },
   {
     id: 2,
     title: "Cyberpunk Future",
-    description: "Transport attendees to a neon-lit future with vibrant colors and futuristic elements.",
-    image: "https://images.unsplash.com/photo-1470813740244-df37b8c1edcb",
+    description: "Transport attendees to a neon-lit future with vibrant colors, digital glitches, and futuristic elements inspired by sci-fi aesthetics.",
+    image: "https://kimera.ai/wp-content/uploads/2023/12/Cyberpunk.jpg",
   },
   {
     id: 3,
     title: "Fantasy Realms",
-    description: "Create magical transformations with ethereal lighting and mystical backgrounds.",
-    image: "https://images.unsplash.com/photo-1500673922987-e212871fec22",
+    description: "Create magical transformations with ethereal lighting, mystical backgrounds, and fantasy-inspired elements that transport guests to enchanted worlds.",
+    image: "https://kimera.ai/wp-content/uploads/2023/12/Fantasy.jpg",
   },
   {
     id: 4,
     title: "Pop Art",
-    description: "Bold, vibrant colors and comic book-style effects for a playful, artistic experience.",
-    image: "https://images.unsplash.com/photo-1493397212122-2b85dda8106b",
+    description: "Transform photos into vibrant pop art masterpieces with bold colors, comic book-style effects, and artistic filters inspired by Andy Warhol.",
+    image: "https://kimera.ai/wp-content/uploads/2023/12/Pop-Art.jpg",
   },
   {
     id: 5,
     title: "Minimalist",
-    description: "Clean, elegant transformations with subtle effects and refined aesthetics.",
-    image: "https://images.unsplash.com/photo-1551038247-3d9af20df552",
+    description: "Create elegant transformations with clean lines, subtle effects, and refined aesthetics that emphasize simplicity and sophistication.",
+    image: "https://kimera.ai/wp-content/uploads/2023/12/Minimalist.jpg",
   },
+  {
+    id: 6,
+    title: "Retro Gaming",
+    description: "Transform photos with pixelated effects, 8-bit styling, and classic gaming aesthetics that appeal to nostalgia and gaming culture.",
+    image: "https://kimera.ai/wp-content/uploads/2023/12/Retro-Gaming.jpg",
+  },
+  {
+    id: 7,
+    title: "Anime Style",
+    description: "Convert photos into anime-inspired artwork with characteristic big eyes, expressive features, and distinctive Japanese animation styling.",
+    image: "https://kimera.ai/wp-content/uploads/2023/12/Anime.jpg",
+  },
+  {
+    id: 8,
+    title: "Street Art",
+    description: "Transform photos with urban art styles, graffiti elements, and street culture aesthetics for a bold, contemporary look.",
+    image: "https://kimera.ai/wp-content/uploads/2023/12/Street-Art.jpg",
+  },
+  {
+    id: 9,
+    title: "Watercolor Dreams",
+    description: "Convert photos into delicate watercolor paintings with soft colors, artistic brush strokes, and dreamy, flowing effects.",
+    image: "https://kimera.ai/wp-content/uploads/2023/12/Watercolor.jpg",
+  }
 ];
 
 const Themes = () => {
@@ -52,7 +76,10 @@ const Themes = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {themes.map((theme) => (
-            <Card key={theme.id} className="overflow-hidden bg-card hover:bg-card/80 transition-colors">
+            <Card 
+              key={theme.id} 
+              className="overflow-hidden bg-white/5 border border-white/10 hover:border-primary/50 transition-all duration-300 hover:-translate-y-1"
+            >
               <div className="aspect-video relative">
                 <img
                   src={theme.image}
