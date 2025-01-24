@@ -143,8 +143,6 @@ const MarketingKit = () => {
         </p>
       </header>
 
-      <EmbedCodeSection />
-
       <div className="flex flex-col md:flex-row gap-4 mb-8">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
@@ -208,7 +206,10 @@ const MarketingKit = () => {
       {activeTab === 'videos' && <VideosSection />}
       {activeTab === 'themes' && (
         <>
-          <EmbeddableThemes />
+          <EmbedCodeSection />
+          <div className="mt-8">
+            <EmbeddableThemes />
+          </div>
         </>
       )}
 
