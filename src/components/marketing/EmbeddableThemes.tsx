@@ -19,7 +19,7 @@ const EmbeddableThemes = () => {
   useEffect(() => {
     const fetchThemes = async () => {
       try {
-        console.log('Fetching themes from storage...');
+        console.log('Starting to fetch themes...');
         const { data: files, error: listError } = await supabase.storage
           .from('themes')
           .list('', {
@@ -34,7 +34,8 @@ const EmbeddableThemes = () => {
           return;
         }
 
-        console.log('Raw response from storage:', files);
+        console.log('Total files found in bucket:', files?.length);
+        console.log('Raw files data:', files);
 
         if (!files || files.length === 0) {
           console.log('No files found in themes bucket');
@@ -47,7 +48,8 @@ const EmbeddableThemes = () => {
           file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)
         );
 
-        console.log('Filtered image files:', imageFiles);
+        console.log('Filtered image files count:', imageFiles.length);
+        console.log('First few image files:', imageFiles.slice(0, 3));
 
         if (imageFiles.length === 0) {
           setError('No image files found in themes bucket');
@@ -81,10 +83,12 @@ const EmbeddableThemes = () => {
           };
         }));
 
-        console.log('Final generated themes:', generatedThemes);
+        console.log('Number of themes generated:', generatedThemes.length);
+        console.log('First generated theme:', generatedThemes[0]);
+        
         setThemes(generatedThemes);
       } catch (err) {
-        console.error('Unexpected error:', err);
+        console.error('Unexpected error in fetchThemes:', err);
         setError(err instanceof Error ? err.message : 'An unexpected error occurred');
       } finally {
         setIsLoading(false);
