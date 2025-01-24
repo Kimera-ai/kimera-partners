@@ -12,6 +12,16 @@ const Login = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    // Clear any existing session data on component mount
+    const clearSession = async () => {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Error clearing session:', error);
+      }
+    };
+    
+    clearSession();
+
     const handleSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
@@ -23,7 +33,6 @@ const Login = () => {
             title: "Authentication Error",
             description: "There was an error checking your session. Please try again.",
           });
-          await supabase.auth.signOut();
           return;
         }
 
@@ -41,7 +50,6 @@ const Login = () => {
           title: "Authentication Error",
           description: "There was an error during authentication. Please try again.",
         });
-        await supabase.auth.signOut();
       }
     };
 
@@ -50,18 +58,14 @@ const Login = () => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event);
+      
       if (event === 'SIGNED_IN' && session) {
         navigate("/partner-program");
         toast({
           title: "Welcome back!",
           description: "You have successfully signed in.",
         });
-      } else if (event === 'TOKEN_REFRESHED') {
-        console.log('Token was refreshed successfully');
-      } else if (event === 'SIGNED_OUT') {
-        console.log('User signed out');
-      } else if (event === 'USER_UPDATED') {
-        console.log('User updated');
       }
     });
 
@@ -108,6 +112,7 @@ const Login = () => {
               }}
               view="sign_in"
               providers={[]}
+              redirectTo={window.location.origin}
               showLinks={true}
               localization={{
                 variables: {
