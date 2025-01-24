@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
-import { Palette, Loader2, AlertCircle } from 'lucide-react';
+import { GalleryHorizontal, Loader2, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Theme {
@@ -114,11 +114,12 @@ const EmbeddableThemes = () => {
     <div className="w-full bg-[#100919] text-gray-300 p-8">
       <header className="text-center max-w-3xl mx-auto mb-16">
         <h2 className="text-4xl font-bold text-white mb-6 flex items-center justify-center gap-4">
-          <Palette className="w-8 h-8" />
+          <GalleryHorizontal className="w-8 h-8" />
           AI Photobooth Themes
         </h2>
         <p className="text-xl text-gray-300">
           Transform your events with our collection of stunning AI-powered photo themes.
+          Each theme offers unique visual effects and artistic transformations.
         </p>
       </header>
 
@@ -126,25 +127,34 @@ const EmbeddableThemes = () => {
         {themes.map((theme) => (
           <Card 
             key={theme.id} 
-            className="overflow-hidden bg-white/5 border border-white/10 hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 backdrop-blur-sm"
+            className="group overflow-hidden bg-white/5 border border-white/10 hover:border-primary/50 transition-all duration-300 hover:-translate-y-1"
           >
-            <div className="aspect-[4/3] relative">
+            <div className="aspect-video relative overflow-hidden">
               <img
                 src={theme.imageName}
                 alt={theme.title}
-                className="object-cover w-full h-full"
+                className="object-cover w-full h-full transform transition-transform duration-500 group-hover:scale-110"
                 onError={(e) => {
                   console.error(`Error loading image for ${theme.title}`);
                   e.currentTarget.src = '/placeholder.svg';
                 }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <span className="px-4 py-2 bg-primary text-white rounded-full text-sm font-medium">
+                  View Theme
+                </span>
+              </div>
             </div>
             <div className="p-6 space-y-4">
-              <h3 className="text-2xl font-semibold text-white">{theme.title}</h3>
-              <p className="text-gray-300">{theme.description}</p>
+              <h3 className="text-2xl font-semibold text-white group-hover:text-primary transition-colors">
+                {theme.title}
+              </h3>
+              <p className="text-gray-400 line-clamp-2">
+                {theme.description}
+              </p>
               <div className="space-y-2">
-                <h4 className="text-sm font-medium text-primary">Key Features:</h4>
+                <h4 className="text-sm font-medium text-primary">Features:</h4>
                 <ul className="grid grid-cols-2 gap-2">
                   {theme.features.map((feature, index) => (
                     <li key={index} className="text-sm text-gray-400 flex items-center">
