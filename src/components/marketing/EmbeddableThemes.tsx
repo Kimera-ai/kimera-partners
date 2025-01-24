@@ -22,7 +22,11 @@ const EmbeddableThemes = () => {
         console.log('Fetching themes from storage...');
         const { data: files, error: listError } = await supabase.storage
           .from('themes')
-          .list('');
+          .list('', {
+            limit: 100,
+            offset: 0,
+            sortBy: { column: 'name', order: 'asc' }
+          });
 
         if (listError) {
           console.error('Error listing files:', listError);
@@ -30,10 +34,11 @@ const EmbeddableThemes = () => {
           return;
         }
 
-        console.log('Files from storage:', files);
+        console.log('Raw response from storage:', files);
 
         if (!files || files.length === 0) {
-          setError('No files found in themes bucket');
+          console.log('No files found in themes bucket');
+          setError('No themes found in the bucket');
           return;
         }
 
@@ -76,7 +81,7 @@ const EmbeddableThemes = () => {
           };
         }));
 
-        console.log('Generated themes:', generatedThemes);
+        console.log('Final generated themes:', generatedThemes);
         setThemes(generatedThemes);
       } catch (err) {
         console.error('Unexpected error:', err);
@@ -127,7 +132,7 @@ const EmbeddableThemes = () => {
         {themes.map((theme) => (
           <Card 
             key={theme.id} 
-            className="group overflow-hidden bg-white/5 border border-white/10 hover:border-primary/50 transition-all duration-300 hover:-translate-y-1"
+            className="group overflow-hidden bg-white/5 border border-white/10 hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 backdrop-blur-sm"
           >
             <div className="aspect-video relative overflow-hidden">
               <img
