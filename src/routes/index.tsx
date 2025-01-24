@@ -5,6 +5,7 @@ import PartnerProgram from "@/pages/PartnerProgram"
 import Dashboard from "@/pages/Dashboard"
 import Pricing from "@/pages/Pricing"
 import ThankYou from "@/pages/ThankYou"
+import EmbedThemes from "@/pages/EmbedThemes"
 import { useSession } from "@/hooks/useSession"
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -73,5 +74,9 @@ export const router = createBrowserRouter([
         <Dashboard />
       </ProtectedRoute>
     ),
+  },
+  {
+    path: "/embed/themes",
+    element: <EmbedThemes />,
   },
 ])

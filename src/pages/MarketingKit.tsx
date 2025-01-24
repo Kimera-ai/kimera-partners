@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, FileText, Video, Star, Camera, Palette } from 'lucide-react';
+import { Search, Filter, FileText, Video, Star, Camera, Palette, Package, Code } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import BaseLayout from '@/components/layouts/BaseLayout';
@@ -13,6 +13,7 @@ import type { CaseStudy } from '@/types/marketing';
 import { EventPhotoGrid } from '@/components/marketing/EventPhotoGrid';
 import { VideoGrid } from '@/components/marketing/VideoGrid';
 import { Card } from '@/components/ui/card';
+import { useToast } from '@/components/ui/use-toast';
 
 const themes = [
   {
@@ -148,53 +149,76 @@ const EventPhotosSection = () => (
   </div>
 );
 
-const ThemesSection = () => (
-  <div className="space-y-8">
-    <header className="text-center max-w-3xl mx-auto mb-16">
-      <h2 className="text-4xl font-bold text-white mb-6 flex items-center justify-center gap-4">
-        <Palette className="w-8 h-8" />
-        AI Photobooth Themes
-      </h2>
-      <p className="text-xl text-gray-300">
-        Transform your events with our collection of stunning AI-powered photo themes. 
-        Each theme offers unique visual effects and artistic transformations.
-      </p>
-    </header>
+const ThemesSection = () => {
+  const { toast } = useToast();
+  const embedCode = `<iframe src="${window.location.origin}/embed/themes" width="100%" height="800" frameborder="0"></iframe>`;
 
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {themes.map((theme) => (
-        <Card 
-          key={theme.id} 
-          className="overflow-hidden bg-white/5 border border-white/10 hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 backdrop-blur-sm"
-        >
-          <div className="aspect-[4/3] relative">
-            <img
-              src={theme.image}
-              alt={theme.title}
-              className="object-cover w-full h-full"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-          </div>
-          <div className="p-6 space-y-4">
-            <h3 className="text-2xl font-semibold text-white">{theme.title}</h3>
-            <p className="text-gray-300">{theme.description}</p>
-            <div className="space-y-2">
-              <h4 className="text-sm font-medium text-primary">Key Features:</h4>
-              <ul className="grid grid-cols-2 gap-2">
-                {theme.features.map((feature, index) => (
-                  <li key={index} className="text-sm text-gray-400 flex items-center">
-                    <span className="w-1.5 h-1.5 bg-primary/50 rounded-full mr-2" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
+  const handleCopyEmbed = () => {
+    navigator.clipboard.writeText(embedCode);
+    toast({
+      title: "Embed code copied!",
+      description: "The embed code has been copied to your clipboard.",
+    });
+  };
+
+  return (
+    <div className="space-y-8">
+      <header className="text-center max-w-3xl mx-auto mb-16">
+        <div className="flex justify-end mb-4">
+          <Button
+            variant="outline"
+            className="border-white/20 hover:bg-white/20 text-white"
+            onClick={handleCopyEmbed}
+          >
+            <Code className="w-4 h-4 mr-2" />
+            Get Embed Code
+          </Button>
+        </div>
+        <h2 className="text-4xl font-bold text-white mb-6 flex items-center justify-center gap-4">
+          <Palette className="w-8 h-8" />
+          AI Photobooth Themes
+        </h2>
+        <p className="text-xl text-gray-300">
+          Transform your events with our collection of stunning AI-powered photo themes. 
+          Each theme offers unique visual effects and artistic transformations.
+        </p>
+      </header>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {themes.map((theme) => (
+          <Card 
+            key={theme.id} 
+            className="overflow-hidden bg-white/5 border border-white/10 hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 backdrop-blur-sm"
+          >
+            <div className="aspect-[4/3] relative">
+              <img
+                src={theme.image}
+                alt={theme.title}
+                className="object-cover w-full h-full"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
             </div>
-          </div>
-        </Card>
-      ))}
+            <div className="p-6 space-y-4">
+              <h3 className="text-2xl font-semibold text-white">{theme.title}</h3>
+              <p className="text-gray-300">{theme.description}</p>
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-primary">Key Features:</h4>
+                <ul className="grid grid-cols-2 gap-2">
+                  {theme.features.map((feature, index) => (
+                    <li key={index} className="text-sm text-gray-400 flex items-center">
+                      <span className="w-1.5 h-1.5 bg-primary/50 rounded-full mr-2" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const MarketingKit = () => {
   const [activeTab, setActiveTab] = useState('event-photos');
