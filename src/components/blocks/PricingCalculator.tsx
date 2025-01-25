@@ -104,16 +104,16 @@ export function PricingCalculator() {
       <div className="space-y-4 mb-6">
         <div className="space-y-2">
           <Label htmlFor="guestCount">Expected Number of Guests</Label>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-lg bg-primary/5 border border-primary/20 backdrop-blur-sm shadow-lg hover:border-primary/30 transition-all duration-300">
             <Input
               id="guestCount"
               type="number"
               min="1"
               value={guestCount}
               onChange={(e) => setGuestCount(Math.max(1, parseInt(e.target.value) || 1))}
-              className="w-full sm:w-32"
+              className="w-full sm:w-32 bg-background/50"
             />
-            <span className="text-sm text-muted-foreground">
+            <span className="text-sm text-primary font-medium">
               ({calculateExpectedUsage(guestCount)} expected runs)
             </span>
           </div>
