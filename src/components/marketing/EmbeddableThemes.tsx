@@ -18,91 +18,91 @@ const getThemeDescription = (imageName: string): { description: string, features
     'adventure': {
       description: 'A rugged explorer with sharp blue eyes, stubbled face, and a determined expression. Dressed in a brown fedora, beige shirt, and a weathered leather vest, he grips a coiled whip while navigating an ancient, dimly lit temple with intricately carved stone pillars. The moody lighting enhances the cinematic adventure feel.',
       features: [
-        'Smart enhancement – Depth and rugged detail in clothing and environment',
-        'Custom effects – Realistic textures on attire and temple ruins',
-        'Professional finish – Cinematic lighting and high clarity',
-        'Artistic touches – Adventure-inspired aesthetic with an aged, mysterious setting'
+        'Enhanced realism',
+        'Custom textures',
+        'Cinematic lighting',
+        'Heroic aesthetics'
       ]
     },
     'angel': {
       description: 'A celestial beauty with soft, radiant skin, wavy brown hair, and a delicate floral headpiece. Dressed in a flowing white gown with intricate lace details, she has large, feathery wings that spread gracefully behind her. She is bathed in golden light against a dreamy sky filled with fluffy clouds.',
       features: [
-        'Smart enhancement – Ethereal glow and soft-focus details',
-        'Custom effects – Realistic feathered wings and divine lighting',
-        'Professional finish – High-definition clarity with seamless blending',
-        'Artistic touches – Heavenly background with radiant aura'
+        'Soft glow',
+        'Feathered wings',
+        'Seamless blending',
+        'Heavenly aura'
       ]
     },
     'artistic-blue-flowers': {
       description: 'A mysterious woman with piercing blue eyes and wavy blonde hair, partially veiled by mist. Blue flowers are woven into her hair, and she is surrounded by a dreamy, enchanted atmosphere with glowing highlights. The background features warm orange flower accents for contrast.',
       features: [
-        'Smart enhancement – Dreamy atmosphere with soft blurs',
-        'Custom effects – Vibrant, enchanting blue floral arrangement',
-        'Professional finish – Balanced contrast between cool and warm tones',
-        'Artistic touches – Delicate mist and fairytale-like ambiance'
+        'Dreamy effects',
+        'Rich colors',
+        'Soft mist',
+        'Floral elegance'
       ]
     },
     'artistic-purple-flowers': {
       description: 'A striking woman with icy blue eyes and an elegant updo, adorned with delicate purple blossoms. Her deep red lips contrast with the cool purple hues, and wisps of ethereal mist swirl around her, giving a surreal, fairytale-like quality against a dark, moody background.',
       features: [
-        'Smart enhancement – Deep hues and vivid color grading',
-        'Custom effects – Soft mist and shadow play for mystery',
-        'Professional finish – High-resolution clarity',
-        'Artistic touches – Elegant floral elements enhancing the composition'
+        'Deep hues',
+        'Mysterious glow',
+        'Elegant florals',
+        'Artistic depth'
       ]
     },
     'artistic-red-flowers': {
       description: 'A fiery, confident woman with piercing green eyes and auburn hair, surrounded by glowing red poppies. Her bold red lips and smoky eye makeup add to her intense and captivating presence, framed by swirling mist in a dark, dramatic setting.',
       features: [
-        'Smart enhancement – High contrast and bold depth',
-        'Custom effects – Realistic textures in flowers and hair',
-        'Professional finish – Cinematic portraiture',
-        'Artistic touches – Fiery composition with a passionate color scheme'
+        'Bold contrast',
+        'Fiery tones',
+        'Dramatic mist',
+        'Passionate feel'
       ]
     },
     'astronaut': {
       description: 'A smiling astronaut in a white NASA spacesuit, floating in space with distant planets in the background. His glass helmet reflects twinkling stars, capturing the excitement of space exploration with crisp, realistic details.',
       features: [
-        'Smart enhancement – Sharp suit details and reflections',
-        'Custom effects – Realistic space elements like stars and planets',
-        'Professional finish – Perfect lighting balance',
-        'Artistic touches – Expressive portrait capturing adventure and wonder'
+        'Sharp details',
+        'Reflective visor',
+        'Cosmic backdrop',
+        'Adventure vibe'
       ]
     },
     'cartoon-ballet': {
       description: 'A cute, animated girl with large, sparkling hazel eyes and soft brown curls, topped with a big pink bow. She wears a delicate lavender tutu dress with glittering details, poised elegantly in a sunlit dance studio where other ballerinas practice in the background.',
       features: [
-        'Smart enhancement – Soft pastel tones and gentle shading',
-        'Custom effects – Sparkling tutu details for a magical effect',
-        'Professional finish – Smooth, high-quality animation styling',
-        'Artistic touches – Whimsical and dreamy ballet scene'
+        'Soft pastels',
+        'Glowing tutu',
+        'Graceful pose',
+        'Whimsical feel'
       ]
     },
     'cartoon-bubbles': {
       description: 'A cheerful, cartoon-style girl with bright, round eyes and rosy cheeks, sitting on a grassy field. She wears a pink sundress and sparkly shoes, surrounded by large, iridescent bubbles floating in a clear blue sky.',
       features: [
-        'Smart enhancement – Vibrant colors and soft character details',
-        'Custom effects – Glowing, translucent bubbles',
-        'Professional finish – Clean, high-definition rendering',
-        'Artistic touches – Bright and cheerful outdoor scene'
+        'Bright colors',
+        'Floating bubbles',
+        'Soft glow',
+        'Joyful vibe'
       ]
     },
     'cartoon-kite': {
       description: 'A playful, animated boy with tousled brown hair and wide green eyes, grinning as he flies a bright red-and-yellow kite. He wears a cozy green hoodie, rolled-up jeans, and sneakers, standing on a grassy hill under a breezy, blue sky.',
       features: [
-        'Smart enhancement – Dynamic motion effects',
-        'Custom effects – Realistic wind-blown elements',
-        'Professional finish – Crisp outlines and smooth color balance',
-        'Artistic touches – Idyllic outdoor setting with a sense of movement'
+        'Dynamic motion',
+        'Wind effects',
+        'Crisp outlines',
+        'Lively setting'
       ]
     },
     'cartoon-paint': {
       description: 'A lively, cartoon-style girl with oversized blue eyes and bouncy brown curls, holding two large paintbrushes dripping with color. She wears a pink hoodie with colorful paint splatters, ripped jeans, and sneakers, standing in front of a vibrant mural filled with flowers and abstract designs.',
       features: [
-        'Smart enhancement – Bright and expressive character design',
-        'Custom effects – Dynamic paint splashes',
-        'Professional finish – Smooth, polished cartoon textures',
-        'Artistic touches – A playful and creative theme with vibrant energy'
+        'Vibrant colors',
+        'Dynamic paint',
+        'Polished textures',
+        'Creative energy'
       ]
     },
     'default': {
