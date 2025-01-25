@@ -96,6 +96,7 @@ export type Database = {
           description: string
           features: string[]
           id: string
+          image_url: string | null
           name: string
           title: string
           updated_at: string
@@ -105,6 +106,7 @@ export type Database = {
           description: string
           features: string[]
           id?: string
+          image_url?: string | null
           name: string
           title: string
           updated_at?: string
@@ -114,6 +116,7 @@ export type Database = {
           description?: string
           features?: string[]
           id?: string
+          image_url?: string | null
           name?: string
           title?: string
           updated_at?: string

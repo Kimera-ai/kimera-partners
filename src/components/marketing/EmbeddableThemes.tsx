@@ -9,7 +9,7 @@ interface Theme {
   description: string;
   name: string;
   features: string[];
-  imageUrl?: string;
+  image_url: string | null;
 }
 
 const EmbeddableThemes = () => {
@@ -37,20 +37,8 @@ const EmbeddableThemes = () => {
           return;
         }
 
-        // For each theme, get the image URL from storage
-        const themesWithImages = await Promise.all(themeData.map(async (theme) => {
-          const { data: urlData } = supabase.storage
-            .from('themes')
-            .getPublicUrl(`${theme.name}.jpg`);
-
-          return {
-            ...theme,
-            imageUrl: urlData.publicUrl
-          };
-        }));
-
-        console.log('Themes with images:', themesWithImages);
-        setThemes(themesWithImages);
+        console.log('Themes fetched:', themeData);
+        setThemes(themeData);
       } catch (err) {
         console.error('Unexpected error in fetchThemes:', err);
         setError(err instanceof Error ? err.message : 'An unexpected error occurred');
@@ -104,7 +92,7 @@ const EmbeddableThemes = () => {
           >
             <div className="aspect-video relative overflow-hidden">
               <img
-                src={theme.imageUrl}
+                src={theme.image_url || '/placeholder.svg'}
                 alt={theme.title}
                 className="object-cover w-full h-full transform transition-transform duration-500 group-hover:scale-110"
                 onError={(e) => {
