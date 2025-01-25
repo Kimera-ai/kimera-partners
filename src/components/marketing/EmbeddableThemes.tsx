@@ -15,6 +15,96 @@ const getThemeDescription = (imageName: string): { description: string, features
   const name = imageName.toLowerCase().replace(/\.(jpg|jpeg|png|gif|webp)$/i, '');
 
   const themeDetails: Record<string, { description: string, features: string[] }> = {
+    'cartoon-skateboard': {
+      description: 'A playful animated boy with tousled brown hair, big expressive eyes, and a wide grin. Wearing an orange hoodie and blue jeans, he performs a mid-air skateboard trick over a colorful skatepark ramp. The background features a bright blue sky with fluffy clouds, adding to the dynamic energy.',
+      features: [
+        'Dynamic action',
+        'Bright colors',
+        'Expressive pose',
+        'Lively setting'
+      ]
+    },
+    'cartoon-street-dance': {
+      description: 'A fun-loving animated boy with curly hair, large shining eyes, and a backwards cap. Dressed in a casual t-shirt and jeans, he dances confidently in a neon-lit urban setting, surrounded by a cheering crowd of kids. The vibrant pink and blue lights enhance the energetic party vibe.',
+      features: [
+        'Neon lighting',
+        'Expressive dance',
+        'Urban vibe',
+        'Lively crowd'
+      ]
+    },
+    'cartoon-vintage': {
+      description: 'A nostalgic animated girl with soft wavy hair, golden-brown eyes, and a gentle smile. Wearing denim shorts, a white blouse, and an orange headband, she holds a vintage camera in a glowing field of wildflowers during sunset. The warm golden light enhances the dreamy atmosphere.',
+      features: [
+        'Vintage tones',
+        'Warm lighting',
+        'Retro camera',
+        'Soft details'
+      ]
+    },
+    'cleopatra': {
+      description: 'A regal woman dressed as Cleopatra, wearing an intricate golden dress and a stunning blue-and-gold striped headdress. Her bold eyeliner and golden jewelry highlight her powerful presence. The background features an ancient Egyptian temple at sunset, creating a dramatic royal aesthetic.',
+      features: [
+        'Royal elegance',
+        'Historical accuracy',
+        'Golden tones',
+        'Dramatic setting'
+      ]
+    },
+    'clown': {
+      description: 'A classic circus clown with a big red nose, curly orange hair, and a playful grin. Wearing a bright blue and red costume with oversized buttons, ruffled collars, and a yellow hat, he stands in front of a striped circus tent with colorful balloons floating around.',
+      features: [
+        'Vibrant colors',
+        'Whimsical outfit',
+        'Expressive face',
+        'Carnival theme'
+      ]
+    },
+    'cruise-ship-party': {
+      description: 'A cheerful man in a vibrant Hawaiian shirt and white shorts, enjoying a tropical evening on a cruise ship deck. Fireworks light up the night sky behind him, while the ocean and ship create a festive, vacation-like atmosphere.',
+      features: [
+        'Tropical vibes',
+        'Festive energy',
+        'Firework display',
+        'Relaxed setting'
+      ]
+    },
+    'cybersecurity-woman': {
+      description: 'A confident woman in a sleek black blazer, standing in a futuristic high-tech environment. Her sharp blue eyes and composed expression exude intelligence and authority, with glowing screens in the background enhancing the cybersecurity theme.',
+      features: [
+        'Futuristic glow',
+        'Professional look',
+        'Tech ambiance',
+        'Confident pose'
+      ]
+    },
+    'elegant-man': {
+      description: 'A sophisticated young man with sharp features, stubble, and intense green eyes. Wearing a tailored brown blazer over a denim shirt, he exudes charm and confidence. The background is softly lit, emphasizing his timeless style.',
+      features: [
+        'Sharp details',
+        'Elegant styling',
+        'Natural lighting',
+        'Classic portrait'
+      ]
+    },
+    'doctor-woman': {
+      description: 'A professional young female doctor with soft blonde hair, wearing a white coat over blue scrubs. She stands in a bright, modern hospital corridor, her calm expression reflecting expertise and care.',
+      features: [
+        'Medical realism',
+        'Soft lighting',
+        'Professional attire',
+        'Modern setting'
+      ]
+    },
+    'farm-woman': {
+      description: 'A natural beauty with wavy dark hair and green eyes, wearing a blue gingham dress with delicate lace details. Holding a basket full of fresh fruits and herbs, she walks through a sunlit countryside path surrounded by greenery and wildflowers.',
+      features: [
+        'Rustic charm',
+        'Soft natural light',
+        'Organic setting',
+        'Fresh produce'
+      ]
+    },
     'adventure': {
       description: 'A rugged explorer with sharp blue eyes, stubbled face, and a determined expression. Dressed in a brown fedora, beige shirt, and a weathered leather vest, he grips a coiled whip while navigating an ancient, dimly lit temple with intricately carved stone pillars. The moody lighting enhances the cinematic adventure feel.',
       features: [
@@ -120,8 +210,6 @@ const getThemeDescription = (imageName: string): { description: string, features
   const matchedTheme = Object.keys(themeDetails).find(key => name.includes(key));
   return matchedTheme ? themeDetails[matchedTheme] : themeDetails['default'];
 };
-
-// ... keep existing code (fetchThemes function and other utilities)
 
 const EmbeddableThemes = () => {
   const [themes, setThemes] = useState<Theme[]>([]);
