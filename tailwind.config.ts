@@ -25,12 +25,12 @@ export default {
         background: "#100919",
         foreground: "#FFFFFF",
         primary: {
-          DEFAULT: "#FF2B6E",
-          hover: "#FF068B",
+          DEFAULT: "#9b87f5", // Changed from red to Primary Purple
+          hover: "#7E69AB", // Changed to Secondary Purple
           foreground: "#FFFFFF",
         },
         secondary: {
-          DEFAULT: "#FF2B6E",
+          DEFAULT: "#D946EF", // Changed to Magenta Pink
           foreground: "#FFFFFF",
         },
         destructive: {
