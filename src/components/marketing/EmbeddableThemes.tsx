@@ -121,7 +121,7 @@ const EmbeddableThemes = () => {
                 <h4 className="text-sm font-medium text-primary">Features:</h4>
                 <ul className="grid grid-cols-2 gap-2">
                   {theme.features.map((feature, index) => (
-                    <li key={index} className="text-sm text-gray-400 flex items-center">
+                    <li key={index} className="text-sm text-gray-400 flex items-center justify-start">
                       <span className="w-1.5 h-1.5 bg-primary/50 rounded-full mr-2" />
                       {feature}
                     </li>
