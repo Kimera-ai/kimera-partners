@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { GalleryHorizontal, Loader2, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import ThemeImageManager from './ThemeImageManager';
 
 interface Theme {
   id: string;
@@ -84,16 +83,6 @@ const EmbeddableThemes = () => {
           Each theme offers unique visual effects and artistic transformations.
         </p>
       </header>
-
-      <div className="space-y-4 mb-8">
-        {themes.map((theme) => (
-          <ThemeImageManager 
-            key={theme.id} 
-            theme={theme} 
-            onImageUpdate={fetchThemes}
-          />
-        ))}
-      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {themes.map((theme) => (
