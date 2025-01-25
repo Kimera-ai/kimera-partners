@@ -90,6 +90,36 @@ export type Database = {
         }
         Relationships: []
       }
+      themes: {
+        Row: {
+          created_at: string
+          description: string
+          features: string[]
+          id: string
+          name: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          features: string[]
+          id?: string
+          name: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          features?: string[]
+          id?: string
+          name?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       videos: {
         Row: {
           created_at: string
