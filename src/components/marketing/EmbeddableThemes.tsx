@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { GalleryHorizontal, Loader2, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import ThemeImageManager from './ThemeImageManager';
 
 interface Theme {
   id: string;
@@ -17,36 +18,36 @@ const EmbeddableThemes = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchThemes = async () => {
-      try {
-        console.log('Starting to fetch themes...');
-        const { data: themeData, error: themeError } = await supabase
-          .from('themes')
-          .select('*')
-          .order('title');
+  const fetchThemes = async () => {
+    try {
+      console.log('Starting to fetch themes...');
+      const { data: themeData, error: themeError } = await supabase
+        .from('themes')
+        .select('*')
+        .order('title');
 
-        if (themeError) {
-          console.error('Error fetching themes:', themeError);
-          setError('Failed to fetch themes');
-          return;
-        }
-
-        if (!themeData || themeData.length === 0) {
-          setError('No themes found in the database');
-          return;
-        }
-
-        console.log('Themes fetched:', themeData);
-        setThemes(themeData);
-      } catch (err) {
-        console.error('Unexpected error in fetchThemes:', err);
-        setError(err instanceof Error ? err.message : 'An unexpected error occurred');
-      } finally {
-        setIsLoading(false);
+      if (themeError) {
+        console.error('Error fetching themes:', themeError);
+        setError('Failed to fetch themes');
+        return;
       }
-    };
 
+      if (!themeData || themeData.length === 0) {
+        setError('No themes found in the database');
+        return;
+      }
+
+      console.log('Themes fetched:', themeData);
+      setThemes(themeData);
+    } catch (err) {
+      console.error('Unexpected error in fetchThemes:', err);
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchThemes();
   }, []);
 
@@ -83,6 +84,16 @@ const EmbeddableThemes = () => {
           Each theme offers unique visual effects and artistic transformations.
         </p>
       </header>
+
+      <div className="space-y-4 mb-8">
+        {themes.map((theme) => (
+          <ThemeImageManager 
+            key={theme.id} 
+            theme={theme} 
+            onImageUpdate={fetchThemes}
+          />
+        ))}
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {themes.map((theme) => (
