@@ -93,11 +93,11 @@ const EmbeddableThemes = () => {
             key={theme.id} 
             className="group overflow-hidden bg-white/5 border border-white/10 hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 backdrop-blur-sm"
           >
-            <div className="aspect-video relative overflow-hidden">
+            <div className="relative">
               <img
                 src={theme.image_url || '/placeholder.svg'}
                 alt={theme.title}
-                className="object-cover w-full h-full transform transition-transform duration-500 group-hover:scale-110"
+                className="w-full h-auto object-contain"
                 onError={(e) => {
                   console.error(`Error loading image for ${theme.title}`);
                   e.currentTarget.src = '/placeholder.svg';
