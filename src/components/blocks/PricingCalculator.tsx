@@ -102,20 +102,25 @@ export function PricingCalculator() {
       <h3 className="text-lg sm:text-xl font-semibold mb-4">Pricing Calculator</h3>
 
       <div className="space-y-4 mb-6">
-        <div className="space-y-2">
-          <Label htmlFor="guestCount">Expected Number of Guests</Label>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-lg bg-primary/5 border border-primary/20 backdrop-blur-sm shadow-lg hover:border-primary/30 transition-all duration-300">
-            <Input
-              id="guestCount"
-              type="number"
-              min="1"
-              value={guestCount}
-              onChange={(e) => setGuestCount(Math.max(1, parseInt(e.target.value) || 1))}
-              className="w-full sm:w-32 bg-background/50"
-            />
-            <span className="text-sm text-primary font-medium">
-              ({calculateExpectedUsage(guestCount)} expected runs)
-            </span>
+        <div className="space-y-4">
+          <Label htmlFor="guestCount" className="text-lg text-center block">Expected Number of Guests</Label>
+          <div className="max-w-md mx-auto">
+            <div className="relative group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50 rounded-lg blur opacity-30 group-hover:opacity-50 transition duration-1000"></div>
+              <div className="relative bg-background/80 border border-primary/20 backdrop-blur-xl rounded-lg p-6 shadow-2xl">
+                <Input
+                  id="guestCount"
+                  type="number"
+                  min="1"
+                  value={guestCount}
+                  onChange={(e) => setGuestCount(Math.max(1, parseInt(e.target.value) || 1))}
+                  className="text-2xl h-14 text-center bg-background/50 border-primary/30 focus:border-primary"
+                />
+                <div className="text-primary font-medium text-lg text-center mt-3">
+                  {calculateExpectedUsage(guestCount)} expected runs
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
