@@ -9,6 +9,7 @@ interface Theme {
   description: string;
   name: string;
   features: string[];
+  imageName?: string; // Added this property
 }
 
 const EmbeddableThemes = () => {
