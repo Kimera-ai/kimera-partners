@@ -77,14 +77,14 @@ const EmbeddableThemes = () => {
         <h2 className="text-4xl font-bold text-white mb-6 flex items-center justify-center gap-4">
           <GalleryHorizontal className="w-8 h-8" />
           AI Photobooth Themes
-          <span className="text-lg bg-primary/10 text-primary px-3 py-1 rounded-full">
-            {themes.length} themes
-          </span>
         </h2>
-        <p className="text-xl text-gray-300">
+        <p className="text-xl text-gray-300 mb-4">
           Transform your events with our collection of stunning AI-powered photo themes.
           Each theme offers unique visual effects and artistic transformations.
         </p>
+        <div className="text-lg bg-primary/10 text-primary px-3 py-1 rounded-full inline-block">
+          {themes.length} themes
+        </div>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
