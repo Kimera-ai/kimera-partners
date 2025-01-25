@@ -99,14 +99,18 @@ export function PricingCalculator() {
 
   return (
     <Card id="pricing-calculator" className="p-4 sm:p-6 bg-background/50 backdrop-blur">
-      <h3 className="text-lg sm:text-xl font-semibold mb-4">Pricing Calculator</h3>
+      <h3 className="text-lg sm:text-xl font-semibold mb-4 bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
+        Pricing Calculator
+      </h3>
 
-      <div className="space-y-4 mb-6">
+      <div className="space-y-6 mb-6">
         <div className="space-y-4">
-          <Label htmlFor="guestCount" className="text-lg text-center block">Expected Number of Guests</Label>
+          <Label htmlFor="guestCount" className="text-lg text-center block">
+            Expected Number of Guests
+          </Label>
           <div className="max-w-md mx-auto">
             <div className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50 rounded-lg blur opacity-30 group-hover:opacity-50 transition duration-1000"></div>
+              <div className="absolute -inset-1 bg-gradient-to-r from-primary/50 via-secondary to-primary/50 rounded-lg blur opacity-30 group-hover:opacity-50 transition duration-1000"></div>
               <div className="relative bg-background/80 border border-primary/20 backdrop-blur-xl rounded-lg p-6 shadow-2xl">
                 <Input
                   id="guestCount"
@@ -124,142 +128,159 @@ export function PricingCalculator() {
           </div>
         </div>
 
-        <h4 className="font-medium pt-4">Base Features</h4>
-        {Object.entries(baseFeatures).map(([key, { label, price }]) => (
-          <div key={key} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div className="flex flex-col sm:flex-row items-center sm:items-center justify-center sm:justify-start gap-2">
-              <Label className="mb-2 sm:mb-0">{label}</Label>
-              <Switch
-                checked={selectedBase === key}
-                onCheckedChange={() =>
-                  setSelectedBase(selectedBase === key ? null : (key as keyof typeof baseFeatures))
-                }
-              />
-            </div>
-            <span className="text-sm font-medium text-center sm:text-left">
-              <NumberFlow
-                format={{ style: "currency", currency: "USD" }}
-                value={price}
-              />
-            </span>
-          </div>
-        ))}
+        <div className="relative group p-6 bg-background/80 border border-primary/20 backdrop-blur-xl rounded-lg">
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/30 via-secondary/30 to-primary/30 rounded-lg blur opacity-30 group-hover:opacity-40 transition duration-1000"></div>
+          <div className="relative">
+            <h4 className="font-medium text-lg bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-4">Base Features</h4>
+            {Object.entries(baseFeatures).map(([key, { label, price }]) => (
+              <div key={key} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-lg hover:bg-white/5 transition-colors">
+                <div className="flex flex-col sm:flex-row items-center sm:items-center justify-center sm:justify-start gap-2">
+                  <Label className="mb-2 sm:mb-0">{label}</Label>
+                  <Switch
+                    checked={selectedBase === key}
+                    onCheckedChange={() =>
+                      setSelectedBase(selectedBase === key ? null : (key as keyof typeof baseFeatures))
+                    }
+                  />
+                </div>
+                <span className="text-sm font-medium text-center sm:text-left">
+                  <NumberFlow
+                    format={{ style: "currency", currency: "USD" }}
+                    value={price}
+                  />
+                </span>
+              </div>
+            ))}
 
-        <div className="flex flex-col sm:flex-row justify-between gap-4 mt-4">
-          <div className="text-center sm:text-left">
-            <Label>Custom Workflow</Label>
-            <div className="text-sm text-muted-foreground">
-              ${CUSTOM_WORKFLOW_PRICE} per workflow
+            <div className="flex flex-col sm:flex-row justify-between gap-4 mt-4 p-3 rounded-lg hover:bg-white/5 transition-colors">
+              <div className="text-center sm:text-left">
+                <Label>Custom Workflow</Label>
+                <div className="text-sm text-muted-foreground">
+                  ${CUSTOM_WORKFLOW_PRICE} per workflow
+                </div>
+              </div>
+              <div className="flex items-center justify-center sm:justify-start gap-2">
+                <button
+                  onClick={() => setCustomWorkflowQuantity(Math.max(0, customWorkflowQuantity - 1))}
+                  className="w-8 h-8 flex items-center justify-center rounded-md border border-primary/30 hover:bg-primary/10 transition-colors"
+                >
+                  -
+                </button>
+                <span className="w-8 text-center">{customWorkflowQuantity}</span>
+                <button
+                  onClick={() => setCustomWorkflowQuantity(customWorkflowQuantity + 1)}
+                  className="w-8 h-8 flex items-center justify-center rounded-md border border-primary/30 hover:bg-primary/10 transition-colors"
+                >
+                  +
+                </button>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center justify-center sm:justify-start gap-2">
-            <button
-              onClick={() => setCustomWorkflowQuantity(Math.max(0, customWorkflowQuantity - 1))}
-              className="w-8 h-8 flex items-center justify-center rounded-md border"
-            >
-              -
-            </button>
-            <span className="w-8 text-center">{customWorkflowQuantity}</span>
-            <button
-              onClick={() => setCustomWorkflowQuantity(customWorkflowQuantity + 1)}
-              className="w-8 h-8 flex items-center justify-center rounded-md border"
-            >
-              +
-            </button>
           </div>
         </div>
       </div>
 
-      <Separator className="my-6" />
+      <Separator className="my-6 bg-primary/20" />
 
-      <div className="space-y-4 mb-6">
-        <h4 className="font-medium">Image Features (Credits per use)</h4>
-        {imageQuantities.map((feature, index) => (
-          <div key={feature.name} className="flex flex-col sm:flex-row justify-between gap-3">
-            <div className="space-y-1 text-center sm:text-left">
-              <Label>{feature.name}</Label>
-              <div className="text-sm text-muted-foreground">
-                {feature.credits} credits × {feature.quantity > 0 ? feature.quantity * calculateExpectedUsage(guestCount) : 0} runs
+      <div className="relative group p-6 bg-background/80 border border-primary/20 backdrop-blur-xl rounded-lg mb-6">
+        <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/30 via-secondary/30 to-primary/30 rounded-lg blur opacity-30 group-hover:opacity-40 transition duration-1000"></div>
+        <div className="relative">
+          <h4 className="font-medium text-lg bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-4">
+            Image Features (Credits per use)
+          </h4>
+          {imageQuantities.map((feature, index) => (
+            <div key={feature.name} className="flex flex-col sm:flex-row justify-between gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors">
+              <div className="space-y-1 text-center sm:text-left">
+                <Label>{feature.name}</Label>
+                <div className="text-sm text-muted-foreground">
+                  {feature.credits} credits × {feature.quantity > 0 ? feature.quantity * calculateExpectedUsage(guestCount) : 0} runs
+                </div>
+              </div>
+              <div className="flex items-center justify-center sm:justify-start gap-2">
+                <button
+                  onClick={() => updateQuantity(imageQuantities, setImageQuantities, index, false)}
+                  className="w-8 h-8 flex items-center justify-center rounded-md border border-primary/30 hover:bg-primary/10 transition-colors"
+                >
+                  -
+                </button>
+                <span className="w-24 text-center">
+                  {feature.quantity > 0 ? `${feature.quantity * calculateExpectedUsage(guestCount)} runs` : '0 runs'}
+                </span>
+                <button
+                  onClick={() => updateQuantity(imageQuantities, setImageQuantities, index, true)}
+                  className="w-8 h-8 flex items-center justify-center rounded-md border border-primary/30 hover:bg-primary/10 transition-colors"
+                >
+                  +
+                </button>
               </div>
             </div>
-            <div className="flex items-center justify-center sm:justify-start gap-2">
-              <button
-                onClick={() => updateQuantity(imageQuantities, setImageQuantities, index, false)}
-                className="w-8 h-8 flex items-center justify-center rounded-md border"
-              >
-                -
-              </button>
-              <span className="w-24 text-center">
-                {feature.quantity > 0 ? `${feature.quantity * calculateExpectedUsage(guestCount)} runs` : '0 runs'}
-              </span>
-              <button
-                onClick={() => updateQuantity(imageQuantities, setImageQuantities, index, true)}
-                className="w-8 h-8 flex items-center justify-center rounded-md border"
-              >
-                +
-              </button>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
-      <Separator className="my-6" />
-
-      <div className="space-y-4 mb-6">
-        <h4 className="font-medium">Video Features (Credits per use)</h4>
-        {videoQuantities.map((feature, index) => (
-          <div key={feature.name} className="flex flex-col sm:flex-row justify-between gap-3">
-            <div className="space-y-1 text-center sm:text-left">
-              <Label>{feature.name}</Label>
-              <div className="text-sm text-muted-foreground">
-                {feature.credits} credits × {feature.quantity > 0 ? feature.quantity * calculateExpectedUsage(guestCount) : 0} runs
+      <div className="relative group p-6 bg-background/80 border border-primary/20 backdrop-blur-xl rounded-lg mb-6">
+        <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/30 via-secondary/30 to-primary/30 rounded-lg blur opacity-30 group-hover:opacity-40 transition duration-1000"></div>
+        <div className="relative">
+          <h4 className="font-medium text-lg bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-4">
+            Video Features (Credits per use)
+          </h4>
+          {videoQuantities.map((feature, index) => (
+            <div key={feature.name} className="flex flex-col sm:flex-row justify-between gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors">
+              <div className="space-y-1 text-center sm:text-left">
+                <Label>{feature.name}</Label>
+                <div className="text-sm text-muted-foreground">
+                  {feature.credits} credits × {feature.quantity > 0 ? feature.quantity * calculateExpectedUsage(guestCount) : 0} runs
+                </div>
+              </div>
+              <div className="flex items-center justify-center sm:justify-start gap-2">
+                <button
+                  onClick={() => updateQuantity(videoQuantities, setVideoQuantities, index, false)}
+                  className="w-8 h-8 flex items-center justify-center rounded-md border border-primary/30 hover:bg-primary/10 transition-colors"
+                >
+                  -
+                </button>
+                <span className="w-24 text-center">
+                  {feature.quantity > 0 ? `${feature.quantity * calculateExpectedUsage(guestCount)} runs` : '0 runs'}
+                </span>
+                <button
+                  onClick={() => updateQuantity(videoQuantities, setVideoQuantities, index, true)}
+                  className="w-8 h-8 flex items-center justify-center rounded-md border border-primary/30 hover:bg-primary/10 transition-colors"
+                >
+                  +
+                </button>
               </div>
             </div>
-            <div className="flex items-center justify-center sm:justify-start gap-2">
-              <button
-                onClick={() => updateQuantity(videoQuantities, setVideoQuantities, index, false)}
-                className="w-8 h-8 flex items-center justify-center rounded-md border"
-              >
-                -
-              </button>
-              <span className="w-24 text-center">
-                {feature.quantity > 0 ? `${feature.quantity * calculateExpectedUsage(guestCount)} runs` : '0 runs'}
-              </span>
-              <button
-                onClick={() => updateQuantity(videoQuantities, setVideoQuantities, index, true)}
-                className="w-8 h-8 flex items-center justify-center rounded-md border"
-              >
-                +
-              </button>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
-      <Separator className="my-6" />
-
-      <div className="flex flex-col sm:flex-row justify-center sm:justify-between items-center sm:items-center gap-2 text-lg font-semibold">
-        <span>Total Price:</span>
-        <NumberFlow
-          format={{ style: "currency", currency: "USD" }}
-          value={calculateTotal()}
-        />
-      </div>
-      
-      <div className="mt-6 flex justify-center">
-        <Button 
-          className="w-full bg-primary hover:bg-primary/90"
-          size="lg"
-          variant="default"
-          onClick={() => setIsFormOpen(true)}
-          disabled={!selectedBase}
-        >
-          <div className="w-full flex items-center justify-center">
-            <span className="truncate text-center w-full">
-              {!selectedBase ? "Please select a base feature" : "Submit Request"}
-            </span>
+      <div className="relative group p-6 bg-background/80 border border-primary/20 backdrop-blur-xl rounded-lg">
+        <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/30 via-secondary/30 to-primary/30 rounded-lg blur opacity-30 group-hover:opacity-40 transition duration-1000"></div>
+        <div className="relative">
+          <div className="flex flex-col sm:flex-row justify-center sm:justify-between items-center sm:items-center gap-2 text-lg font-semibold">
+            <span>Total Price:</span>
+            <NumberFlow
+              format={{ style: "currency", currency: "USD" }}
+              value={calculateTotal()}
+              className="text-2xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+            />
           </div>
-        </Button>
+          
+          <div className="mt-6 flex justify-center">
+            <Button 
+              className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity"
+              size="lg"
+              variant="default"
+              onClick={() => setIsFormOpen(true)}
+              disabled={!selectedBase}
+            >
+              <div className="w-full flex items-center justify-center">
+                <span className="truncate text-center w-full">
+                  {!selectedBase ? "Please select a base feature" : "Submit Request"}
+                </span>
+              </div>
+            </Button>
+          </div>
+        </div>
       </div>
 
       <PricingRequestForm
