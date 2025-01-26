@@ -256,12 +256,12 @@ export function PricingCalculator() {
       <div className="relative group p-6 bg-background/80 border border-primary/20 backdrop-blur-xl rounded-lg">
         <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/30 via-secondary/30 to-primary/30 rounded-lg blur opacity-30 group-hover:opacity-40 transition duration-1000"></div>
         <div className="relative">
-          <div className="flex flex-col sm:flex-row justify-center sm:justify-between items-center sm:items-center gap-2 text-lg font-semibold">
-            <span>Total Price:</span>
+          <div className="flex flex-col sm:flex-row justify-center sm:justify-between items-center sm:items-center gap-4 text-lg">
+            <span className="text-xl font-semibold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Total Price:</span>
             <NumberFlow
               format={{ style: "currency", currency: "USD" }}
               value={calculateTotal()}
-              className="text-2xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+              className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
             />
           </div>
           
