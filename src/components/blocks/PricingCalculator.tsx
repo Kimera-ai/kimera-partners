@@ -257,7 +257,7 @@ export function PricingCalculator() {
         <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/30 via-secondary/30 to-primary/30 rounded-lg blur opacity-30 group-hover:opacity-40 transition duration-1000"></div>
         <div className="relative">
 
-          <div className="flex flex-col sm:flex-row justify-center sm:justify-between items-center sm:items-center gap-4 text-lg">
+          <div className="flex flex-col sm:flex-row justify-center sm:justify-between items-center sm:items-center gap-4 text-lg p-4 rounded-lg bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-purple-500/20">
             <span className="text-xl font-semibold text-white">
               Total Price:
             </span>
