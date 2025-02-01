@@ -116,7 +116,7 @@ const EmbeddableThemes = () => {
       <header className="text-center max-w-3xl mx-auto mb-16">
         <h2 className="text-4xl font-bold text-white mb-6 flex items-center justify-center gap-4">
           <GalleryHorizontal className="w-8 h-8" />
-          AI Themes
+          AI Stock Themes
         </h2>
         <p className="text-xl text-gray-300 mb-4">
           Transform your events with our collection of stunning AI-powered photo themes.
