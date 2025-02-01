@@ -83,6 +83,20 @@ export function PricingCalculator() {
     return basePrice + imageCreditTotal + videoCreditTotal + customWorkflowTotal;
   };
 
+  const calculateTotalCredits = () => {
+    const expectedUsage = calculateExpectedUsage(guestCount);
+    
+    const imageCreditTotal = imageQuantities.reduce((acc, feature) => {
+      return acc + (feature.credits * feature.quantity * expectedUsage);
+    }, 0);
+
+    const videoCreditTotal = videoQuantities.reduce((acc, feature) => {
+      return acc + (feature.credits * feature.quantity * expectedUsage);
+    }, 0);
+    
+    return imageCreditTotal + videoCreditTotal;
+  };
+
   const getSelectedFeatures = () => {
     return {
       basePackage: selectedBase ? baseFeatures[selectedBase].label : null,
@@ -269,6 +283,15 @@ export function PricingCalculator() {
             </div>
           </div>
           
+          <div className="flex flex-col sm:flex-row justify-center sm:justify-between items-center sm:items-center gap-4">
+            <span className="text-xl font-semibold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
+              Total Credits:
+            </span>
+            <div className="text-3xl font-bold text-white">
+              {calculateTotalCredits().toLocaleString()} credits
+            </div>
+          </div>
+
           <div className="mt-6 flex justify-center">
             <Button 
               className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity"
