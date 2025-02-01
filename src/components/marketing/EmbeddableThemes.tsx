@@ -93,14 +93,14 @@ const EmbeddableThemes = () => {
             key={theme.id} 
             className="group overflow-hidden bg-white/5 border border-white/10 hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 backdrop-blur-sm flex flex-col"
           >
-            <div className="relative">
+            <div className="relative aspect-[4/3] w-full">
               <img
-                src={theme.image_url || '/placeholder.svg'}
+                src={theme.image_url || 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b'}
                 alt={theme.title}
-                className="w-full h-auto object-contain"
+                className="w-full h-full object-cover"
                 onError={(e) => {
                   console.error(`Error loading image for ${theme.title}`);
-                  e.currentTarget.src = '/placeholder.svg';
+                  e.currentTarget.src = 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b';
                 }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
