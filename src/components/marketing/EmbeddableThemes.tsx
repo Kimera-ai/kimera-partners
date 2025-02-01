@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
-import { GalleryHorizontal, Loader2, AlertCircle } from 'lucide-react';
+import { GalleryHorizontal, Loader2, AlertCircle, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Theme {
@@ -16,6 +16,7 @@ const EmbeddableThemes = () => {
   const [themes, setThemes] = useState<Theme[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const fetchThemes = async () => {
     try {
@@ -105,9 +106,12 @@ const EmbeddableThemes = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <span className="px-4 py-2 bg-primary text-white rounded-full text-sm font-medium">
+                <button 
+                  onClick={() => setSelectedImage(theme.image_url || 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b')}
+                  className="px-4 py-2 bg-primary text-white rounded-full text-sm font-medium hover:bg-primary-hover transition-colors"
+                >
                   View Theme
-                </span>
+                </button>
               </div>
             </div>
             <div className="flex-1 p-6 flex flex-col">
@@ -132,6 +136,27 @@ const EmbeddableThemes = () => {
           </Card>
         ))}
       </div>
+
+      {/* Image Preview Modal */}
+      {selectedImage && (
+        <div 
+          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+          onClick={() => setSelectedImage(null)}
+        >
+          <button 
+            className="absolute top-4 right-4 text-white hover:text-primary transition-colors"
+            onClick={() => setSelectedImage(null)}
+          >
+            <X size={24} />
+          </button>
+          <img 
+            src={selectedImage} 
+            alt="Theme Preview" 
+            className="max-w-full max-h-[90vh] object-contain rounded-lg"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   );
 };
