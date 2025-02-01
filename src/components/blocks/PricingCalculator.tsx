@@ -260,11 +260,11 @@ export function PricingCalculator() {
             <span className="text-xl font-semibold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
               Total Price:
             </span>
-            <div className="bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
+            <div>
               <NumberFlow
                 format={{ style: "currency", currency: "USD" }}
                 value={calculateTotal()}
-                className="text-3xl font-bold animate-fade-in"
+                className="text-3xl font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent animate-fade-in"
               />
             </div>
           </div>
