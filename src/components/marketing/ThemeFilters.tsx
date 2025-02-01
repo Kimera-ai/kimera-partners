@@ -56,24 +56,6 @@ const ThemeFilters = ({
           ))}
         </div>
       </div>
-      <div className="flex gap-2 flex-wrap">
-        {availableFeatures.map((feature) => (
-          <Button
-            key={feature}
-            variant={selectedFeature === feature ? "secondary" : "outline"}
-            size="sm"
-            onClick={() => setSelectedFeature(selectedFeature === feature ? null : feature)}
-            className="flex items-center gap-2"
-          >
-            {selectedFeature === feature ? (
-              <X size={16} className="text-white" />
-            ) : (
-              <Filter size={16} />
-            )}
-            {feature}
-          </Button>
-        ))}
-      </div>
     </div>
   );
 };
