@@ -264,7 +264,7 @@ export function PricingCalculator() {
               <NumberFlow
                 format={{ style: "currency", currency: "USD" }}
                 value={calculateTotal()}
-                className="text-3xl font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent animate-fade-in"
+                className="text-3xl font-bold text-white"
               />
             </div>
           </div>
