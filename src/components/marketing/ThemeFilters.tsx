@@ -25,26 +25,26 @@ const ThemeFilters = ({
   availableStyles,
 }: ThemeFiltersProps) => {
   return (
-    <div className="mb-8 space-y-4">
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
+    <div className="mb-8">
+      <div className="flex flex-col sm:flex-row items-center gap-6">
+        <div className="relative w-full sm:w-auto">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/50" size={20} />
           <Input
             type="search"
             placeholder="Search themes..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-12 h-12 min-w-[300px] bg-white/[0.03] border-white/10 text-white placeholder:text-gray-400 focus:border-primary/50 focus:ring-primary/20 transition-all rounded-lg"
+            className="pl-12 h-12 w-full sm:min-w-[400px] bg-white/[0.03] border-white/10 text-white placeholder:text-gray-400 focus:border-primary/50 focus:ring-primary/20 transition-all rounded-lg"
           />
         </div>
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex items-center gap-3 flex-wrap">
           {availableStyles.map((style) => (
             <Button
               key={style}
               variant={selectedStyle === style ? "default" : "outline"}
               size="sm"
               onClick={() => setSelectedStyle(selectedStyle === style ? null : style)}
-              className="flex items-center gap-2 capitalize"
+              className="flex items-center gap-2 capitalize h-12 px-6"
             >
               {selectedStyle === style ? (
                 <X size={16} className="text-white" />
