@@ -11,6 +11,7 @@ interface Theme {
   name: string;
   features: string[];
   image_url: string | null;
+  style: string;
 }
 
 const EmbeddableThemes = () => {
@@ -20,6 +21,7 @@ const EmbeddableThemes = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
+  const [selectedStyle, setSelectedStyle] = useState<string | null>(null);
 
   const fetchThemes = async () => {
     try {
@@ -54,16 +56,21 @@ const EmbeddableThemes = () => {
     fetchThemes();
   }, []);
 
-  // Extract unique features from all themes
-  const availableFeatures = useMemo(() => {
+  // Extract unique features and styles from all themes
+  const { availableFeatures, availableStyles } = useMemo(() => {
     const featureSet = new Set<string>();
+    const styleSet = new Set<string>();
     themes.forEach(theme => {
       theme.features.forEach(feature => featureSet.add(feature));
+      styleSet.add(theme.style);
     });
-    return Array.from(featureSet).sort();
+    return {
+      availableFeatures: Array.from(featureSet).sort(),
+      availableStyles: Array.from(styleSet).sort()
+    };
   }, [themes]);
 
-  // Filter themes based on search term and selected feature
+  // Filter themes based on search term, selected feature, and selected style
   const filteredThemes = useMemo(() => {
     return themes.filter(theme => {
       const matchesSearch = 
@@ -75,9 +82,13 @@ const EmbeddableThemes = () => {
         !selectedFeature ||
         theme.features.includes(selectedFeature);
 
-      return matchesSearch && matchesFeature;
+      const matchesStyle =
+        !selectedStyle ||
+        theme.style === selectedStyle;
+
+      return matchesSearch && matchesFeature && matchesStyle;
     });
-  }, [themes, searchTerm, selectedFeature]);
+  }, [themes, searchTerm, selectedFeature, selectedStyle]);
 
   if (isLoading) {
     return (
@@ -121,7 +132,10 @@ const EmbeddableThemes = () => {
         setSearchTerm={setSearchTerm}
         selectedFeature={selectedFeature}
         setSelectedFeature={setSelectedFeature}
+        selectedStyle={selectedStyle}
+        setSelectedStyle={setSelectedStyle}
         availableFeatures={availableFeatures}
+        availableStyles={availableStyles}
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -151,9 +165,14 @@ const EmbeddableThemes = () => {
               </div>
             </div>
             <div className="flex-1 p-6 flex flex-col">
-              <h3 className="text-2xl font-semibold text-white group-hover:text-primary transition-colors">
-                {theme.title}
-              </h3>
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="text-2xl font-semibold text-white group-hover:text-primary transition-colors">
+                  {theme.title}
+                </h3>
+                <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full capitalize">
+                  {theme.style}
+                </span>
+              </div>
               <p className="text-gray-400 line-clamp-2 mt-2 flex-grow">
                 {theme.description}
               </p>

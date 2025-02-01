@@ -8,7 +8,10 @@ interface ThemeFiltersProps {
   setSearchTerm: (term: string) => void;
   selectedFeature: string | null;
   setSelectedFeature: (feature: string | null) => void;
+  selectedStyle: string | null;
+  setSelectedStyle: (style: string | null) => void;
   availableFeatures: string[];
+  availableStyles: string[];
 }
 
 const ThemeFilters = ({
@@ -16,7 +19,10 @@ const ThemeFilters = ({
   setSearchTerm,
   selectedFeature,
   setSelectedFeature,
+  selectedStyle,
+  setSelectedStyle,
   availableFeatures,
+  availableStyles,
 }: ThemeFiltersProps) => {
   return (
     <div className="mb-8 space-y-4">
@@ -32,23 +38,41 @@ const ThemeFilters = ({
           />
         </div>
         <div className="flex gap-2 flex-wrap">
-          {availableFeatures.map((feature) => (
+          {availableStyles.map((style) => (
             <Button
-              key={feature}
-              variant={selectedFeature === feature ? "default" : "outline"}
+              key={style}
+              variant={selectedStyle === style ? "default" : "outline"}
               size="sm"
-              onClick={() => setSelectedFeature(selectedFeature === feature ? null : feature)}
-              className="flex items-center gap-2"
+              onClick={() => setSelectedStyle(selectedStyle === style ? null : style)}
+              className="flex items-center gap-2 capitalize"
             >
-              {selectedFeature === feature ? (
+              {selectedStyle === style ? (
                 <X size={16} className="text-white" />
               ) : (
                 <Filter size={16} />
               )}
-              {feature}
+              {style}
             </Button>
           ))}
         </div>
+      </div>
+      <div className="flex gap-2 flex-wrap">
+        {availableFeatures.map((feature) => (
+          <Button
+            key={feature}
+            variant={selectedFeature === feature ? "secondary" : "outline"}
+            size="sm"
+            onClick={() => setSelectedFeature(selectedFeature === feature ? null : feature)}
+            className="flex items-center gap-2"
+          >
+            {selectedFeature === feature ? (
+              <X size={16} className="text-white" />
+            ) : (
+              <Filter size={16} />
+            )}
+            {feature}
+          </Button>
+        ))}
       </div>
     </div>
   );
