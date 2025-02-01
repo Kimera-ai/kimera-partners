@@ -93,7 +93,7 @@ const EmbeddableThemes = () => {
             key={theme.id} 
             className="group overflow-hidden bg-white/5 border border-white/10 hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 backdrop-blur-sm flex flex-col h-full"
           >
-            <div className="relative w-full h-[240px] overflow-hidden">
+            <div className="relative w-full h-[320px] overflow-hidden">
               <img
                 src={theme.image_url || 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b'}
                 alt={theme.title}
