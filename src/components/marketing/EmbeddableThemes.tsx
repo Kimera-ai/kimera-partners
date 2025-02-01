@@ -91,7 +91,7 @@ const EmbeddableThemes = () => {
         {themes.map((theme) => (
           <Card 
             key={theme.id} 
-            className="group overflow-hidden bg-white/5 border border-white/10 hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 backdrop-blur-sm flex flex-col"
+            className="group overflow-hidden bg-white/5 border border-white/10 hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 backdrop-blur-sm flex flex-col h-full"
           >
             <div className="relative w-full h-[240px] overflow-hidden">
               <img
@@ -110,16 +110,16 @@ const EmbeddableThemes = () => {
                 </span>
               </div>
             </div>
-            <div className="mt-auto p-6">
+            <div className="flex-1 p-6 flex flex-col">
               <h3 className="text-2xl font-semibold text-white group-hover:text-primary transition-colors">
                 {theme.title}
               </h3>
-              <p className="text-gray-400 line-clamp-2 mt-2">
+              <p className="text-gray-400 line-clamp-2 mt-2 flex-grow">
                 {theme.description}
               </p>
               <div className="mt-4">
-                <h4 className="text-sm font-medium text-primary">Features:</h4>
-                <ul className="grid grid-cols-2 gap-2 text-left mt-2">
+                <h4 className="text-sm font-medium text-primary mb-2">Features:</h4>
+                <ul className="grid grid-cols-2 gap-2 text-left">
                   {theme.features.map((feature, index) => (
                     <li key={index} className="text-sm text-gray-400 flex items-start">
                       <span className="w-1.5 h-1.5 bg-primary/50 rounded-full mr-2 flex-shrink-0 mt-1.5" />
