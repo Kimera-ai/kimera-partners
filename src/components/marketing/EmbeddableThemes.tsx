@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { GalleryHorizontal, Loader2, AlertCircle, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import ThemeFilters from './ThemeFilters';
 
 interface Theme {
   id: string;
@@ -17,6 +18,8 @@ const EmbeddableThemes = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
 
   const fetchThemes = async () => {
     try {
@@ -51,6 +54,31 @@ const EmbeddableThemes = () => {
     fetchThemes();
   }, []);
 
+  // Extract unique features from all themes
+  const availableFeatures = useMemo(() => {
+    const featureSet = new Set<string>();
+    themes.forEach(theme => {
+      theme.features.forEach(feature => featureSet.add(feature));
+    });
+    return Array.from(featureSet).sort();
+  }, [themes]);
+
+  // Filter themes based on search term and selected feature
+  const filteredThemes = useMemo(() => {
+    return themes.filter(theme => {
+      const matchesSearch = 
+        searchTerm === '' ||
+        theme.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        theme.description.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesFeature = 
+        !selectedFeature ||
+        theme.features.includes(selectedFeature);
+
+      return matchesSearch && matchesFeature;
+    });
+  }, [themes, searchTerm, selectedFeature]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -84,12 +112,20 @@ const EmbeddableThemes = () => {
           Each theme offers unique visual effects and artistic transformations.
         </p>
         <div className="text-lg bg-primary/10 text-primary px-3 py-1 rounded-full inline-block">
-          {themes.length} themes
+          {filteredThemes.length} themes
         </div>
       </header>
 
+      <ThemeFilters
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        selectedFeature={selectedFeature}
+        setSelectedFeature={setSelectedFeature}
+        availableFeatures={availableFeatures}
+      />
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {themes.map((theme) => (
+        {filteredThemes.map((theme) => (
           <Card 
             key={theme.id} 
             className="group overflow-hidden bg-white/5 border border-white/10 hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 backdrop-blur-sm flex flex-col h-full"
