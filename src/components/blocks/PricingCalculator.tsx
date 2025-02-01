@@ -274,24 +274,18 @@ export function PricingCalculator() {
             <span className="text-xl font-semibold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
               Total Price:
             </span>
-            <div>
+            <div className="flex flex-col items-end gap-1">
               <NumberFlow
                 format={{ style: "currency", currency: "USD" }}
                 value={calculateTotal()}
                 className="text-3xl font-bold text-white"
               />
+              <div className="text-sm text-gray-400">
+                {calculateTotalCredits().toLocaleString()} credits
+              </div>
             </div>
           </div>
           
-          <div className="flex flex-col sm:flex-row justify-center sm:justify-between items-center sm:items-center gap-4">
-            <span className="text-xl font-semibold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
-              Total Credits:
-            </span>
-            <div className="text-3xl font-bold text-white">
-              {calculateTotalCredits().toLocaleString()} credits
-            </div>
-          </div>
-
           <div className="mt-6 flex justify-center">
             <Button 
               className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity"
