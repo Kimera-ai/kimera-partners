@@ -28,13 +28,13 @@ const ThemeFilters = ({
     <div className="mb-8 space-y-4">
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-primary/50" size={20} />
           <Input
             type="search"
             placeholder="Search themes..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-white/5 border-white/10 text-white"
+            className="pl-10 bg-white/[0.03] border-white/10 text-white placeholder:text-gray-400 focus:border-primary/50 focus:ring-primary/20 transition-all"
           />
         </div>
         <div className="flex gap-2 flex-wrap">
