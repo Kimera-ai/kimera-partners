@@ -72,7 +72,6 @@ const Pricing = () => {
               <PricingCard
                 key={card.tier}
                 {...card}
-                className={index === 1 ? "md:scale-105 md:-mt-4 md:mb-4 relative before:absolute before:-inset-[1px] before:rounded-[inherit] before:bg-gradient-to-r before:from-purple-500 before:via-pink-500 before:to-purple-500 before:-z-10" : ""}
               />
             ))}
           </div>
