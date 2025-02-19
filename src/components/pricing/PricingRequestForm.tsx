@@ -66,67 +66,6 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
           </div>
           
           <div className="p-8 space-y-6">
-            {/* Pricing Summary */}
-            <div className="bg-white/5 border border-white/10 p-6 rounded-xl space-y-4">
-              <h3 className="text-xl font-semibold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Your Package Summary
-              </h3>
-              
-              <div className="space-y-4 text-sm">
-                {selectedFeatures.basePackage && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-400">Base Package:</span>
-                    <span className="text-white">{selectedFeatures.basePackage}</span>
-                  </div>
-                )}
-                
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Guest Count:</span>
-                  <span className="text-white">{selectedFeatures.guestCount}</span>
-                </div>
-
-                {selectedFeatures.imageFeatures.length > 0 && (
-                  <div className="space-y-2">
-                    <span className="text-gray-400">Image Features:</span>
-                    <ul className="list-disc pl-4 text-white space-y-1">
-                      {selectedFeatures.imageFeatures.map((feature, index) => (
-                        <li key={index}>{feature}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {selectedFeatures.videoFeatures.length > 0 && (
-                  <div className="space-y-2">
-                    <span className="text-gray-400">Video Features:</span>
-                    <ul className="list-disc pl-4 text-white space-y-1">
-                      {selectedFeatures.videoFeatures.map((feature, index) => (
-                        <li key={index}>{feature}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {selectedFeatures.customWorkflows > 0 && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-400">Custom Workflows:</span>
-                    <span className="text-white">{selectedFeatures.customWorkflows}</span>
-                  </div>
-                )}
-
-                <div className="pt-4 border-t border-white/10">
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-semibold text-white">Total Price:</span>
-                    <NumberFlow
-                      format={{ style: "currency", currency: "USD" }}
-                      value={totalPrice}
-                      className="text-lg font-bold text-white"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
             <iframe 
               src={`https://kimeracrm.netlify.app/embed/event-form?${formParams.toString()}`}
               width="100%" 
