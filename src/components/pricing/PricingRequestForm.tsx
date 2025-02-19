@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { X } from 'lucide-react';
 import NumberFlow from "@number-flow/react";
@@ -41,8 +40,7 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
     total_price: totalPrice.toString(),
     image_features: imageFeatureRuns,
     video_features: videoFeatureRuns,
-    custom_workflows: selectedFeatures.customWorkflows.toString(),
-    expected_runs: expectedRuns.toString()
+    custom_workflows: selectedFeatures.customWorkflows.toString()
   });
   
   if (!isOpen) return null;
