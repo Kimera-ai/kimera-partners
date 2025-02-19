@@ -24,12 +24,12 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
   // Create URL parameters for the form
   const formParams = new URLSearchParams({
     email: userEmail,
-    package: selectedFeatures.basePackage || '',
-    guestCount: selectedFeatures.guestCount.toString(),
-    totalPrice: totalPrice.toString(),
-    imageFeatures: selectedFeatures.imageFeatures.join(','),
-    videoFeatures: selectedFeatures.videoFeatures.join(','),
-    customWorkflows: selectedFeatures.customWorkflows.toString()
+    package_type: selectedFeatures.basePackage || '',
+    guest_count: selectedFeatures.guestCount.toString(),
+    total_price: totalPrice.toString(),
+    image_features: selectedFeatures.imageFeatures.join(','),
+    video_features: selectedFeatures.videoFeatures.join(','),
+    custom_workflows: selectedFeatures.customWorkflows.toString()
   });
   
   if (!isOpen) return null;
