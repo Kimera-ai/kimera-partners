@@ -21,6 +21,17 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
   const { session } = useSession();
   const userEmail = session?.user?.email || '';
   
+  // Create URL parameters for the form
+  const formParams = new URLSearchParams({
+    email: userEmail,
+    package: selectedFeatures.basePackage || '',
+    guestCount: selectedFeatures.guestCount.toString(),
+    totalPrice: totalPrice.toString(),
+    imageFeatures: selectedFeatures.imageFeatures.join(','),
+    videoFeatures: selectedFeatures.videoFeatures.join(','),
+    customWorkflows: selectedFeatures.customWorkflows.toString()
+  });
+  
   if (!isOpen) return null;
 
   return (
@@ -107,7 +118,7 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
             {/* Embedded Form */}
             <div className="bg-white/5 border border-white/10 p-6 rounded-xl space-y-4">
               <iframe 
-                src={`https://kimeracrm.netlify.app/embed/event-form?email=${encodeURIComponent(userEmail)}`}
+                src={`https://kimeracrm.netlify.app/embed/event-form?${formParams.toString()}`}
                 width="100%" 
                 height="800px"
                 className="rounded-xl bg-transparent"
