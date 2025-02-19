@@ -24,14 +24,14 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
   // Calculate expected runs (70% usage rate)
   const expectedRuns = Math.round(selectedFeatures.guestCount * 0.7);
   
-  // Create feature strings with run counts, each on a new line using URL-encoded newline
+  // Create feature strings with run counts, separated by comma and space
   const imageFeatureRuns = selectedFeatures.imageFeatures
     .map(feature => `${feature} (${expectedRuns} runs)`)
-    .join('%0A'); // URL-encoded newline character
+    .join(', ');
   
   const videoFeatureRuns = selectedFeatures.videoFeatures
     .map(feature => `${feature} (${expectedRuns} runs)`)
-    .join('%0A'); // URL-encoded newline character
+    .join(', ');
   
   // Create URL parameters for the form
   const formParams = new URLSearchParams({
