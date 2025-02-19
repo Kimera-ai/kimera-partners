@@ -2,6 +2,7 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import NumberFlow from "@number-flow/react";
+import { useSession } from "@/hooks/useSession";
 
 interface PricingRequestFormProps {
   isOpen: boolean;
@@ -17,6 +18,9 @@ interface PricingRequestFormProps {
 }
 
 const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: PricingRequestFormProps) => {
+  const { session } = useSession();
+  const userEmail = session?.user?.email || '';
+  
   if (!isOpen) return null;
 
   return (
@@ -103,7 +107,7 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
             {/* Embedded Form */}
             <div className="bg-white/5 border border-white/10 p-6 rounded-xl space-y-4">
               <iframe 
-                src="https://kimeracrm.netlify.app/embed/event-form" 
+                src={`https://kimeracrm.netlify.app/embed/event-form?email=${encodeURIComponent(userEmail)}`}
                 width="100%" 
                 height="800px"
                 className="rounded-xl bg-transparent"
