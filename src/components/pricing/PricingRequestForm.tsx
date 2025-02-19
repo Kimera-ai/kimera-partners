@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { X } from 'lucide-react';
 import NumberFlow from "@number-flow/react";
@@ -126,17 +127,14 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
               </div>
             </div>
 
-            {/* Embedded Form */}
-            <div className="bg-white/5 border border-white/10 p-6 rounded-xl space-y-4">
-              <iframe 
-                src={`https://kimeracrm.netlify.app/embed/event-form?${formParams.toString()}`}
-                width="100%" 
-                height="800px"
-                className="rounded-xl bg-transparent"
-                style={{ border: 'none' }}
-                title="Event Request Form"
-              />
-            </div>
+            <iframe 
+              src={`https://kimeracrm.netlify.app/embed/event-form?${formParams.toString()}`}
+              width="100%" 
+              height="800px"
+              className="rounded-xl bg-transparent"
+              style={{ border: 'none' }}
+              title="Event Request Form"
+            />
           </div>
         </div>
       </div>
