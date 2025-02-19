@@ -24,14 +24,14 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
   // Calculate expected runs (70% usage rate)
   const expectedRuns = Math.round(selectedFeatures.guestCount * 0.7);
   
-  // Create feature strings with run counts
-  const imageFeatureRuns = selectedFeatures.imageFeatures.map(feature => 
-    `${feature} (${expectedRuns} runs)`
-  );
+  // Create feature strings with run counts, each on a new line
+  const imageFeatureRuns = selectedFeatures.imageFeatures
+    .map(feature => `${feature} (${expectedRuns} runs)`)
+    .join('\n');
   
-  const videoFeatureRuns = selectedFeatures.videoFeatures.map(feature => 
-    `${feature} (${expectedRuns} runs)`
-  );
+  const videoFeatureRuns = selectedFeatures.videoFeatures
+    .map(feature => `${feature} (${expectedRuns} runs)`)
+    .join('\n');
   
   // Create URL parameters for the form
   const formParams = new URLSearchParams({
@@ -39,8 +39,8 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
     package_type: selectedFeatures.basePackage || '',
     guest_count: selectedFeatures.guestCount.toString(),
     total_price: totalPrice.toString(),
-    image_features: imageFeatureRuns.join(','),
-    video_features: videoFeatureRuns.join(','),
+    image_features: imageFeatureRuns,
+    video_features: videoFeatureRuns,
     custom_workflows: selectedFeatures.customWorkflows.toString(),
     expected_runs: expectedRuns.toString()
   });
