@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { X } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Loader } from 'lucide-react';
 import NumberFlow from "@number-flow/react";
 import { useSession } from "@/hooks/useSession";
 
@@ -20,6 +20,7 @@ interface PricingRequestFormProps {
 const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: PricingRequestFormProps) => {
   const { session } = useSession();
   const userEmail = session?.user?.email || '';
+  const [isLoading, setIsLoading] = useState(true);
   
   // Calculate expected runs (70% usage rate)
   const expectedRuns = Math.round(selectedFeatures.guestCount * 0.7);
@@ -65,7 +66,12 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
             </button>
           </div>
           
-          <div className="p-8 space-y-6">
+          <div className="p-8 space-y-6 relative">
+            {isLoading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-[#1A1123]/80 backdrop-blur-sm z-10">
+                <Loader className="w-8 h-8 text-purple-400 animate-spin" />
+              </div>
+            )}
             <iframe 
               src={`https://kimeracrm.netlify.app/embed/event-form?${formParams.toString()}`}
               width="100%" 
@@ -73,6 +79,7 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
               className="rounded-xl bg-transparent"
               style={{ border: 'none' }}
               title="Event Request Form"
+              onLoad={() => setIsLoading(false)}
             />
           </div>
         </div>
