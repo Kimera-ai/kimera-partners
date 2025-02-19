@@ -21,15 +21,28 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
   const { session } = useSession();
   const userEmail = session?.user?.email || '';
   
+  // Calculate expected runs (70% usage rate)
+  const expectedRuns = Math.round(selectedFeatures.guestCount * 0.7);
+  
+  // Create feature strings with run counts
+  const imageFeatureRuns = selectedFeatures.imageFeatures.map(feature => 
+    `${feature} (${expectedRuns} runs)`
+  );
+  
+  const videoFeatureRuns = selectedFeatures.videoFeatures.map(feature => 
+    `${feature} (${expectedRuns} runs)`
+  );
+  
   // Create URL parameters for the form
   const formParams = new URLSearchParams({
     email: userEmail,
     package_type: selectedFeatures.basePackage || '',
     guest_count: selectedFeatures.guestCount.toString(),
     total_price: totalPrice.toString(),
-    image_features: selectedFeatures.imageFeatures.join(','),
-    video_features: selectedFeatures.videoFeatures.join(','),
-    custom_workflows: selectedFeatures.customWorkflows.toString()
+    image_features: imageFeatureRuns.join(','),
+    video_features: videoFeatureRuns.join(','),
+    custom_workflows: selectedFeatures.customWorkflows.toString(),
+    expected_runs: expectedRuns.toString()
   });
   
   if (!isOpen) return null;
