@@ -1,24 +1,10 @@
+
 import { PricingCalculator } from "@/components/blocks/PricingCalculator";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { PricingCard } from "@/components/ui/dark-gradient-pricing";
 
 const Pricing = () => {
   const pricingCards = [
-    {
-      tier: "Basic Event",
-      price: "$79",
-      bestFor: "Perfect for brands seeking to elevate their events with AI-powered experiences. Includes our core AI transformation technology, real-time photo effects, and seamless digital delivery system, all backed by enterprise-grade support.",
-      CTA: "Calculate My Pricing",
-      benefits: [
-        { text: "AI-powered transformations", checked: true },
-        { text: "14-day access to platform and images", checked: true },
-        { text: "Multi-language support", checked: true },
-        { text: "Image delivery via email, WhatsApp, and SMS", checked: true },
-        { text: "Unmatched live event Support", checked: true },
-        { text: "Unlimited device usage for your devices", checked: true },
-        { text: "Access to our theme library with 100+ themes", checked: true },
-      ],
-    },
     {
       tier: "Branded Event",
       price: "$130",
@@ -67,7 +53,7 @@ const Pricing = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto mb-32">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-7xl mx-auto mb-32">
             {pricingCards.map((card, index) => (
               <PricingCard
                 key={card.tier}
