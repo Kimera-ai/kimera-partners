@@ -25,6 +25,8 @@ const baseFeatures = {
   brandedEvent: { price: 130, label: "Branded Event" },
 };
 
+const PERMANENT_INSTALL_PRICE = 500;
+
 const imageFeatures: Feature[] = [
   { name: "Standard HD Image ($0.14/image)", credits: 14, quantity: 0 },
   { name: "HQ Image for Print ($0.28/image)", credits: 28, quantity: 0 },
@@ -46,6 +48,7 @@ export function PricingCalculator({ initialBase, initialCustomWorkflows = 0 }: P
   const [customWorkflowQuantity, setCustomWorkflowQuantity] = useState(initialCustomWorkflows);
   const [guestCount, setGuestCount] = useState(100);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isPermanentInstall, setIsPermanentInstall] = useState(false);
 
   useEffect(() => {
     if (initialBase) {
@@ -73,6 +76,7 @@ export function PricingCalculator({ initialBase, initialCustomWorkflows = 0 }: P
 
   const calculateTotal = () => {
     const basePrice = selectedBase ? baseFeatures[selectedBase].price : 0;
+    const permanentInstallPrice = isPermanentInstall ? PERMANENT_INSTALL_PRICE : 0;
     
     const imageCreditTotal =
       imageQuantities.reduce((acc, feature) => {
@@ -86,7 +90,7 @@ export function PricingCalculator({ initialBase, initialCustomWorkflows = 0 }: P
 
     const customWorkflowTotal = customWorkflowQuantity * CUSTOM_WORKFLOW_PRICE;
     
-    return basePrice + imageCreditTotal + videoCreditTotal + customWorkflowTotal;
+    return basePrice + imageCreditTotal + videoCreditTotal + customWorkflowTotal + permanentInstallPrice;
   };
 
   const calculateTotalCredits = () => {
@@ -111,7 +115,8 @@ export function PricingCalculator({ initialBase, initialCustomWorkflows = 0 }: P
       videoFeatures: videoQuantities
         .filter(f => f.quantity > 0)
         .map(f => f.name),
-      customWorkflows: customWorkflowQuantity
+      customWorkflows: customWorkflowQuantity,
+      permanentInstall: isPermanentInstall
     };
   };
 
@@ -169,6 +174,22 @@ export function PricingCalculator({ initialBase, initialCustomWorkflows = 0 }: P
                 </span>
               </div>
             ))}
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-lg hover:bg-white/5 transition-colors mt-2">
+              <div className="flex flex-col sm:flex-row items-center sm:items-center justify-center sm:justify-start gap-2">
+                <Label className="mb-2 sm:mb-0">Permanent Install</Label>
+                <Switch
+                  checked={isPermanentInstall}
+                  onCheckedChange={setIsPermanentInstall}
+                />
+              </div>
+              <span className="text-sm font-medium text-center sm:text-left">
+                <NumberFlow
+                  format={{ style: "currency", currency: "USD" }}
+                  value={PERMANENT_INSTALL_PRICE}
+                />
+              </span>
+            </div>
 
             <div className="flex flex-col sm:flex-row justify-between gap-4 mt-4 p-3 rounded-lg hover:bg-white/5 transition-colors">
               <div className="text-center sm:text-left">
