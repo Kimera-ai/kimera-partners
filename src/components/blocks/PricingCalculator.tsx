@@ -25,7 +25,7 @@ const baseFeatures = {
   brandedEvent: { price: 130, label: "Branded Event" },
 };
 
-const PERMANENT_INSTALL_PRICE = 500;
+const PERMANENT_INSTALL_PRICE = 499; // Price per month
 
 const imageFeatures: Feature[] = [
   { name: "Standard HD Image ($0.14/image)", credits: 14, quantity: 0 },
@@ -49,6 +49,7 @@ export function PricingCalculator({ initialBase, initialCustomWorkflows = 0 }: P
   const [guestCount, setGuestCount] = useState(100);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isPermanentInstall, setIsPermanentInstall] = useState(false);
+  const [permanentInstallMonths, setPermanentInstallMonths] = useState(1);
 
   useEffect(() => {
     if (initialBase) {
@@ -76,7 +77,7 @@ export function PricingCalculator({ initialBase, initialCustomWorkflows = 0 }: P
 
   const calculateTotal = () => {
     const basePrice = selectedBase ? baseFeatures[selectedBase].price : 0;
-    const permanentInstallPrice = isPermanentInstall ? PERMANENT_INSTALL_PRICE : 0;
+    const permanentInstallPrice = isPermanentInstall ? PERMANENT_INSTALL_PRICE * permanentInstallMonths : 0;
     
     const imageCreditTotal =
       imageQuantities.reduce((acc, feature) => {
@@ -116,7 +117,8 @@ export function PricingCalculator({ initialBase, initialCustomWorkflows = 0 }: P
         .filter(f => f.quantity > 0)
         .map(f => f.name),
       customWorkflows: customWorkflowQuantity,
-      permanentInstall: isPermanentInstall
+      permanentInstall: isPermanentInstall,
+      permanentInstallMonths: isPermanentInstall ? permanentInstallMonths : 0
     };
   };
 
@@ -183,12 +185,38 @@ export function PricingCalculator({ initialBase, initialCustomWorkflows = 0 }: P
                   onCheckedChange={setIsPermanentInstall}
                 />
               </div>
-              <span className="text-sm font-medium text-center sm:text-left">
-                <NumberFlow
-                  format={{ style: "currency", currency: "USD" }}
-                  value={PERMANENT_INSTALL_PRICE}
-                />
-              </span>
+              <div className="flex items-center gap-4">
+                {isPermanentInstall && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setPermanentInstallMonths(Math.max(1, permanentInstallMonths - 1))}
+                      className="w-8 h-8 flex items-center justify-center rounded-md border border-primary/30 hover:bg-primary/10 transition-colors"
+                    >
+                      -
+                    </button>
+                    <span className="w-16 text-center">
+                      {permanentInstallMonths} {permanentInstallMonths === 1 ? 'month' : 'months'}
+                    </span>
+                    <button
+                      onClick={() => setPermanentInstallMonths(permanentInstallMonths + 1)}
+                      className="w-8 h-8 flex items-center justify-center rounded-md border border-primary/30 hover:bg-primary/10 transition-colors"
+                    >
+                      +
+                    </button>
+                  </div>
+                )}
+                <span className="text-sm font-medium text-center sm:text-left whitespace-nowrap">
+                  <NumberFlow
+                    format={{ style: "currency", currency: "USD" }}
+                    value={isPermanentInstall ? PERMANENT_INSTALL_PRICE * permanentInstallMonths : PERMANENT_INSTALL_PRICE}
+                  />
+                  {isPermanentInstall && (
+                    <span className="text-xs text-muted-foreground ml-1">
+                      (${PERMANENT_INSTALL_PRICE}/month)
+                    </span>
+                  )}
+                </span>
+              </div>
             </div>
 
             <div className="flex flex-col sm:flex-row justify-between gap-4 mt-4 p-3 rounded-lg hover:bg-white/5 transition-colors">
