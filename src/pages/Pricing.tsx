@@ -5,7 +5,7 @@ import { PricingCard } from "@/components/ui/dark-gradient-pricing";
 import { useState } from "react";
 
 const Pricing = () => {
-  const [selectedBase, setSelectedBase] = useState<"baseEvent" | "brandedEvent" | null>(null);
+  const [selectedBase, setSelectedBase] = useState<"brandedEvent" | null>(null);
   const [customWorkflows, setCustomWorkflows] = useState(0);
 
   const handleCalculateClick = (type: string) => {
