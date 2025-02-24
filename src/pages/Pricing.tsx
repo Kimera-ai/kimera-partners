@@ -10,7 +10,6 @@ const Pricing = () => {
       price: "$130",
       bestFor: "Our flagship package combines advanced AI capabilities with complete brand customization. Create immersive, on-brand experiences with custom UI elements, branded outputs, and advanced engagement features that capture valuable customer insights.",
       CTA: "Calculate My Pricing",
-      popular: true,
       benefits: [
         { text: "All Base Package features", checked: true },
         { text: "White Labelled Email Template", checked: true },
