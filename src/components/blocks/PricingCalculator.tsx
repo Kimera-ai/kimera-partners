@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -15,7 +16,7 @@ interface Feature {
 }
 
 interface PricingCalculatorProps {
-  initialBase?: "baseEvent" | "brandedEvent" | null;
+  initialBase?: "brandedEvent" | null;
   initialCustomWorkflows?: number;
 }
 
@@ -23,7 +24,6 @@ const CREDIT_COST = 0.01; // 1 credit = $0.01
 const USAGE_RATE = 0.7; // 70% of guests are expected to use features
 
 const baseFeatures = {
-  baseEvent: { price: 79, label: "Base Event" },
   brandedEvent: { price: 130, label: "Branded Event" },
 };
 
