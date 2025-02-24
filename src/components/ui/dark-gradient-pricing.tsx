@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion"
 import { Check, X } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -34,6 +35,7 @@ interface PricingCardProps {
   benefits: Array<{ text: string; checked: boolean }>
   className?: string
   popular?: boolean
+  onCTAClick?: () => void
 }
 
 export const PricingCard = ({
@@ -44,14 +46,8 @@ export const PricingCard = ({
   benefits,
   className,
   popular,
+  onCTAClick,
 }: PricingCardProps) => {
-  const scrollToCalculator = () => {
-    const calculator = document.querySelector('#pricing-calculator')
-    if (calculator) {
-      calculator.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    }
-  }
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -92,7 +88,7 @@ export const PricingCard = ({
           ))}
         </div>
         <Button
-          onClick={scrollToCalculator}
+          onClick={onCTAClick}
           className={cn(
             "w-full transition-all duration-300",
             "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600",
