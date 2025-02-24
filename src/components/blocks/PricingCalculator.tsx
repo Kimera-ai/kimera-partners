@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -12,6 +12,11 @@ interface Feature {
   name: string;
   credits: number;
   quantity: number;
+}
+
+interface PricingCalculatorProps {
+  initialBase?: "baseEvent" | "brandedEvent" | null;
+  initialCustomWorkflows?: number;
 }
 
 const CREDIT_COST = 0.01; // 1 credit = $0.01
@@ -36,13 +41,22 @@ const videoFeatures: Feature[] = [
 
 const CUSTOM_WORKFLOW_PRICE = 150;
 
-export function PricingCalculator() {
-  const [selectedBase, setSelectedBase] = useState<keyof typeof baseFeatures | null>(null);
+export function PricingCalculator({ initialBase, initialCustomWorkflows = 0 }: PricingCalculatorProps) {
+  const [selectedBase, setSelectedBase] = useState<keyof typeof baseFeatures | null>(initialBase || null);
   const [imageQuantities, setImageQuantities] = useState(imageFeatures);
   const [videoQuantities, setVideoQuantities] = useState(videoFeatures);
-  const [customWorkflowQuantity, setCustomWorkflowQuantity] = useState(0);
+  const [customWorkflowQuantity, setCustomWorkflowQuantity] = useState(initialCustomWorkflows);
   const [guestCount, setGuestCount] = useState(100);
   const [isFormOpen, setIsFormOpen] = useState(false);
+
+  useEffect(() => {
+    if (initialBase) {
+      setSelectedBase(initialBase);
+    }
+    if (initialCustomWorkflows > 0) {
+      setCustomWorkflowQuantity(initialCustomWorkflows);
+    }
+  }, [initialBase, initialCustomWorkflows]);
 
   const updateQuantity = (
     features: Feature[],
@@ -125,7 +139,7 @@ export function PricingCalculator() {
           <div className="max-w-md mx-auto">
             <div className="relative group">
               <div className="absolute -inset-1 bg-gradient-to-r from-primary/50 via-secondary to-primary/50 rounded-lg blur opacity-30 group-hover:opacity-50 transition duration-1000"></div>
-              <div className="relative bg-background/80 border border-primary/20 backdrop-blur-xl rounded-lg p-6 shadow-2xl">
+              <div className="relative bg-background/80 border border-primary/30 backdrop-blur-xl rounded-lg p-6 shadow-2xl">
                 <Input
                   id="guestCount"
                   type="number"

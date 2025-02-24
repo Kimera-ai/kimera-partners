@@ -2,8 +2,26 @@
 import { PricingCalculator } from "@/components/blocks/PricingCalculator";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { PricingCard } from "@/components/ui/dark-gradient-pricing";
+import { useState } from "react";
 
 const Pricing = () => {
+  const [selectedBase, setSelectedBase] = useState<"baseEvent" | "brandedEvent" | null>(null);
+  const [customWorkflows, setCustomWorkflows] = useState(0);
+
+  const handleCalculateClick = (type: string) => {
+    const calculatorElement = document.getElementById('pricing-calculator');
+    if (calculatorElement) {
+      if (type === "Branded Event") {
+        setSelectedBase("brandedEvent");
+        setCustomWorkflows(0);
+      } else if (type === "Custom Workflows") {
+        setSelectedBase("brandedEvent");
+        setCustomWorkflows(1);
+      }
+      calculatorElement.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const pricingCards = [
     {
       tier: "Branded Event",
@@ -19,6 +37,7 @@ const Pricing = () => {
         { text: "Custom Image frames for your event", checked: true },
         { text: "Remove Kimera branding", checked: true },
       ],
+      onCTAClick: () => handleCalculateClick("Branded Event"),
     },
     {
       tier: "Custom Workflows",
@@ -33,6 +52,7 @@ const Pricing = () => {
         { text: "Technical consultation", checked: true },
         { text: "Custom development", checked: true },
       ],
+      onCTAClick: () => handleCalculateClick("Custom Workflows"),
     },
   ];
 
@@ -69,7 +89,10 @@ const Pricing = () => {
               <h2 className="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
                 Customize Your Package
               </h2>
-              <PricingCalculator />
+              <PricingCalculator 
+                initialBase={selectedBase} 
+                initialCustomWorkflows={customWorkflows}
+              />
             </div>
           </div>
         </div>
