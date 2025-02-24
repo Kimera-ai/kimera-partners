@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -21,7 +20,6 @@ interface PricingCalculatorProps {
 }
 
 const CREDIT_COST = 0.01; // 1 credit = $0.01
-const USAGE_RATE = 0.7; // 70% of guests are expected to use features
 
 const baseFeatures = {
   brandedEvent: { price: 130, label: "Branded Event" },
@@ -73,23 +71,17 @@ export function PricingCalculator({ initialBase, initialCustomWorkflows = 0 }: P
     );
   };
 
-  const calculateExpectedUsage = (baseCount: number) => {
-    return Math.round(baseCount * USAGE_RATE);
-  };
-
   const calculateTotal = () => {
     const basePrice = selectedBase ? baseFeatures[selectedBase].price : 0;
     
-    const expectedUsage = calculateExpectedUsage(guestCount);
-    
     const imageCreditTotal =
       imageQuantities.reduce((acc, feature) => {
-        return acc + (feature.credits * feature.quantity * expectedUsage);
+        return acc + (feature.credits * feature.quantity * guestCount);
       }, 0) * CREDIT_COST;
 
     const videoCreditTotal =
       videoQuantities.reduce((acc, feature) => {
-        return acc + (feature.credits * feature.quantity * expectedUsage);
+        return acc + (feature.credits * feature.quantity * guestCount);
       }, 0) * CREDIT_COST;
 
     const customWorkflowTotal = customWorkflowQuantity * CUSTOM_WORKFLOW_PRICE;
@@ -98,14 +90,12 @@ export function PricingCalculator({ initialBase, initialCustomWorkflows = 0 }: P
   };
 
   const calculateTotalCredits = () => {
-    const expectedUsage = calculateExpectedUsage(guestCount);
-    
     const imageCreditTotal = imageQuantities.reduce((acc, feature) => {
-      return acc + (feature.credits * feature.quantity * expectedUsage);
+      return acc + (feature.credits * feature.quantity * guestCount);
     }, 0);
 
     const videoCreditTotal = videoQuantities.reduce((acc, feature) => {
-      return acc + (feature.credits * feature.quantity * expectedUsage);
+      return acc + (feature.credits * feature.quantity * guestCount);
     }, 0);
     
     return imageCreditTotal + videoCreditTotal;
@@ -149,7 +139,7 @@ export function PricingCalculator({ initialBase, initialCustomWorkflows = 0 }: P
                   className="text-2xl h-14 text-center bg-background/50 border-primary/30 focus:border-primary"
                 />
                 <div className="text-primary font-medium text-lg text-center mt-3">
-                  {calculateExpectedUsage(guestCount)} expected runs
+                  {guestCount} expected runs
                 </div>
               </div>
             </div>
@@ -220,7 +210,7 @@ export function PricingCalculator({ initialBase, initialCustomWorkflows = 0 }: P
               <div className="space-y-1 text-center sm:text-left">
                 <Label>{feature.name}</Label>
                 <div className="text-sm text-muted-foreground">
-                  {feature.credits} credits × {feature.quantity > 0 ? feature.quantity * calculateExpectedUsage(guestCount) : 0} runs
+                  {feature.credits} credits × {feature.quantity > 0 ? feature.quantity * guestCount : 0} runs
                 </div>
               </div>
               <div className="flex items-center justify-center sm:justify-start gap-2">
@@ -231,7 +221,7 @@ export function PricingCalculator({ initialBase, initialCustomWorkflows = 0 }: P
                   -
                 </button>
                 <span className="w-24 text-center">
-                  {feature.quantity > 0 ? `${feature.quantity * calculateExpectedUsage(guestCount)} runs` : '0 runs'}
+                  {feature.quantity > 0 ? `${feature.quantity * guestCount} runs` : '0 runs'}
                 </span>
                 <button
                   onClick={() => updateQuantity(imageQuantities, setImageQuantities, index, true)}
@@ -256,7 +246,7 @@ export function PricingCalculator({ initialBase, initialCustomWorkflows = 0 }: P
               <div className="space-y-1 text-center sm:text-left">
                 <Label>{feature.name}</Label>
                 <div className="text-sm text-muted-foreground">
-                  {feature.credits} credits × {feature.quantity > 0 ? feature.quantity * calculateExpectedUsage(guestCount) : 0} runs
+                  {feature.credits} credits × {feature.quantity > 0 ? feature.quantity * guestCount : 0} runs
                 </div>
               </div>
               <div className="flex items-center justify-center sm:justify-start gap-2">
@@ -267,7 +257,7 @@ export function PricingCalculator({ initialBase, initialCustomWorkflows = 0 }: P
                   -
                 </button>
                 <span className="w-24 text-center">
-                  {feature.quantity > 0 ? `${feature.quantity * calculateExpectedUsage(guestCount)} runs` : '0 runs'}
+                  {feature.quantity > 0 ? `${feature.quantity * guestCount} runs` : '0 runs'}
                 </span>
                 <button
                   onClick={() => updateQuantity(videoQuantities, setVideoQuantities, index, true)}
