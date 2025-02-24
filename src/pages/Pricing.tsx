@@ -52,13 +52,16 @@ const Pricing = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-7xl mx-auto mb-32">
-            {pricingCards.map((card, index) => (
-              <PricingCard
-                key={card.tier}
-                {...card}
-              />
-            ))}
+          <div className="relative flex flex-col md:flex-row gap-8 max-w-7xl mx-auto mb-32 items-center">
+            <div className="flex-1">
+              <PricingCard {...pricingCards[0]} />
+            </div>
+            <div className="hidden md:flex items-center justify-center">
+              <span className="text-6xl font-bold text-purple-400/50">+</span>
+            </div>
+            <div className="flex-1">
+              <PricingCard {...pricingCards[1]} />
+            </div>
           </div>
 
           <div className="w-full max-w-5xl mx-auto">
