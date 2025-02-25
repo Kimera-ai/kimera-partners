@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Image, Settings, Sparkles, Wand2, X, Clock, LightBulb } from "lucide-react";
+import { Image, Settings, Sparkles, Wand2, X, Clock, Lightbulb } from "lucide-react";
 import { DotPattern } from "@/components/ui/dot-pattern";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -354,7 +354,7 @@ const PromptMaker = () => {
                         className="absolute bottom-2 right-2 text-muted-foreground hover:text-foreground"
                         onClick={handleImprovePrompt}
                       >
-                        <LightBulb className="h-4 w-4" />
+                        <Lightbulb className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
