@@ -1,3 +1,4 @@
+
 import { useState, useRef, useCallback, useEffect } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { Input } from "@/components/ui/input";
@@ -9,6 +10,13 @@ import { Image, Settings, Sparkles, Wand2, X, Clock } from "lucide-react";
 import { DotPattern } from "@/components/ui/dot-pattern";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const API_KEY = "1712edc40e3eb72c858332fe7500bf33e885324f8c1cd52b8cded2cdfd724cee";
 const PIPELINE_ID = "803a4MBY";
@@ -62,6 +70,7 @@ const PromptMaker = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [ratio, setRatio] = useState("2:3");
   const { toast } = useToast();
   const previewRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<NodeJS.Timeout>();
@@ -160,7 +169,7 @@ const PromptMaker = () => {
       const requestBody = {
         pipeline_id: PIPELINE_ID,
         imageUrl: uploadedImageUrl,
-        ratio: "2:3",
+        ratio: ratio,
         prompt: prompt || "Enhance this image"
       };
 
@@ -265,6 +274,20 @@ const PromptMaker = () => {
 
           <Card className="p-6 bg-background/50 backdrop-blur mb-6">
             <div className="space-y-4">
+              <div>
+                <Label htmlFor="ratio">Aspect Ratio</Label>
+                <Select value={ratio} onValueChange={setRatio}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select ratio" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1:1">1:1 (Square)</SelectItem>
+                    <SelectItem value="2:3">2:3 (Portrait)</SelectItem>
+                    <SelectItem value="3:4">3:4 (Portrait)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div>
                 <Label htmlFor="prompt">Prompt</Label>
                 <div className="relative">
