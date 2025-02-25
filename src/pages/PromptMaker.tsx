@@ -58,33 +58,45 @@ const PromptMaker = () => {
   const [prompt, setPrompt] = useState("");
   const [negativePrompt, setNegativePrompt] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const { toast } = useToast();
   const previewRef = useRef<HTMLDivElement>(null);
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+    setSelectedFile(file);
+  };
+
+  const handleGenerate = async () => {
+    if (!selectedFile) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please select an image first",
+      });
+      return;
+    }
+
     try {
-      setIsUploading(true);
+      setIsProcessing(true);
 
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-
-      const fileExt = file.name.split('.').pop();
+      const fileExt = selectedFile.name.split('.').pop();
       const fileName = `${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `${fileName}`;
 
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('images')
-        .upload(filePath, file);
+        .upload(filePath, selectedFile);
 
       if (uploadError) {
         console.error("Storage upload error:", uploadError);
@@ -115,57 +127,21 @@ const PromptMaker = () => {
       const kimeraUrl = await kimeraResponse.json();
       console.log("Kimera response:", kimeraUrl);
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('uploaded_images')
         .insert([{ 
           image_url: kimeraUrl,
           original_url: publicUrl
-        }])
-        .select()
-        .single();
+        }]);
 
       if (error) {
         console.error("Database error:", error);
         throw new Error('Failed to save image to database');
       }
 
-      setUploadedImageUrl(kimeraUrl);
-      console.log("Image saved to database:", data);
-
-      toast({
-        title: "Success",
-        description: "Image uploaded successfully",
-      });
-
-    } catch (error) {
-      console.error("Upload error:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to upload image",
-      });
-      setImagePreview(null);
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const handleGenerate = async () => {
-    if (!uploadedImageUrl) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please upload an image first",
-      });
-      return;
-    }
-
-    try {
-      setIsProcessing(true);
-      
       const requestBody = {
         pipeline_id: PIPELINE_ID,
-        imageUrl: uploadedImageUrl,
+        imageUrl: kimeraUrl,
         ratio: "2:3",
         prompt: prompt || "Enhance this image"
       };
@@ -234,8 +210,8 @@ const PromptMaker = () => {
     e.preventDefault();
     e.stopPropagation();
     setImagePreview(null);
+    setSelectedFile(null);
     setGeneratedImage(null);
-    setUploadedImageUrl(null);
   }, []);
 
   return (
@@ -278,7 +254,7 @@ const PromptMaker = () => {
                     id="reference-image"
                     type="file"
                     accept="image/*"
-                    onChange={handleImageUpload}
+                    onChange={handleImageSelect}
                     className="hidden"
                     disabled={isUploading || isProcessing}
                   />
