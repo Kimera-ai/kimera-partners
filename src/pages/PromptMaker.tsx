@@ -1,3 +1,4 @@
+
 import { useState, useRef, useCallback } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { Input } from "@/components/ui/input";
@@ -58,48 +59,37 @@ const PromptMaker = () => {
   const [prompt, setPrompt] = useState("");
   const [negativePrompt, setNegativePrompt] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const { toast } = useToast();
   const previewRef = useRef<HTMLDivElement>(null);
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result as string);
-    };
-    reader.readAsDataURL(file);
-    setSelectedFile(file);
-  };
-
-  const handleGenerate = async () => {
-    if (!selectedFile) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please select an image first",
-      });
-      return;
-    }
-
     try {
-      setIsProcessing(true);
+      setIsUploading(true);
 
-      const fileExt = selectedFile.name.split('.').pop();
+      // Show preview immediately
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+
+      // Upload to Supabase
+      const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `${fileName}`;
 
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('images')
-        .upload(filePath, selectedFile);
+        .upload(filePath, file);
 
       if (uploadError) {
-        console.error("Storage upload error:", uploadError);
         throw new Error('Failed to upload image to storage');
       }
 
@@ -107,15 +97,48 @@ const PromptMaker = () => {
         .from('images')
         .getPublicUrl(filePath);
 
-      console.log("Uploaded image public URL:", publicUrl);
+      setUploadedImageUrl(publicUrl);
+      
+      toast({
+        title: "Success",
+        description: "Image uploaded successfully",
+      });
 
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to upload image",
+      });
+      setImagePreview(null);
+      setUploadedImageUrl(null);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleGenerate = async () => {
+    if (!uploadedImageUrl) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please upload an image first",
+      });
+      return;
+    }
+
+    try {
+      setIsProcessing(true);
+
+      // Upload to Kimera
       const kimeraResponse = await fetch('https://api.kimera.ai/v1/upload', {
         method: 'POST',
         headers: {
           'x-api-key': API_KEY,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ url: publicUrl })
+        body: JSON.stringify({ url: uploadedImageUrl })
       });
 
       if (!kimeraResponse.ok) {
@@ -127,18 +150,20 @@ const PromptMaker = () => {
       const kimeraUrl = await kimeraResponse.json();
       console.log("Kimera response:", kimeraUrl);
 
-      const { error } = await supabase
+      // Save to database
+      const { error: dbError } = await supabase
         .from('uploaded_images')
         .insert([{ 
           image_url: kimeraUrl,
-          original_url: publicUrl
+          original_url: uploadedImageUrl
         }]);
 
-      if (error) {
-        console.error("Database error:", error);
+      if (dbError) {
+        console.error("Database error:", dbError);
         throw new Error('Failed to save image to database');
       }
 
+      // Run pipeline
       const requestBody = {
         pipeline_id: PIPELINE_ID,
         imageUrl: kimeraUrl,
@@ -166,6 +191,7 @@ const PromptMaker = () => {
       const { id: jobId } = await pipelineResponse.json();
       console.log("Job started with ID:", jobId);
 
+      // Poll for results
       const pollInterval = setInterval(async () => {
         const statusResponse = await fetch(`https://api.kimera.ai/v1/pipeline/run/${jobId}`, {
           headers: {
@@ -210,7 +236,7 @@ const PromptMaker = () => {
     e.preventDefault();
     e.stopPropagation();
     setImagePreview(null);
-    setSelectedFile(null);
+    setUploadedImageUrl(null);
     setGeneratedImage(null);
   }, []);
 
@@ -254,7 +280,7 @@ const PromptMaker = () => {
                     id="reference-image"
                     type="file"
                     accept="image/*"
-                    onChange={handleImageSelect}
+                    onChange={handleImageUpload}
                     className="hidden"
                     disabled={isUploading || isProcessing}
                   />
