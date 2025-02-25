@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { Input } from "@/components/ui/input";
@@ -17,6 +18,8 @@ const PromptMaker = () => {
   const [negativePrompt, setNegativePrompt] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,8 +54,33 @@ const PromptMaker = () => {
       }
 
       const { imageUrl } = await uploadResponse.json();
+      console.log("Image uploaded successfully:", imageUrl);
 
-      // Then start the pipeline with the uploaded image URL
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to upload image",
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleGenerate = async () => {
+    if (!imagePreview) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please upload an image first",
+      });
+      return;
+    }
+
+    try {
+      setIsProcessing(true);
+      
+      // Start the pipeline with the uploaded image URL
       const pipelineResponse = await fetch('https://api.kimera.ai/v1/pipeline/run', {
         method: 'POST',
         headers: {
@@ -61,7 +89,7 @@ const PromptMaker = () => {
         },
         body: JSON.stringify({
           pipeline_id: PIPELINE_ID,
-          imageUrl: imageUrl,
+          imageUrl: imagePreview,
           ratio: "2:3",
           prompt: prompt || "Enhance this image"
         })
@@ -72,6 +100,7 @@ const PromptMaker = () => {
       }
 
       const { id: jobId } = await pipelineResponse.json();
+      console.log("Job started with ID:", jobId);
 
       // Start polling for results
       const pollInterval = setInterval(async () => {
@@ -87,28 +116,30 @@ const PromptMaker = () => {
         }
 
         const status = await statusResponse.json();
+        console.log("Current status:", status);
         
         if (status.status === 'completed') {
           clearInterval(pollInterval);
+          setGeneratedImage(status.source);
+          setIsProcessing(false);
           toast({
             title: "Success",
-            description: "Image has been processed successfully!",
+            description: "Image has been generated successfully!",
           });
-          // Here you can handle the processed image URL from status.result
-        } else if (status.status === 'failed') {
+        } else if (status.status === 'failed' || status.status === 'Error') {
           clearInterval(pollInterval);
+          setIsProcessing(false);
           throw new Error('Processing failed');
         }
       }, 2000);
 
     } catch (error) {
+      setIsProcessing(false);
       toast({
         variant: "destructive",
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to process image",
       });
-    } finally {
-      setIsUploading(false);
     }
   };
 
@@ -116,6 +147,7 @@ const PromptMaker = () => {
     e.preventDefault();
     e.stopPropagation();
     setImagePreview(null);
+    setGeneratedImage(null);
   };
 
   return (
@@ -169,7 +201,7 @@ const PromptMaker = () => {
                       accept="image/*"
                       onChange={handleImageUpload}
                       className="hidden"
-                      disabled={isUploading}
+                      disabled={isUploading || isProcessing}
                     />
                     {imagePreview ? (
                       <div className="relative group">
@@ -179,7 +211,7 @@ const PromptMaker = () => {
                           size="icon"
                           className="h-6 w-6 rounded-md bg-white border border-black p-0.5 hover:bg-white/90"
                           onClick={removeImage}
-                          disabled={isUploading}
+                          disabled={isUploading || isProcessing}
                         >
                           <img 
                             src={imagePreview} 
@@ -222,19 +254,31 @@ const PromptMaker = () => {
                 />
               </div>
 
-              <Button className="w-full" disabled={isUploading}>
+              <Button 
+                className="w-full" 
+                disabled={isUploading || isProcessing || !imagePreview}
+                onClick={handleGenerate}
+              >
                 <Sparkles className="w-4 h-4 mr-2" />
-                {isUploading ? "Processing..." : "Generate"}
+                {isProcessing ? "Processing..." : "Generate"}
               </Button>
             </div>
           </Card>
 
           {/* Generated Images Panel */}
           <Card className="p-6 bg-background/50 backdrop-blur min-h-[600px] flex items-center justify-center">
-            <div className="text-center text-muted-foreground">
-              <Image className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p>Your generated images will appear here</p>
-            </div>
+            {generatedImage ? (
+              <img 
+                src={generatedImage} 
+                alt="Generated" 
+                className="max-w-full max-h-[550px] object-contain rounded-lg shadow-lg"
+              />
+            ) : (
+              <div className="text-center text-muted-foreground">
+                <Image className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>Your generated images will appear here</p>
+              </div>
+            )}
           </Card>
         </div>
       </div>
