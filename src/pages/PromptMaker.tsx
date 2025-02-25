@@ -56,7 +56,6 @@ const ImagePreview = ({
 
 const PromptMaker = () => {
   const [prompt, setPrompt] = useState("");
-  const [negativePrompt, setNegativePrompt] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
@@ -300,17 +299,6 @@ const PromptMaker = () => {
                     />
                   </div>
                 </div>
-              </div>
-
-              <div>
-                <Label htmlFor="negative-prompt">Negative Prompt</Label>
-                <Textarea
-                  id="negative-prompt"
-                  placeholder="blurry, low quality, distorted, bad anatomy..."
-                  value={negativePrompt}
-                  onChange={(e) => setNegativePrompt(e.target.value)}
-                  className="h-32 resize-none bg-background/50"
-                />
               </div>
 
               <Button 
