@@ -170,7 +170,12 @@ const PromptMaker = () => {
         pipeline_id: PIPELINE_ID,
         imageUrl: uploadedImageUrl,
         ratio: ratio,
-        prompt: `${style} style: ${prompt}` || `${style} this image`
+        prompt: `${style} style: ${prompt}` || `${style} this image`,
+        data: {
+          lora_scale: 0.5,
+          style: style,
+          seed: -1
+        }
       };
 
       console.log("Sending request with body:", requestBody);
