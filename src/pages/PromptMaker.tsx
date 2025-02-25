@@ -1,12 +1,11 @@
-
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Image, Settings, Sparkles, Wand2, X } from "lucide-react";
+import { Image, Settings, Sparkles, Wand2, X, Clock } from "lucide-react";
 import { DotPattern } from "@/components/ui/dot-pattern";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -63,8 +62,35 @@ const PromptMaker = () => {
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
+  const [elapsedTime, setElapsedTime] = useState(0);
   const { toast } = useToast();
   const previewRef = useRef<HTMLDivElement>(null);
+  const timerRef = useRef<NodeJS.Timeout>();
+
+  useEffect(() => {
+    if (isProcessing) {
+      setElapsedTime(0);
+      timerRef.current = setInterval(() => {
+        setElapsedTime(prev => prev + 1);
+      }, 1000);
+    } else {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [isProcessing]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -128,6 +154,7 @@ const PromptMaker = () => {
 
     try {
       setIsProcessing(true);
+      setElapsedTime(0);
 
       const requestBody = {
         pipeline_id: PIPELINE_ID,
@@ -173,7 +200,7 @@ const PromptMaker = () => {
         
         if (status.status === 'completed') {
           clearInterval(pollInterval);
-          setGeneratedImage(status.result); // Changed from status.source to status.result
+          setGeneratedImage(status.result);
           setIsProcessing(false);
           toast({
             title: "Success",
@@ -297,7 +324,13 @@ const PromptMaker = () => {
             </div>
           </Card>
 
-          <Card className="p-6 bg-background/50 backdrop-blur min-h-[600px] flex items-center justify-center">
+          <Card className="p-6 bg-background/50 backdrop-blur min-h-[600px] flex items-center justify-center relative">
+            {isProcessing && (
+              <div className="absolute top-4 right-4 flex items-center gap-2 bg-background/80 backdrop-blur px-3 py-1.5 rounded-full text-sm">
+                <Clock className="w-4 h-4 animate-pulse" />
+                <span>{formatTime(elapsedTime)}</span>
+              </div>
+            )}
             {generatedImage ? (
               <img 
                 src={generatedImage} 
