@@ -98,8 +98,7 @@ const PromptMaker = () => {
       const { data, error } = await supabase
         .from('generated_images')
         .select('*')
-        .order('created_at', { ascending: false })
-        .limit(6);
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       
@@ -511,7 +510,7 @@ const PromptMaker = () => {
                   <History className="w-5 h-5" />
                   Generation History
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                   {previousGenerations.map((gen) => (
                     <div key={gen.id} className="space-y-3">
                       <div className="relative group">
