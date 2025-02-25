@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Image, Settings, Sparkles, Wand2, X, Clock, Lightbulb, History, Loader2 } from "lucide-react";
+import { Image, Settings, Sparkles, Wand2, X, Clock, Lightbulb, History, Loader2, Download } from "lucide-react";
 import { DotPattern } from "@/components/ui/dot-pattern";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -345,6 +345,33 @@ const PromptMaker = () => {
     setShowPromptDialog(true);
   };
 
+  const handleDownload = async (imageUrl: string) => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `generated-image-${Date.now()}.png`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast({
+        title: "Success",
+        description: "Image downloaded successfully",
+      });
+    } catch (error) {
+      console.error('Error downloading image:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to download image",
+      });
+    }
+  };
+
   return (
     <BaseLayout>
       <div className="relative min-h-screen">
@@ -544,7 +571,19 @@ const PromptMaker = () => {
       <Dialog open={showPromptDialog} onOpenChange={setShowPromptDialog}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Generation Details</DialogTitle>
+            <DialogTitle className="flex items-center justify-between">
+              Generation Details
+              {selectedGeneration && (
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => handleDownload(selectedGeneration.image_url)}
+                  className="h-8 w-8"
+                >
+                  <Download className="h-4 w-4" />
+                </Button>
+              )}
+            </DialogTitle>
           </DialogHeader>
           {selectedGeneration && (
             <div className="space-y-4">
