@@ -46,8 +46,40 @@ const PromptMaker = () => {
             </div>
           </div>
 
+          {/* Moved Prompt Input to top */}
+          <Card className="p-6 bg-background/50 backdrop-blur mb-6">
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="prompt">Prompt</Label>
+                <Textarea
+                  id="prompt"
+                  placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..."
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  className="h-32 resize-none bg-background/50"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="negative-prompt">Negative Prompt</Label>
+                <Textarea
+                  id="negative-prompt"
+                  placeholder="blurry, low quality, distorted, bad anatomy..."
+                  value={negativePrompt}
+                  onChange={(e) => setNegativePrompt(e.target.value)}
+                  className="h-32 resize-none bg-background/50"
+                />
+              </div>
+
+              <Button className="w-full">
+                <Sparkles className="w-4 h-4 mr-2" />
+                Generate
+              </Button>
+            </div>
+          </Card>
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Panel - Prompt Input */}
+            {/* Left Panel - Tabs */}
             <div className="lg:col-span-1 space-y-6">
               <Card className="p-6 bg-background/50 backdrop-blur">
                 <div className="flex gap-4 mb-6 border-b border-primary/20">
@@ -72,35 +104,6 @@ const PromptMaker = () => {
                   >
                     Settings
                   </TabButton>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="prompt">Prompt</Label>
-                    <Textarea
-                      id="prompt"
-                      placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..."
-                      value={prompt}
-                      onChange={(e) => setPrompt(e.target.value)}
-                      className="h-32 resize-none bg-background/50"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="negative-prompt">Negative Prompt</Label>
-                    <Textarea
-                      id="negative-prompt"
-                      placeholder="blurry, low quality, distorted, bad anatomy..."
-                      value={negativePrompt}
-                      onChange={(e) => setNegativePrompt(e.target.value)}
-                      className="h-32 resize-none bg-background/50"
-                    />
-                  </div>
-
-                  <Button className="w-full">
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Generate
-                  </Button>
                 </div>
               </Card>
             </div>
