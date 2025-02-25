@@ -71,15 +71,15 @@ const PromptMaker = () => {
                     placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..."
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
-                    className={`h-32 resize-none bg-background/50 ${imagePreview ? 'pl-[120px]' : ''}`}
+                    className={`h-32 resize-none bg-background/50 ${imagePreview ? 'pl-[84px]' : ''}`}
                   />
                   {imagePreview ? (
-                    <div className="absolute top-2 left-2 w-[100px]">
+                    <div className="absolute top-2 left-2 w-[64px]">
                       <div className="relative">
                         <img 
                           src={imagePreview} 
                           alt="Reference" 
-                          className="w-full h-[80px] object-cover rounded-lg"
+                          className="w-[64px] h-[64px] object-cover rounded-lg"
                         />
                         <Button
                           variant="destructive"
