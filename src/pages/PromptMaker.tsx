@@ -388,7 +388,7 @@ const PromptMaker = () => {
         <div className="relative z-10">
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              AI Image Generation
+              Kimera Image Generation
             </h1>
             <div className="flex gap-2">
               <Button variant="outline" size="sm">
