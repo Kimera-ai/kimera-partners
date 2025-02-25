@@ -153,22 +153,13 @@ const PromptMaker = () => {
   };
 
   const handleGenerate = async () => {
-    if (!uploadedImageUrl) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please upload an image first",
-      });
-      return;
-    }
-
     try {
       setIsProcessing(true);
       setElapsedTime(0);
 
       const requestBody = {
         pipeline_id: PIPELINE_ID,
-        imageUrl: uploadedImageUrl,
+        imageUrl: uploadedImageUrl || "",
         ratio: ratio,
         prompt: `${style} style: ${prompt}` || `${style} this image`,
         data: {
@@ -355,7 +346,7 @@ const PromptMaker = () => {
 
               <Button 
                 className="w-full" 
-                disabled={isUploading || isProcessing || !imagePreview}
+                disabled={isProcessing}
                 onClick={handleGenerate}
               >
                 <Sparkles className="w-4 h-4 mr-2" />
