@@ -65,34 +65,37 @@ const PromptMaker = () => {
             <div className="space-y-4">
               <div>
                 <Label htmlFor="prompt">Prompt</Label>
-                <div className="relative">
-                  <Textarea
-                    id="prompt"
-                    placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..."
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    className={`h-32 resize-none bg-background/50 ${imagePreview ? 'pl-[84px]' : ''}`}
-                  />
+                <Textarea
+                  id="prompt"
+                  placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..."
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  className="h-32 resize-none bg-background/50"
+                />
+              </div>
+
+              {/* Image Upload Section */}
+              <div className="space-y-2">
+                <Label htmlFor="reference-image">Reference Image</Label>
+                <div className="border-2 border-dashed border-border rounded-lg p-4">
                   {imagePreview ? (
-                    <div className="absolute top-2 left-2 w-[64px]">
-                      <div className="relative">
-                        <img 
-                          src={imagePreview} 
-                          alt="Reference" 
-                          className="w-[64px] h-[64px] object-cover rounded-lg"
-                        />
-                        <Button
-                          variant="destructive"
-                          size="icon"
-                          className="absolute -top-2 -right-2 h-5 w-5"
-                          onClick={removeImage}
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                      </div>
+                    <div className="relative">
+                      <img 
+                        src={imagePreview} 
+                        alt="Reference" 
+                        className="w-full max-h-64 object-contain rounded-lg"
+                      />
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-2 right-2"
+                        onClick={removeImage}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
                     </div>
                   ) : (
-                    <div className="absolute top-2 left-2">
+                    <div className="flex flex-col items-center justify-center py-4">
                       <Input
                         id="reference-image"
                         type="file"
@@ -102,10 +105,12 @@ const PromptMaker = () => {
                       />
                       <label
                         htmlFor="reference-image"
-                        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground cursor-pointer"
+                        className="flex flex-col items-center cursor-pointer"
                       >
-                        <Upload className="h-4 w-4" />
-                        <span>Add reference</span>
+                        <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+                        <span className="text-sm text-muted-foreground">
+                          Click to upload a reference image
+                        </span>
                       </label>
                     </div>
                   )}
