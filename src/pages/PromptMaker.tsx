@@ -1,4 +1,3 @@
-
 import { useState, useRef, useCallback, useEffect } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { Input } from "@/components/ui/input";
@@ -71,6 +70,7 @@ const PromptMaker = () => {
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [ratio, setRatio] = useState("2:3");
+  const [style, setStyle] = useState("Enhance");
   const { toast } = useToast();
   const previewRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<NodeJS.Timeout>();
@@ -170,7 +170,7 @@ const PromptMaker = () => {
         pipeline_id: PIPELINE_ID,
         imageUrl: uploadedImageUrl,
         ratio: ratio,
-        prompt: prompt || "Enhance this image"
+        prompt: `${style} style: ${prompt}` || `${style} this image`
       };
 
       console.log("Sending request with body:", requestBody);
@@ -274,18 +274,40 @@ const PromptMaker = () => {
 
           <Card className="p-6 bg-background/50 backdrop-blur mb-6">
             <div className="space-y-4">
-              <div>
-                <Label htmlFor="ratio">Aspect Ratio</Label>
-                <Select value={ratio} onValueChange={setRatio}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select ratio" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1:1">1:1 (Square)</SelectItem>
-                    <SelectItem value="2:3">2:3 (Portrait)</SelectItem>
-                    <SelectItem value="3:4">3:4 (Portrait)</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="ratio">Aspect Ratio</Label>
+                  <Select value={ratio} onValueChange={setRatio}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select ratio" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1:1">1:1 (Square)</SelectItem>
+                      <SelectItem value="2:3">2:3 (Portrait)</SelectItem>
+                      <SelectItem value="3:4">3:4 (Portrait)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="style">Style</Label>
+                  <Select value={style} onValueChange={setStyle}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select style" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Cinematic">Cinematic</SelectItem>
+                      <SelectItem value="Animated">Animated</SelectItem>
+                      <SelectItem value="Digital Art">Digital Art</SelectItem>
+                      <SelectItem value="Photographic">Photographic</SelectItem>
+                      <SelectItem value="Fantasy art">Fantasy art</SelectItem>
+                      <SelectItem value="Neonpunk">Neonpunk</SelectItem>
+                      <SelectItem value="Enhance">Enhance</SelectItem>
+                      <SelectItem value="Comic book">Comic book</SelectItem>
+                      <SelectItem value="Lowpoly">Lowpoly</SelectItem>
+                      <SelectItem value="Line art">Line art</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <div>
