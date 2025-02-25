@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,47 @@ import { supabase } from "@/integrations/supabase/client";
 
 const API_KEY = "1712edc40e3eb72c858332fe7500bf33e885324f8c1cd52b8cded2cdfd724cee";
 const PIPELINE_ID = "803a4MBY";
+
+const ImagePreview = ({ 
+  imagePreview, 
+  isUploading, 
+  isProcessing, 
+  onRemove 
+}: { 
+  imagePreview: string | null;
+  isUploading: boolean;
+  isProcessing: boolean;
+  onRemove: (e: React.MouseEvent) => void;
+}) => {
+  if (!imagePreview) {
+    return (
+      <label
+        htmlFor="reference-image"
+        className="cursor-pointer block"
+      >
+        <div className="h-8 w-8 rounded-md bg-white/10 backdrop-blur border border-white/20 p-1.5 hover:bg-white/20 flex items-center justify-center">
+          <Image className="h-full w-full text-white/70" />
+        </div>
+      </label>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      className="h-8 w-8 rounded-md bg-white/10 backdrop-blur border border-white/20 p-0.5 hover:bg-white/20 group relative"
+      onClick={onRemove}
+      disabled={isUploading || isProcessing}
+    >
+      <img 
+        src={imagePreview} 
+        alt="Reference" 
+        className="w-full h-full object-cover rounded transition-opacity group-hover:opacity-50"
+      />
+      <X className="absolute inset-0 m-auto h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+    </button>
+  );
+};
 
 const PromptMaker = () => {
   const [prompt, setPrompt] = useState("");
@@ -189,13 +230,13 @@ const PromptMaker = () => {
     }
   };
 
-  const removeImage = (e: React.MouseEvent) => {
+  const removeImage = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setImagePreview(null);
     setGeneratedImage(null);
     setUploadedImageUrl(null);
-  };
+  }, []);
 
   return (
     <BaseLayout>
@@ -241,36 +282,21 @@ const PromptMaker = () => {
                     className="hidden"
                     disabled={isUploading || isProcessing}
                   />
-                  <div className="relative isolate">
+                  <div className="relative">
                     <div 
                       ref={previewRef}
-                      className="absolute left-3 top-3 z-[100]"
-                      style={{ isolation: 'isolate' }}
+                      className="absolute left-3 top-3 z-[9999] pointer-events-auto"
+                      style={{ 
+                        position: 'absolute',
+                        isolation: 'isolate'
+                      }}
                     >
-                      {imagePreview ? (
-                        <button
-                          type="button"
-                          className="h-8 w-8 rounded-md bg-white/10 backdrop-blur border border-white/20 p-0.5 hover:bg-white/20 group relative"
-                          onClick={removeImage}
-                          disabled={isUploading || isProcessing}
-                        >
-                          <img 
-                            src={imagePreview} 
-                            alt="Reference" 
-                            className="w-full h-full object-cover rounded transition-opacity group-hover:opacity-50"
-                          />
-                          <X className="absolute inset-0 m-auto h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
-                        </button>
-                      ) : (
-                        <label
-                          htmlFor="reference-image"
-                          className="cursor-pointer block"
-                        >
-                          <div className="h-8 w-8 rounded-md bg-white/10 backdrop-blur border border-white/20 p-1.5 hover:bg-white/20 flex items-center justify-center">
-                            <Image className="h-full w-full text-white/70" />
-                          </div>
-                        </label>
-                      )}
+                      <ImagePreview 
+                        imagePreview={imagePreview}
+                        isUploading={isUploading}
+                        isProcessing={isProcessing}
+                        onRemove={removeImage}
+                      />
                     </div>
                     <Textarea
                       id="prompt"
