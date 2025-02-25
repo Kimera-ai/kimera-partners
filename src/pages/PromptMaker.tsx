@@ -25,7 +25,9 @@ const PromptMaker = () => {
     }
   };
 
-  const removeImage = () => {
+  const removeImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     setImagePreview(null);
   };
 
@@ -82,7 +84,7 @@ const PromptMaker = () => {
                       className="hidden"
                     />
                     {imagePreview ? (
-                      <div className="relative">
+                      <div className="relative group">
                         <Button
                           type="button"
                           variant="ghost"
@@ -95,12 +97,15 @@ const PromptMaker = () => {
                             alt="Reference" 
                             className="w-full h-full object-cover rounded"
                           />
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 rounded flex items-center justify-center transition-opacity">
+                            <X className="h-3 w-3 text-white" />
+                          </div>
                         </Button>
                       </div>
                     ) : (
                       <label
                         htmlFor="reference-image"
-                        className="cursor-pointer"
+                        className="cursor-pointer block"
                       >
                         <Button
                           type="button"
