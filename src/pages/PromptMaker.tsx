@@ -548,7 +548,7 @@ const PromptMaker = () => {
               </Card>
             </div>
 
-            <Card className="p-6 bg-background/50 backdrop-blur min-h-[600px] flex items-center justify-center relative">
+            <Card className="p-6 bg-background/50 backdrop-blur relative aspect-[2/3] flex items-center justify-center">
               {isProcessing && (
                 <div className="absolute inset-0 flex items-center justify-center z-10">
                   <div className="flex items-center gap-2 bg-background/80 backdrop-blur px-6 py-3 rounded-full text-lg font-mono">
@@ -558,14 +558,11 @@ const PromptMaker = () => {
                 </div>
               )}
               {generatedImage ? (
-                <div className="w-full h-full flex items-center justify-center">
-                  <img 
-                    src={generatedImage} 
-                    alt="Generated" 
-                    className="w-full h-full object-contain rounded-lg shadow-lg"
-                    style={{ maxHeight: '550px' }}
-                  />
-                </div>
+                <img 
+                  src={generatedImage} 
+                  alt="Generated" 
+                  className="w-full h-full object-cover rounded-lg shadow-lg"
+                />
               ) : (
                 <div className="text-center text-muted-foreground">
                   <Image className="w-12 h-12 mx-auto mb-4 opacity-50" />
