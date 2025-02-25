@@ -10,6 +10,12 @@ import { DotPattern } from "@/components/ui/dot-pattern";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -75,6 +81,8 @@ const PromptMaker = () => {
   const [previousGenerations, setPreviousGenerations] = useState<any[]>([]);
   const [showHistory, setShowHistory] = useState(false);
   const [isImprovingPrompt, setIsImprovingPrompt] = useState(false);
+  const [selectedGeneration, setSelectedGeneration] = useState<any | null>(null);
+  const [showPromptDialog, setShowPromptDialog] = useState(false);
   const { session } = useSession();
   const { toast } = useToast();
   const previewRef = useRef<HTMLDivElement>(null);
@@ -332,6 +340,11 @@ const PromptMaker = () => {
     }
   };
 
+  const handleImageClick = (generation: any) => {
+    setSelectedGeneration(generation);
+    setShowPromptDialog(true);
+  };
+
   return (
     <BaseLayout>
       <div className="relative min-h-screen">
@@ -481,17 +494,19 @@ const PromptMaker = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {previousGenerations.map((gen) => (
                       <div key={gen.id} className="space-y-3">
-                        <img 
-                          src={gen.image_url} 
-                          alt={gen.prompt} 
-                          className="w-full aspect-square object-cover rounded-lg"
-                        />
-                        <div className="space-y-2">
-                          <p className="text-sm text-white/90">{gen.prompt}</p>
-                          <div className="flex gap-3 text-xs text-white/70">
-                            <span>Style: {gen.style}</span>
-                            <span>Ratio: {gen.ratio}</span>
-                          </div>
+                        <button 
+                          className="w-full text-left"
+                          onClick={() => handleImageClick(gen)}
+                        >
+                          <img 
+                            src={gen.image_url} 
+                            alt={gen.prompt} 
+                            className="w-full aspect-square object-cover rounded-lg hover:opacity-90 transition-opacity"
+                          />
+                        </button>
+                        <div className="flex gap-3 text-xs text-white/70">
+                          <span>Style: {gen.style}</span>
+                          <span>Ratio: {gen.ratio}</span>
                         </div>
                       </div>
                     ))}
@@ -525,6 +540,39 @@ const PromptMaker = () => {
           </div>
         </div>
       </div>
+
+      <Dialog open={showPromptDialog} onOpenChange={setShowPromptDialog}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Generation Details</DialogTitle>
+          </DialogHeader>
+          {selectedGeneration && (
+            <div className="space-y-4">
+              <img 
+                src={selectedGeneration.image_url} 
+                alt={selectedGeneration.prompt}
+                className="w-full rounded-lg"
+              />
+              <div className="space-y-2">
+                <Label>Prompt</Label>
+                <p className="text-sm text-white/90 bg-background/50 p-4 rounded-lg">
+                  {selectedGeneration.prompt}
+                </p>
+                <div className="flex gap-4 text-sm text-white/70">
+                  <div>
+                    <Label>Style</Label>
+                    <p>{selectedGeneration.style}</p>
+                  </div>
+                  <div>
+                    <Label>Ratio</Label>
+                    <p>{selectedGeneration.ratio}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </BaseLayout>
   );
 };
