@@ -248,39 +248,41 @@ const PromptMaker = () => {
                     className="hidden"
                     disabled={isUploading || isProcessing}
                   />
-                  {imagePreview ? (
-                    <div className="absolute left-3 top-3 z-10">
-                      <button
-                        type="button"
-                        className="h-8 w-8 rounded-md bg-white/10 backdrop-blur border border-white/20 p-0.5 hover:bg-white/20 group relative"
-                        onClick={removeImage}
-                        disabled={isUploading || isProcessing}
-                      >
-                        <img 
-                          src={imagePreview} 
-                          alt="Reference" 
-                          className="w-full h-full object-cover rounded transition-opacity group-hover:opacity-50"
-                        />
-                        <X className="absolute inset-0 m-auto h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </button>
-                    </div>
-                  ) : (
-                    <label
-                      htmlFor="reference-image"
-                      className="absolute left-3 top-3 z-10 cursor-pointer block"
-                    >
-                      <div className="h-8 w-8 rounded-md bg-white/10 backdrop-blur border border-white/20 p-1.5 hover:bg-white/20 flex items-center justify-center">
-                        <Image className="h-full w-full text-white/70" />
+                  <div className="relative">
+                    {imagePreview ? (
+                      <div className="absolute left-3 top-3 z-50">
+                        <button
+                          type="button"
+                          className="h-8 w-8 rounded-md bg-white/10 backdrop-blur border border-white/20 p-0.5 hover:bg-white/20 group relative"
+                          onClick={removeImage}
+                          disabled={isUploading || isProcessing}
+                        >
+                          <img 
+                            src={imagePreview} 
+                            alt="Reference" 
+                            className="w-full h-full object-cover rounded transition-opacity group-hover:opacity-50"
+                          />
+                          <X className="absolute inset-0 m-auto h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </button>
                       </div>
-                    </label>
-                  )}
-                  <Textarea
-                    id="prompt"
-                    placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..."
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    className="h-32 resize-none bg-background/50 pl-14"
-                  />
+                    ) : (
+                      <label
+                        htmlFor="reference-image"
+                        className="absolute left-3 top-3 z-50 cursor-pointer block"
+                      >
+                        <div className="h-8 w-8 rounded-md bg-white/10 backdrop-blur border border-white/20 p-1.5 hover:bg-white/20 flex items-center justify-center">
+                          <Image className="h-full w-full text-white/70" />
+                        </div>
+                      </label>
+                    )}
+                    <Textarea
+                      id="prompt"
+                      placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..."
+                      value={prompt}
+                      onChange={(e) => setPrompt(e.target.value)}
+                      className="h-32 resize-none bg-background/50 pl-14"
+                    />
+                  </div>
                 </div>
               </div>
 
