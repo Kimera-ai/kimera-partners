@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ const PromptMaker = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const { toast } = useToast();
+  const previewRef = useRef<HTMLDivElement>(null);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -30,14 +31,12 @@ const PromptMaker = () => {
     try {
       setIsUploading(true);
 
-      // First, show preview
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
       };
       reader.readAsDataURL(file);
 
-      // Upload to Supabase Storage
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `${fileName}`;
@@ -51,14 +50,12 @@ const PromptMaker = () => {
         throw new Error('Failed to upload image to storage');
       }
 
-      // Get the public URL
       const { data: { publicUrl } } = supabase.storage
         .from('images')
         .getPublicUrl(filePath);
 
       console.log("Uploaded image public URL:", publicUrl);
 
-      // Upload the image URL to Kimera API
       const kimeraResponse = await fetch('https://api.kimera.ai/v1/upload', {
         method: 'POST',
         headers: {
@@ -77,7 +74,6 @@ const PromptMaker = () => {
       const kimeraUrl = await kimeraResponse.json();
       console.log("Kimera response:", kimeraUrl);
 
-      // Save reference in the database
       const { data, error } = await supabase
         .from('uploaded_images')
         .insert([{ 
@@ -135,7 +131,6 @@ const PromptMaker = () => {
 
       console.log("Sending request with body:", requestBody);
       
-      // Start the pipeline with the saved image URL
       const pipelineResponse = await fetch('https://api.kimera.ai/v1/pipeline/run', {
         method: 'POST',
         headers: {
@@ -154,7 +149,6 @@ const PromptMaker = () => {
       const { id: jobId } = await pipelineResponse.json();
       console.log("Job started with ID:", jobId);
 
-      // Start polling for results
       const pollInterval = setInterval(async () => {
         const statusResponse = await fetch(`https://api.kimera.ai/v1/pipeline/run/${jobId}`, {
           headers: {
@@ -234,7 +228,6 @@ const PromptMaker = () => {
             </div>
           </div>
 
-          {/* Prompt Input Section */}
           <Card className="p-6 bg-background/50 backdrop-blur mb-6">
             <div className="space-y-4">
               <div>
@@ -248,9 +241,13 @@ const PromptMaker = () => {
                     className="hidden"
                     disabled={isUploading || isProcessing}
                   />
-                  <div className="relative">
-                    {imagePreview ? (
-                      <div className="absolute left-3 top-3 z-50">
+                  <div className="relative isolate">
+                    <div 
+                      ref={previewRef}
+                      className="absolute left-3 top-3 z-[100]"
+                      style={{ isolation: 'isolate' }}
+                    >
+                      {imagePreview ? (
                         <button
                           type="button"
                           className="h-8 w-8 rounded-md bg-white/10 backdrop-blur border border-white/20 p-0.5 hover:bg-white/20 group relative"
@@ -264,17 +261,17 @@ const PromptMaker = () => {
                           />
                           <X className="absolute inset-0 m-auto h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
                         </button>
-                      </div>
-                    ) : (
-                      <label
-                        htmlFor="reference-image"
-                        className="absolute left-3 top-3 z-50 cursor-pointer block"
-                      >
-                        <div className="h-8 w-8 rounded-md bg-white/10 backdrop-blur border border-white/20 p-1.5 hover:bg-white/20 flex items-center justify-center">
-                          <Image className="h-full w-full text-white/70" />
-                        </div>
-                      </label>
-                    )}
+                      ) : (
+                        <label
+                          htmlFor="reference-image"
+                          className="cursor-pointer block"
+                        >
+                          <div className="h-8 w-8 rounded-md bg-white/10 backdrop-blur border border-white/20 p-1.5 hover:bg-white/20 flex items-center justify-center">
+                            <Image className="h-full w-full text-white/70" />
+                          </div>
+                        </label>
+                      )}
+                    </div>
                     <Textarea
                       id="prompt"
                       placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..."
@@ -308,7 +305,6 @@ const PromptMaker = () => {
             </div>
           </Card>
 
-          {/* Generated Images Panel */}
           <Card className="p-6 bg-background/50 backdrop-blur min-h-[600px] flex items-center justify-center">
             {generatedImage ? (
               <img 
