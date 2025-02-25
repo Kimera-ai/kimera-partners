@@ -1,3 +1,4 @@
+
 import { useState, useRef, useCallback } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { Input } from "@/components/ui/input";
@@ -130,9 +131,9 @@ const PromptMaker = () => {
 
       const requestBody = {
         pipeline_id: PIPELINE_ID,
-        imageUrl: [uploadedImageUrl],
+        imageUrl: uploadedImageUrl,
         ratio: "2:3",
-        prompt: [prompt || "Enhance this image"]
+        prompt: prompt || "Enhance this image"
       };
 
       console.log("Sending request with body:", requestBody);
