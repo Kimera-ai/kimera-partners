@@ -65,55 +65,54 @@ const PromptMaker = () => {
             <div className="space-y-4">
               <div>
                 <Label htmlFor="prompt">Prompt</Label>
-                <Textarea
-                  id="prompt"
-                  placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..."
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  className="h-32 resize-none bg-background/50"
-                />
-              </div>
-
-              {/* Image Upload Section */}
-              <div className="space-y-2">
-                <Label htmlFor="reference-image">Reference Image</Label>
-                <div className="border-2 border-dashed border-border rounded-lg p-4">
-                  {imagePreview ? (
-                    <div className="relative">
-                      <img 
-                        src={imagePreview} 
-                        alt="Reference" 
-                        className="w-full max-h-64 object-contain rounded-lg"
-                      />
-                      <Button
-                        variant="destructive"
-                        size="icon"
-                        className="absolute top-2 right-2"
-                        onClick={removeImage}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center py-4">
-                      <Input
-                        id="reference-image"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="hidden"
-                      />
+                <div className="relative">
+                  <Textarea
+                    id="prompt"
+                    placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..."
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    className="h-32 resize-none bg-background/50 pl-12"
+                  />
+                  <div className="absolute left-3 top-3">
+                    <Input
+                      id="reference-image"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                    {imagePreview ? (
+                      <div className="relative">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 rounded-md bg-muted p-0.5 hover:bg-muted/80"
+                          onClick={removeImage}
+                        >
+                          <img 
+                            src={imagePreview} 
+                            alt="Reference" 
+                            className="w-full h-full object-cover rounded"
+                          />
+                        </Button>
+                      </div>
+                    ) : (
                       <label
                         htmlFor="reference-image"
-                        className="flex flex-col items-center cursor-pointer"
+                        className="cursor-pointer"
                       >
-                        <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-                        <span className="text-sm text-muted-foreground">
-                          Click to upload a reference image
-                        </span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 rounded-md bg-muted p-1 hover:bg-muted/80"
+                        >
+                          <Image className="h-full w-full" />
+                        </Button>
                       </label>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
 
