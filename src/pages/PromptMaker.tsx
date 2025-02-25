@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { Input } from "@/components/ui/input";
@@ -234,88 +235,113 @@ const PromptMaker = () => {
             </div>
           </div>
 
-          {/* Prompt Input Section */}
-          <Card className="p-6 bg-background/50 backdrop-blur mb-6">
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="prompt">Prompt</Label>
-                <div className="relative">
-                  <Textarea
-                    id="prompt"
-                    placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..."
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    className="h-32 resize-none bg-background/50 pl-12"
-                  />
-                  <div className="absolute left-3 top-3">
-                    <Input
-                      id="reference-image"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="hidden"
-                      disabled={isUploading || isProcessing}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Left Column - Prompt Input Section */}
+            <Card className="p-6 bg-background/50 backdrop-blur">
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="prompt">Prompt</Label>
+                  <div className="relative">
+                    <Textarea
+                      id="prompt"
+                      placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..."
+                      value={prompt}
+                      onChange={(e) => setPrompt(e.target.value)}
+                      className="h-32 resize-none bg-background/50 pl-12"
                     />
-                    {imagePreview ? (
-                      <div className="relative group">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 rounded-md bg-white border border-black p-0.5 hover:bg-white/90"
-                          onClick={removeImage}
-                          disabled={isUploading || isProcessing}
-                        >
-                          <img 
-                            src={imagePreview} 
-                            alt="Reference" 
-                            className="w-full h-full object-cover rounded"
-                          />
-                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 rounded flex items-center justify-center transition-opacity">
-                            <X className="h-3 w-3 text-white" />
-                          </div>
-                        </Button>
-                      </div>
-                    ) : (
-                      <label
-                        htmlFor="reference-image"
-                        className="cursor-pointer block"
-                      >
-                        <div
-                          className="h-6 w-6 rounded-md bg-white border border-black p-1 hover:bg-white/90 cursor-pointer flex items-center justify-center"
-                        >
-                          <Image className="h-full w-full text-black" />
+                    <div className="absolute left-3 top-3">
+                      <Input
+                        id="reference-image"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                        disabled={isUploading || isProcessing}
+                      />
+                      {imagePreview ? (
+                        <div className="relative group">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 rounded-md bg-white border border-black p-0.5 hover:bg-white/90"
+                            onClick={removeImage}
+                            disabled={isUploading || isProcessing}
+                          >
+                            <img 
+                              src={imagePreview} 
+                              alt="Reference" 
+                              className="w-full h-full object-cover rounded"
+                            />
+                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 rounded flex items-center justify-center transition-opacity">
+                              <X className="h-3 w-3 text-white" />
+                            </div>
+                          </Button>
                         </div>
-                      </label>
-                    )}
+                      ) : (
+                        <label
+                          htmlFor="reference-image"
+                          className="cursor-pointer block"
+                        >
+                          <div
+                            className="h-6 w-6 rounded-md bg-white border border-black p-1 hover:bg-white/90 cursor-pointer flex items-center justify-center"
+                          >
+                            <Image className="h-full w-full text-black" />
+                          </div>
+                        </label>
+                      )}
+                    </div>
                   </div>
                 </div>
+
+                <div>
+                  <Label htmlFor="negative-prompt">Negative Prompt</Label>
+                  <Textarea
+                    id="negative-prompt"
+                    placeholder="blurry, low quality, distorted, bad anatomy..."
+                    value={negativePrompt}
+                    onChange={(e) => setNegativePrompt(e.target.value)}
+                    className="h-32 resize-none bg-background/50"
+                  />
+                </div>
+
+                <Button 
+                  className="w-full" 
+                  disabled={isUploading || isProcessing || !imagePreview}
+                  onClick={handleGenerate}
+                >
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  {isProcessing ? "Processing..." : "Generate"}
+                </Button>
               </div>
+            </Card>
 
-              <div>
-                <Label htmlFor="negative-prompt">Negative Prompt</Label>
-                <Textarea
-                  id="negative-prompt"
-                  placeholder="blurry, low quality, distorted, bad anatomy..."
-                  value={negativePrompt}
-                  onChange={(e) => setNegativePrompt(e.target.value)}
-                  className="h-32 resize-none bg-background/50"
-                />
+            {/* Right Column - Image Preview */}
+            <Card className="p-6 bg-background/50 backdrop-blur">
+              <div className="space-y-4">
+                <div className="text-sm font-medium">Source Image</div>
+                <div className="aspect-[2/3] relative rounded-lg overflow-hidden border border-border/50">
+                  {imagePreview ? (
+                    <img 
+                      src={imagePreview} 
+                      alt="Source" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-background/30">
+                      <div className="text-center text-muted-foreground">
+                        <Upload className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                        <p>Upload an image to get started</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
+            </Card>
+          </div>
 
-              <Button 
-                className="w-full" 
-                disabled={isUploading || isProcessing || !imagePreview}
-                onClick={handleGenerate}
-              >
-                <Sparkles className="w-4 h-4 mr-2" />
-                {isProcessing ? "Processing..." : "Generate"}
-              </Button>
-            </div>
-          </Card>
-
-          {/* Generated Images Panel */}
-          <Card className="p-6 bg-background/50 backdrop-blur min-h-[600px] flex items-center justify-center">
+          {/* Generated Image Panel */}
+          <Card className="p-6 bg-background/50 backdrop-blur mt-6 min-h-[600px] flex items-center justify-center">
             {generatedImage ? (
               <img 
                 src={generatedImage} 
