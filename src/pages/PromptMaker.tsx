@@ -8,20 +8,108 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Image, Settings, Sparkles, Upload, Wand2, X } from "lucide-react";
 import { DotPattern } from "@/components/ui/dot-pattern";
+import { useToast } from "@/components/ui/use-toast";
+
+const API_KEY = "1712edc40e3eb72c858332fe7500bf33e885324f8c1cd52b8cded2cdfd724cee";
+const PIPELINE_ID = "803a4MBY";
 
 const PromptMaker = () => {
   const [prompt, setPrompt] = useState("");
   const [negativePrompt, setNegativePrompt] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const { toast } = useToast();
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
+    if (!file) return;
+
+    try {
+      setIsUploading(true);
+
+      // First, show preview
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
       };
       reader.readAsDataURL(file);
+
+      // Create FormData and upload the file
+      const formData = new FormData();
+      formData.append('file', file);
+
+      // First upload the image to get a URL
+      const uploadResponse = await fetch('https://api.kimera.ai/v1/upload', {
+        method: 'POST',
+        headers: {
+          'x-api-key': API_KEY
+        },
+        body: formData
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error('Failed to upload image');
+      }
+
+      const { imageUrl } = await uploadResponse.json();
+
+      // Then start the pipeline with the uploaded image URL
+      const pipelineResponse = await fetch('https://api.kimera.ai/v1/pipeline/run', {
+        method: 'POST',
+        headers: {
+          'x-api-key': API_KEY,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          pipeline_id: PIPELINE_ID,
+          imageUrl: imageUrl,
+          ratio: "2:3",
+          prompt: prompt || "Enhance this image"
+        })
+      });
+
+      if (!pipelineResponse.ok) {
+        throw new Error('Failed to process image');
+      }
+
+      const { id: jobId } = await pipelineResponse.json();
+
+      // Start polling for results
+      const pollInterval = setInterval(async () => {
+        const statusResponse = await fetch(`https://api.kimera.ai/v1/pipeline/run/${jobId}`, {
+          headers: {
+            'x-api-key': API_KEY
+          }
+        });
+
+        if (!statusResponse.ok) {
+          clearInterval(pollInterval);
+          throw new Error('Failed to check status');
+        }
+
+        const status = await statusResponse.json();
+        
+        if (status.status === 'completed') {
+          clearInterval(pollInterval);
+          toast({
+            title: "Success",
+            description: "Image has been processed successfully!",
+          });
+          // Here you can handle the processed image URL from status.result
+        } else if (status.status === 'failed') {
+          clearInterval(pollInterval);
+          throw new Error('Processing failed');
+        }
+      }, 2000);
+
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to process image",
+      });
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -82,6 +170,7 @@ const PromptMaker = () => {
                       accept="image/*"
                       onChange={handleImageUpload}
                       className="hidden"
+                      disabled={isUploading}
                     />
                     {imagePreview ? (
                       <div className="relative group">
@@ -91,6 +180,7 @@ const PromptMaker = () => {
                           size="icon"
                           className="h-6 w-6 rounded-md bg-white border border-black p-0.5 hover:bg-white/90"
                           onClick={removeImage}
+                          disabled={isUploading}
                         >
                           <img 
                             src={imagePreview} 
@@ -112,6 +202,7 @@ const PromptMaker = () => {
                           variant="ghost"
                           size="icon"
                           className="h-6 w-6 rounded-md bg-white border border-black p-1 hover:bg-white/90"
+                          disabled={isUploading}
                         >
                           <Image className="h-full w-full text-black" />
                         </Button>
@@ -132,9 +223,9 @@ const PromptMaker = () => {
                 />
               </div>
 
-              <Button className="w-full">
+              <Button className="w-full" disabled={isUploading}>
                 <Sparkles className="w-4 h-4 mr-2" />
-                Generate
+                {isUploading ? "Processing..." : "Generate"}
               </Button>
             </div>
           </Card>
