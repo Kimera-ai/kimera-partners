@@ -38,39 +38,53 @@ const PromptMaker = () => {
       };
       reader.readAsDataURL(file);
 
-      // Create FormData and upload the file
-      const formData = new FormData();
-      formData.append('file', file);
+      // Upload to Supabase Storage
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `${fileName}`;
 
-      // Upload the image to Kimera API
-      const uploadResponse = await fetch('https://api.kimera.ai/v1/upload', {
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        console.error("Storage upload error:", uploadError);
+        throw new Error('Failed to upload image to storage');
+      }
+
+      // Get the public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('images')
+        .getPublicUrl(filePath);
+
+      console.log("Uploaded image public URL:", publicUrl);
+
+      // Upload the image URL to Kimera API
+      const kimeraResponse = await fetch('https://api.kimera.ai/v1/upload', {
         method: 'POST',
         headers: {
-          'x-api-key': API_KEY
+          'x-api-key': API_KEY,
+          'Content-Type': 'application/json'
         },
-        body: formData
+        body: JSON.stringify({ url: publicUrl })
       });
 
-      if (!uploadResponse.ok) {
-        const errorData = await uploadResponse.json();
-        console.error("Upload error response:", errorData);
-        throw new Error('Failed to upload image');
+      if (!kimeraResponse.ok) {
+        const errorData = await kimeraResponse.json();
+        console.error("Kimera upload error:", errorData);
+        throw new Error('Failed to process image with Kimera');
       }
 
-      const uploadData = await uploadResponse.json();
-      console.log("Upload response:", uploadData);
+      const kimeraUrl = await kimeraResponse.json();
+      console.log("Kimera response:", kimeraUrl);
 
-      // The API returns the URL directly as a string
-      const imageUrl = uploadData;
-      if (!imageUrl || typeof imageUrl !== 'string') {
-        console.error("Invalid image URL format:", imageUrl);
-        throw new Error('Invalid response format from server');
-      }
-
-      // Save the image URL to the database
+      // Save reference in the database
       const { data, error } = await supabase
         .from('uploaded_images')
-        .insert([{ image_url: imageUrl }])
+        .insert([{ 
+          image_url: kimeraUrl,
+          original_url: publicUrl
+        }])
         .select()
         .single();
 
@@ -79,7 +93,7 @@ const PromptMaker = () => {
         throw new Error('Failed to save image to database');
       }
 
-      setUploadedImageUrl(imageUrl);
+      setUploadedImageUrl(kimeraUrl);
       console.log("Image saved to database:", data);
 
       toast({
