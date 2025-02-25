@@ -389,12 +389,6 @@ const PromptMaker = () => {
             <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Kimera Image Generation
             </h1>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm">
-                <Settings className="w-4 h-4 mr-2" />
-                Advanced Settings
-              </Button>
-            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
