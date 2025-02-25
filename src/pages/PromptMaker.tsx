@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { Input } from "@/components/ui/input";
@@ -54,29 +55,41 @@ const PromptMaker = () => {
         throw new Error('Failed to upload image');
       }
 
-      const { imageUrl } = await uploadResponse.json();
-      console.log("Image uploaded successfully:", imageUrl);
+      const uploadData = await uploadResponse.json();
+      if (!uploadData.imageUrl) {
+        throw new Error('No image URL received from server');
+      }
+
+      console.log("Upload response:", uploadData);
 
       // Save the image URL to the database
       const { data, error } = await supabase
         .from('uploaded_images')
-        .insert([{ image_url: imageUrl }])
+        .insert([{ image_url: uploadData.imageUrl }])
         .select()
         .single();
 
       if (error) {
+        console.error("Database error:", error);
         throw new Error('Failed to save image to database');
       }
 
-      setUploadedImageUrl(imageUrl);
+      setUploadedImageUrl(uploadData.imageUrl);
       console.log("Image saved to database:", data);
 
+      toast({
+        title: "Success",
+        description: "Image uploaded successfully",
+      });
+
     } catch (error) {
+      console.error("Upload error:", error);
       toast({
         variant: "destructive",
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to upload image",
       });
+      setImagePreview(null);
     } finally {
       setIsUploading(false);
     }
@@ -95,6 +108,15 @@ const PromptMaker = () => {
     try {
       setIsProcessing(true);
       
+      const requestBody = {
+        pipeline_id: PIPELINE_ID,
+        imageUrl: uploadedImageUrl,
+        ratio: "2:3",
+        prompt: prompt || "Enhance this image"
+      };
+
+      console.log("Sending request with body:", requestBody);
+      
       // Start the pipeline with the saved image URL
       const pipelineResponse = await fetch('https://api.kimera.ai/v1/pipeline/run', {
         method: 'POST',
@@ -102,15 +124,12 @@ const PromptMaker = () => {
           'x-api-key': API_KEY,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          pipeline_id: PIPELINE_ID,
-          imageUrl: uploadedImageUrl,
-          ratio: "2:3",
-          prompt: prompt || "Enhance this image"
-        })
+        body: JSON.stringify(requestBody)
       });
 
       if (!pipelineResponse.ok) {
+        const errorData = await pipelineResponse.json();
+        console.error("Pipeline error response:", errorData);
         throw new Error('Failed to process image');
       }
 
