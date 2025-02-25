@@ -385,7 +385,7 @@ const PromptMaker = () => {
         </div>
         
         <div className="relative z-10">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-center mb-6">
             <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Kimera Image Generation
             </h1>
