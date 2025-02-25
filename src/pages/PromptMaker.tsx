@@ -510,38 +510,40 @@ const PromptMaker = () => {
                   <History className="w-5 h-5" />
                   Generation History
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                  {previousGenerations.map((gen) => (
-                    <div key={gen.id} className="space-y-3">
-                      <div className="relative group">
-                        <button 
-                          className="w-full text-left"
-                          onClick={() => handleImageClick(gen)}
-                        >
-                          <img 
-                            src={gen.image_url} 
-                            alt={gen.prompt} 
-                            className="w-full aspect-square object-cover rounded-lg hover:opacity-90 transition-opacity"
-                          />
-                        </button>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDownload(gen.image_url);
-                          }}
-                          className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity bg-background/50 backdrop-blur hover:bg-background/80"
-                        >
-                          <Download className="h-4 w-4" />
-                        </Button>
+                <div className="max-h-[400px] overflow-y-auto pr-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                    {previousGenerations.map((gen) => (
+                      <div key={gen.id} className="space-y-3">
+                        <div className="relative group">
+                          <button 
+                            className="w-full text-left"
+                            onClick={() => handleImageClick(gen)}
+                          >
+                            <img 
+                              src={gen.image_url} 
+                              alt={gen.prompt} 
+                              className="w-full aspect-square object-cover rounded-lg hover:opacity-90 transition-opacity"
+                            />
+                          </button>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDownload(gen.image_url);
+                            }}
+                            className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity bg-background/50 backdrop-blur hover:bg-background/80"
+                          >
+                            <Download className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <div className="flex gap-3 text-xs text-white/70">
+                          <span>Style: {gen.style}</span>
+                          <span>Ratio: {gen.ratio}</span>
+                        </div>
                       </div>
-                      <div className="flex gap-3 text-xs text-white/70">
-                        <span>Style: {gen.style}</span>
-                        <span>Ratio: {gen.ratio}</span>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </Card>
             </div>
