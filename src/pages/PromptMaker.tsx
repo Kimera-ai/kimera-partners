@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Image, Settings, Sparkles, Wand2, X, Clock } from "lucide-react";
+import { Image, Settings, Sparkles, Wand2, X, Clock, LightBulb } from "lucide-react";
 import { DotPattern } from "@/components/ui/dot-pattern";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -237,6 +237,13 @@ const PromptMaker = () => {
     setGeneratedImage(null);
   }, []);
 
+  const handleImprovePrompt = () => {
+    toast({
+      title: "Prompt Tips",
+      description: "Try being more specific with details like color, style, mood, and composition. Add descriptive adjectives and artistic references.",
+    });
+  };
+
   return (
     <BaseLayout>
       <div className="relative min-h-screen">
@@ -333,13 +340,23 @@ const PromptMaker = () => {
                         onRemove={removeImage}
                       />
                     </div>
-                    <Textarea
-                      id="prompt"
-                      placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..."
-                      value={prompt}
-                      onChange={(e) => setPrompt(e.target.value)}
-                      className="h-32 resize-none bg-background/50 pl-14"
-                    />
+                    <div className="relative">
+                      <Textarea
+                        id="prompt"
+                        placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..."
+                        value={prompt}
+                        onChange={(e) => setPrompt(e.target.value)}
+                        className="h-32 resize-none bg-background/50 pl-14"
+                      />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="absolute bottom-2 right-2 text-muted-foreground hover:text-foreground"
+                        onClick={handleImprovePrompt}
+                      >
+                        <LightBulb className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
