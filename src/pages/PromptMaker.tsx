@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Image, Settings, Sparkles, Wand2, X, Clock, Lightbulb, History } from "lucide-react";
+import { Image, Settings, Sparkles, Wand2, X, Clock, Lightbulb, History, Loader2 } from "lucide-react";
 import { DotPattern } from "@/components/ui/dot-pattern";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -74,6 +74,7 @@ const PromptMaker = () => {
   const [style, setStyle] = useState("Enhance");
   const [previousGenerations, setPreviousGenerations] = useState<any[]>([]);
   const [showHistory, setShowHistory] = useState(false);
+  const [isImprovingPrompt, setIsImprovingPrompt] = useState(false);
   const { session } = useSession();
   const { toast } = useToast();
   const previewRef = useRef<HTMLDivElement>(null);
@@ -299,6 +300,7 @@ const PromptMaker = () => {
     }
 
     try {
+      setIsImprovingPrompt(true);
       const { data, error } = await supabase.functions.invoke('improve-prompt', {
         body: { prompt },
       });
@@ -319,6 +321,8 @@ const PromptMaker = () => {
         title: "Error",
         description: "Failed to improve the prompt. Please try again.",
       });
+    } finally {
+      setIsImprovingPrompt(false);
     }
   };
 
@@ -441,8 +445,13 @@ const PromptMaker = () => {
                             size="icon"
                             className="absolute bottom-3 left-3 text-primary/70 hover:text-primary hover:bg-primary/10 hover:scale-110 transition-all hover:shadow-[0_0_15px_rgba(155,135,245,0.3)] backdrop-blur-sm"
                             onClick={handleImprovePrompt}
+                            disabled={isImprovingPrompt}
                           >
-                            <Sparkles className="h-4 w-4" />
+                            {isImprovingPrompt ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Sparkles className="h-4 w-4" />
+                            )}
                           </Button>
                         </div>
                       </div>
