@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { Input } from "@/components/ui/input";
@@ -5,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Image, Settings, Sparkles, Upload, Wand2, X } from "lucide-react";
+import { Image, Settings, Sparkles, Wand2, X } from "lucide-react";
 import { DotPattern } from "@/components/ui/dot-pattern";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -240,55 +241,54 @@ const PromptMaker = () => {
               <div>
                 <Label htmlFor="prompt">Prompt</Label>
                 <div className="relative">
+                  <Input
+                    id="reference-image"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    disabled={isUploading || isProcessing}
+                  />
+                  {imagePreview ? (
+                    <div className="absolute left-3 top-3 z-10">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 rounded-md bg-white/10 backdrop-blur border border-white/20 p-0.5 hover:bg-white/20 group"
+                        onClick={removeImage}
+                        disabled={isUploading || isProcessing}
+                      >
+                        <img 
+                          src={imagePreview} 
+                          alt="Reference" 
+                          className="w-full h-full object-cover rounded transition-opacity group-hover:opacity-50"
+                        />
+                        <X className="absolute inset-0 m-auto h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <label
+                      htmlFor="reference-image"
+                      className="absolute left-3 top-3 z-10 cursor-pointer block"
+                    >
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 rounded-md bg-white/10 backdrop-blur border border-white/20 p-1.5 hover:bg-white/20"
+                      >
+                        <Image className="h-full w-full text-white/70" />
+                      </Button>
+                    </label>
+                  )}
                   <Textarea
                     id="prompt"
                     placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..."
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
-                    className="h-32 resize-none bg-background/50 pl-12"
+                    className="h-32 resize-none bg-background/50 pl-14"
                   />
-                  <div className="absolute left-3 top-3">
-                    <Input
-                      id="reference-image"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="hidden"
-                      disabled={isUploading || isProcessing}
-                    />
-                    {imagePreview ? (
-                      <div className="relative group">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 rounded-md bg-white border border-black p-0.5 hover:bg-white/90"
-                          onClick={removeImage}
-                          disabled={isUploading || isProcessing}
-                        >
-                          <img 
-                            src={imagePreview} 
-                            alt="Reference" 
-                            className="w-full h-full object-cover rounded"
-                          />
-                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 rounded flex items-center justify-center transition-opacity">
-                            <X className="h-3 w-3 text-white" />
-                          </div>
-                        </Button>
-                      </div>
-                    ) : (
-                      <label
-                        htmlFor="reference-image"
-                        className="cursor-pointer block"
-                      >
-                        <div
-                          className="h-6 w-6 rounded-md bg-white border border-black p-1 hover:bg-white/90 cursor-pointer flex items-center justify-center"
-                        >
-                          <Image className="h-full w-full text-black" />
-                        </div>
-                      </label>
-                    )}
-                  </div>
                 </div>
               </div>
 
