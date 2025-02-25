@@ -486,8 +486,10 @@ const PromptMaker = () => {
                           alt={gen.prompt} 
                           className="w-full aspect-square object-cover rounded-lg"
                         />
-                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity p-2 rounded-lg">
-                          <p className="text-xs text-white line-clamp-3">{gen.prompt}</p>
+                        <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity p-4 rounded-lg overflow-y-auto">
+                          <p className="text-xs text-white">{gen.prompt}</p>
+                          <p className="text-xs text-white/70 mt-2">Style: {gen.style}</p>
+                          <p className="text-xs text-white/70">Ratio: {gen.ratio}</p>
                         </div>
                       </div>
                     ))}
