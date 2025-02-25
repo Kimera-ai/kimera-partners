@@ -6,12 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { TabButton } from "@/components/marketing/TabButton";
 import { Image, Settings, Sparkles, Wand2 } from "lucide-react";
 import { DotPattern } from "@/components/ui/dot-pattern";
 
 const PromptMaker = () => {
-  const [activeTab, setActiveTab] = useState<"create" | "history" | "settings">("create");
   const [prompt, setPrompt] = useState("");
   const [negativePrompt, setNegativePrompt] = useState("");
 
@@ -78,44 +76,13 @@ const PromptMaker = () => {
             </div>
           </Card>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Panel - Tabs */}
-            <div className="lg:col-span-1">
-              <div className="flex gap-4 mb-6 border-b border-primary/20">
-                <TabButton 
-                  icon={Sparkles}
-                  active={activeTab === "create"}
-                  onClick={() => setActiveTab("create")}
-                >
-                  Create
-                </TabButton>
-                <TabButton 
-                  icon={Image}
-                  active={activeTab === "history"}
-                  onClick={() => setActiveTab("history")}
-                >
-                  History
-                </TabButton>
-                <TabButton 
-                  icon={Settings}
-                  active={activeTab === "settings"}
-                  onClick={() => setActiveTab("settings")}
-                >
-                  Settings
-                </TabButton>
-              </div>
+          {/* Generated Images Panel */}
+          <Card className="p-6 bg-background/50 backdrop-blur min-h-[600px] flex items-center justify-center">
+            <div className="text-center text-muted-foreground">
+              <Image className="w-12 h-12 mx-auto mb-4 opacity-50" />
+              <p>Your generated images will appear here</p>
             </div>
-
-            {/* Right Panel - Generated Images */}
-            <div className="lg:col-span-2">
-              <Card className="p-6 bg-background/50 backdrop-blur min-h-[600px] flex items-center justify-center">
-                <div className="text-center text-muted-foreground">
-                  <Image className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>Your generated images will appear here</p>
-                </div>
-              </Card>
-            </div>
-          </div>
+          </Card>
         </div>
       </div>
     </BaseLayout>
