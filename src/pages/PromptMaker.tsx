@@ -87,7 +87,7 @@ const PromptMaker = () => {
                           type="button"
                           variant="ghost"
                           size="icon"
-                          className="h-6 w-6 rounded-md bg-muted p-0.5 hover:bg-muted/80"
+                          className="h-6 w-6 rounded-md bg-white border border-black p-0.5 hover:bg-white/90"
                           onClick={removeImage}
                         >
                           <img 
@@ -106,9 +106,9 @@ const PromptMaker = () => {
                           type="button"
                           variant="ghost"
                           size="icon"
-                          className="h-6 w-6 rounded-md bg-muted p-1 hover:bg-muted/80"
+                          className="h-6 w-6 rounded-md bg-white border border-black p-1 hover:bg-white/90"
                         >
-                          <Image className="h-full w-full" />
+                          <Image className="h-full w-full text-black" />
                         </Button>
                       </label>
                     )}
