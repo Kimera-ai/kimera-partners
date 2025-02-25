@@ -558,11 +558,14 @@ const PromptMaker = () => {
                 </div>
               )}
               {generatedImage ? (
-                <img 
-                  src={generatedImage} 
-                  alt="Generated" 
-                  className="max-w-full max-h-[550px] object-contain rounded-lg shadow-lg relative"
-                />
+                <div className="w-full h-full flex items-center justify-center">
+                  <img 
+                    src={generatedImage} 
+                    alt="Generated" 
+                    className="w-full h-full object-contain rounded-lg shadow-lg"
+                    style={{ maxHeight: '550px' }}
+                  />
+                </div>
               ) : (
                 <div className="text-center text-muted-foreground">
                   <Image className="w-12 h-12 mx-auto mb-4 opacity-50" />
