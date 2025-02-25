@@ -99,7 +99,7 @@ const PromptMaker = () => {
         .from('generated_images')
         .select('*')
         .order('created_at', { ascending: false })
-        .limit(12);
+        .limit(6);
 
       if (error) throw error;
       
