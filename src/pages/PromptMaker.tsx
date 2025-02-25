@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { Input } from "@/components/ui/input";
@@ -196,16 +195,16 @@ const PromptMaker = () => {
                       <label
                         htmlFor="reference-image"
                         className="cursor-pointer block"
+                        onClick={() => {
+                          const input = document.getElementById('reference-image') as HTMLInputElement;
+                          input?.click();
+                        }}
                       >
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 rounded-md bg-white border border-black p-1 hover:bg-white/90"
-                          disabled={isUploading}
+                        <div
+                          className="h-6 w-6 rounded-md bg-white border border-black p-1 hover:bg-white/90 cursor-pointer flex items-center justify-center"
                         >
                           <Image className="h-full w-full text-black" />
-                        </Button>
+                        </div>
                       </label>
                     )}
                   </div>
