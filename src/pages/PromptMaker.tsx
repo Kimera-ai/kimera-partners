@@ -478,18 +478,20 @@ const PromptMaker = () => {
               {showHistory && previousGenerations.length > 0 && (
                 <Card className="p-6 bg-background/50 backdrop-blur">
                   <h2 className="text-lg font-semibold mb-4">Previous Generations</h2>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {previousGenerations.map((gen) => (
-                      <div key={gen.id} className="relative group">
+                      <div key={gen.id} className="space-y-3">
                         <img 
                           src={gen.image_url} 
                           alt={gen.prompt} 
                           className="w-full aspect-square object-cover rounded-lg"
                         />
-                        <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity p-4 rounded-lg overflow-y-auto">
-                          <p className="text-xs text-white">{gen.prompt}</p>
-                          <p className="text-xs text-white/70 mt-2">Style: {gen.style}</p>
-                          <p className="text-xs text-white/70">Ratio: {gen.ratio}</p>
+                        <div className="space-y-2">
+                          <p className="text-sm text-white/90">{gen.prompt}</p>
+                          <div className="flex gap-3 text-xs text-white/70">
+                            <span>Style: {gen.style}</span>
+                            <span>Ratio: {gen.ratio}</span>
+                          </div>
                         </div>
                       </div>
                     ))}
