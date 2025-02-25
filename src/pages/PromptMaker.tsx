@@ -6,12 +6,28 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Image, Settings, Sparkles, Wand2 } from "lucide-react";
+import { Image, Settings, Sparkles, Upload, Wand2, X } from "lucide-react";
 import { DotPattern } from "@/components/ui/dot-pattern";
 
 const PromptMaker = () => {
   const [prompt, setPrompt] = useState("");
   const [negativePrompt, setNegativePrompt] = useState("");
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setImagePreview(null);
+  };
 
   return (
     <BaseLayout>
@@ -56,6 +72,49 @@ const PromptMaker = () => {
                   onChange={(e) => setPrompt(e.target.value)}
                   className="h-32 resize-none bg-background/50"
                 />
+              </div>
+
+              {/* Image Upload Section */}
+              <div className="space-y-2">
+                <Label htmlFor="reference-image">Reference Image</Label>
+                <div className="border-2 border-dashed border-border rounded-lg p-4">
+                  {imagePreview ? (
+                    <div className="relative">
+                      <img 
+                        src={imagePreview} 
+                        alt="Reference" 
+                        className="w-full max-h-64 object-contain rounded-lg"
+                      />
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-2 right-2"
+                        onClick={removeImage}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-4">
+                      <Input
+                        id="reference-image"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                      <label
+                        htmlFor="reference-image"
+                        className="flex flex-col items-center cursor-pointer"
+                      >
+                        <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+                        <span className="text-sm text-muted-foreground">
+                          Click to upload a reference image
+                        </span>
+                      </label>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div>
