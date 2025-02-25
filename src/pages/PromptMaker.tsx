@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { Input } from "@/components/ui/input";
@@ -251,11 +250,9 @@ const PromptMaker = () => {
                   />
                   {imagePreview ? (
                     <div className="absolute left-3 top-3 z-10">
-                      <Button
+                      <button
                         type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 rounded-md bg-white/10 backdrop-blur border border-white/20 p-0.5 hover:bg-white/20 group"
+                        className="h-8 w-8 rounded-md bg-white/10 backdrop-blur border border-white/20 p-0.5 hover:bg-white/20 group relative"
                         onClick={removeImage}
                         disabled={isUploading || isProcessing}
                       >
@@ -265,21 +262,16 @@ const PromptMaker = () => {
                           className="w-full h-full object-cover rounded transition-opacity group-hover:opacity-50"
                         />
                         <X className="absolute inset-0 m-auto h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </Button>
+                      </button>
                     </div>
                   ) : (
                     <label
                       htmlFor="reference-image"
                       className="absolute left-3 top-3 z-10 cursor-pointer block"
                     >
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 rounded-md bg-white/10 backdrop-blur border border-white/20 p-1.5 hover:bg-white/20"
-                      >
+                      <div className="h-8 w-8 rounded-md bg-white/10 backdrop-blur border border-white/20 p-1.5 hover:bg-white/20 flex items-center justify-center">
                         <Image className="h-full w-full text-white/70" />
-                      </Button>
+                      </div>
                     </label>
                   )}
                   <Textarea
