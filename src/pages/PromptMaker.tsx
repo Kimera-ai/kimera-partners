@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { TabButton } from "@/components/marketing/TabButton";
-import { Image, Magic, Settings, Sparkles } from "lucide-react";
+import { Image, Settings, Sparkles, Wand2 } from "lucide-react";
 import { DotPattern } from "@/components/ui/dot-pattern";
 
 const PromptMaker = () => {
@@ -36,7 +36,7 @@ const PromptMaker = () => {
             </h1>
             <div className="flex gap-2">
               <Button variant="outline" size="sm">
-                <Magic className="w-4 h-4 mr-2" />
+                <Wand2 className="w-4 h-4 mr-2" />
                 Random Prompt
               </Button>
               <Button variant="outline" size="sm">
