@@ -52,20 +52,25 @@ const PromptMaker = () => {
       });
 
       if (!uploadResponse.ok) {
+        const errorData = await uploadResponse.json();
+        console.error("Upload error response:", errorData);
         throw new Error('Failed to upload image');
       }
 
       const uploadData = await uploadResponse.json();
-      if (!uploadData.imageUrl) {
-        throw new Error('No image URL received from server');
-      }
-
       console.log("Upload response:", uploadData);
+
+      // The API returns the URL directly as a string
+      const imageUrl = uploadData;
+      if (!imageUrl || typeof imageUrl !== 'string') {
+        console.error("Invalid image URL format:", imageUrl);
+        throw new Error('Invalid response format from server');
+      }
 
       // Save the image URL to the database
       const { data, error } = await supabase
         .from('uploaded_images')
-        .insert([{ image_url: uploadData.imageUrl }])
+        .insert([{ image_url: imageUrl }])
         .select()
         .single();
 
@@ -74,7 +79,7 @@ const PromptMaker = () => {
         throw new Error('Failed to save image to database');
       }
 
-      setUploadedImageUrl(uploadData.imageUrl);
+      setUploadedImageUrl(imageUrl);
       console.log("Image saved to database:", data);
 
       toast({
