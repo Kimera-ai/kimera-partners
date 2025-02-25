@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Image, Settings, Sparkles, Wand2, X, Clock, Lightbulb } from "lucide-react";
+import { Image, Settings, Sparkles, Wand2, X, Clock, Lightbulb, History } from "lucide-react";
 import { DotPattern } from "@/components/ui/dot-pattern";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useSession } from "@/hooks/useSession";
 
 const API_KEY = "1712edc40e3eb72c858332fe7500bf33e885324f8c1cd52b8cded2cdfd724cee";
 const PIPELINE_ID = "803a4MBY";
@@ -71,9 +72,32 @@ const PromptMaker = () => {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [ratio, setRatio] = useState("2:3");
   const [style, setStyle] = useState("Enhance");
+  const [previousGenerations, setPreviousGenerations] = useState<any[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
+  const { session } = useSession();
   const { toast } = useToast();
   const previewRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<NodeJS.Timeout>();
+
+  useEffect(() => {
+    if (session?.user) {
+      fetchPreviousGenerations();
+    }
+  }, [session?.user]);
+
+  const fetchPreviousGenerations = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('generated_images')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setPreviousGenerations(data || []);
+    } catch (error) {
+      console.error('Error fetching previous generations:', error);
+    }
+  };
 
   useEffect(() => {
     if (isProcessing) {
@@ -153,12 +177,21 @@ const PromptMaker = () => {
   };
 
   const handleGenerate = async () => {
+    if (!session?.user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to generate images.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setIsProcessing(true);
       setElapsedTime(0);
 
       const requestBody = {
-        pipeline_id: PIPELINE_ID,
+        pipeline_id: "803a4MBY",
         imageUrl: uploadedImageUrl || "",
         ratio: ratio,
         prompt: `${style} style: ${prompt}` || `${style} this image`,
@@ -174,7 +207,7 @@ const PromptMaker = () => {
       const pipelineResponse = await fetch('https://api.kimera.ai/v1/pipeline/run', {
         method: 'POST',
         headers: {
-          'x-api-key': API_KEY,
+          'x-api-key': "1712edc40e3eb72c858332fe7500bf33e885324f8c1cd52b8cded2cdfd724cee",
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(requestBody)
@@ -192,7 +225,7 @@ const PromptMaker = () => {
       const pollInterval = setInterval(async () => {
         const statusResponse = await fetch(`https://api.kimera.ai/v1/pipeline/run/${jobId}`, {
           headers: {
-            'x-api-key': API_KEY
+            'x-api-key': "1712edc40e3eb72c858332fe7500bf33e885324f8c1cd52b8cded2cdfd724cee"
           }
         });
 
@@ -208,6 +241,24 @@ const PromptMaker = () => {
           clearInterval(pollInterval);
           setGeneratedImage(status.result);
           setIsProcessing(false);
+
+          const { error: dbError } = await supabase
+            .from('generated_images')
+            .insert({
+              user_id: session.user.id,
+              image_url: status.result,
+              prompt: prompt,
+              style: style,
+              ratio: ratio
+            });
+
+          if (dbError) {
+            console.error('Error storing generation:', dbError);
+            throw new Error('Failed to store generation');
+          }
+
+          await fetchPreviousGenerations();
+
           toast({
             title: "Success",
             description: "Image has been generated successfully!",
@@ -291,6 +342,14 @@ const PromptMaker = () => {
               AI Image Generation
             </h1>
             <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowHistory(!showHistory)}
+              >
+                <History className="w-4 h-4 mr-2" />
+                History
+              </Button>
               <Button variant="outline" size="sm">
                 <Wand2 className="w-4 h-4 mr-2" />
                 Random Prompt
@@ -302,125 +361,149 @@ const PromptMaker = () => {
             </div>
           </div>
 
-          <Card className="p-6 bg-background/50 backdrop-blur mb-6">
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="ratio">Aspect Ratio</Label>
-                  <Select value={ratio} onValueChange={setRatio}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select ratio" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1:1">1:1 (Square)</SelectItem>
-                      <SelectItem value="2:3">2:3 (Portrait)</SelectItem>
-                      <SelectItem value="3:4">3:4 (Portrait)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="style">Style</Label>
-                  <Select value={style} onValueChange={setStyle}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select style" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Cinematic">Cinematic</SelectItem>
-                      <SelectItem value="Animated">Animated</SelectItem>
-                      <SelectItem value="Digital Art">Digital Art</SelectItem>
-                      <SelectItem value="Photographic">Photographic</SelectItem>
-                      <SelectItem value="Fantasy art">Fantasy art</SelectItem>
-                      <SelectItem value="Neonpunk">Neonpunk</SelectItem>
-                      <SelectItem value="Enhance">Enhance</SelectItem>
-                      <SelectItem value="Comic book">Comic book</SelectItem>
-                      <SelectItem value="Lowpoly">Lowpoly</SelectItem>
-                      <SelectItem value="Line art">Line art</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor="prompt">Prompt</Label>
-                <div className="relative">
-                  <Input
-                    id="reference-image"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                    disabled={isUploading || isProcessing}
-                  />
-                  <div className="relative">
-                    <div 
-                      ref={previewRef}
-                      className="absolute left-3 top-3 z-[9999] pointer-events-auto"
-                      style={{ 
-                        position: 'absolute',
-                        isolation: 'isolate'
-                      }}
-                    >
-                      <ImagePreview 
-                        imagePreview={imagePreview}
-                        isUploading={isUploading}
-                        isProcessing={isProcessing}
-                        onRemove={removeImage}
-                      />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="space-y-6">
+              <Card className="p-6 bg-background/50 backdrop-blur">
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="ratio">Aspect Ratio</Label>
+                      <Select value={ratio} onValueChange={setRatio}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select ratio" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1:1">1:1 (Square)</SelectItem>
+                          <SelectItem value="2:3">2:3 (Portrait)</SelectItem>
+                          <SelectItem value="3:4">3:4 (Portrait)</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <div className="relative">
-                      <Textarea
-                        id="prompt"
-                        placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..."
-                        value={prompt}
-                        onChange={(e) => setPrompt(e.target.value)}
-                        className="h-32 resize-none bg-background/50 pl-14"
-                      />
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="absolute bottom-3 left-3 text-primary/70 hover:text-primary hover:bg-primary/10 hover:scale-110 transition-all hover:shadow-[0_0_15px_rgba(155,135,245,0.3)] backdrop-blur-sm"
-                        onClick={handleImprovePrompt}
-                      >
-                        <Sparkles className="h-4 w-4" />
-                      </Button>
+                    <div>
+                      <Label htmlFor="style">Style</Label>
+                      <Select value={style} onValueChange={setStyle}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select style" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Cinematic">Cinematic</SelectItem>
+                          <SelectItem value="Animated">Animated</SelectItem>
+                          <SelectItem value="Digital Art">Digital Art</SelectItem>
+                          <SelectItem value="Photographic">Photographic</SelectItem>
+                          <SelectItem value="Fantasy art">Fantasy art</SelectItem>
+                          <SelectItem value="Neonpunk">Neonpunk</SelectItem>
+                          <SelectItem value="Enhance">Enhance</SelectItem>
+                          <SelectItem value="Comic book">Comic book</SelectItem>
+                          <SelectItem value="Lowpoly">Lowpoly</SelectItem>
+                          <SelectItem value="Line art">Line art</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
-                </div>
-              </div>
 
-              <Button 
-                className="w-full" 
-                disabled={isProcessing}
-                onClick={handleGenerate}
-              >
-                <Sparkles className="w-4 h-4 mr-2" />
-                {isProcessing ? "Processing..." : "Generate"}
-              </Button>
+                  <div>
+                    <Label htmlFor="prompt">Prompt</Label>
+                    <div className="relative">
+                      <Input
+                        id="reference-image"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                        disabled={isUploading || isProcessing}
+                      />
+                      <div className="relative">
+                        <div 
+                          ref={previewRef}
+                          className="absolute left-3 top-3 z-[9999] pointer-events-auto"
+                          style={{ 
+                            position: 'absolute',
+                            isolation: 'isolate'
+                          }}
+                        >
+                          <ImagePreview 
+                            imagePreview={imagePreview}
+                            isUploading={isUploading}
+                            isProcessing={isProcessing}
+                            onRemove={removeImage}
+                          />
+                        </div>
+                        <div className="relative">
+                          <Textarea
+                            id="prompt"
+                            placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..."
+                            value={prompt}
+                            onChange={(e) => setPrompt(e.target.value)}
+                            className="h-32 resize-none bg-background/50 pl-14"
+                          />
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="absolute bottom-3 left-3 text-primary/70 hover:text-primary hover:bg-primary/10 hover:scale-110 transition-all hover:shadow-[0_0_15px_rgba(155,135,245,0.3)] backdrop-blur-sm"
+                            onClick={handleImprovePrompt}
+                          >
+                            <Sparkles className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Button 
+                    className="w-full" 
+                    disabled={isProcessing}
+                    onClick={handleGenerate}
+                  >
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    {isProcessing ? "Processing..." : "Generate"}
+                  </Button>
+                </div>
+              </Card>
+
+              {showHistory && previousGenerations.length > 0 && (
+                <Card className="p-6 bg-background/50 backdrop-blur">
+                  <h2 className="text-lg font-semibold mb-4">Previous Generations</h2>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    {previousGenerations.map((gen) => (
+                      <div key={gen.id} className="relative group">
+                        <img 
+                          src={gen.image_url} 
+                          alt={gen.prompt} 
+                          className="w-full aspect-square object-cover rounded-lg"
+                        />
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity p-2 rounded-lg">
+                          <p className="text-xs text-white line-clamp-3">{gen.prompt}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              )}
             </div>
-          </Card>
 
-          <Card className="p-6 bg-background/50 backdrop-blur min-h-[600px] flex items-center justify-center relative">
-            {isProcessing && (
-              <div className="absolute inset-0 flex items-center justify-center z-10">
-                <div className="flex items-center gap-2 bg-background/80 backdrop-blur px-6 py-3 rounded-full text-lg font-mono">
-                  <Clock className="w-6 h-6 animate-pulse" />
-                  <span>{formatTime(elapsedTime)}</span>
+            <Card className="p-6 bg-background/50 backdrop-blur min-h-[600px] flex items-center justify-center relative">
+              {isProcessing && (
+                <div className="absolute inset-0 flex items-center justify-center z-10">
+                  <div className="flex items-center gap-2 bg-background/80 backdrop-blur px-6 py-3 rounded-full text-lg font-mono">
+                    <Clock className="w-6 h-6 animate-pulse" />
+                    <span>{formatTime(elapsedTime)}</span>
+                  </div>
                 </div>
-              </div>
-            )}
-            {generatedImage ? (
-              <img 
-                src={generatedImage} 
-                alt="Generated" 
-                className="max-w-full max-h-[550px] object-contain rounded-lg shadow-lg relative"
-              />
-            ) : (
-              <div className="text-center text-muted-foreground">
-                <Image className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p>Your generated images will appear here</p>
-              </div>
-            )}
-          </Card>
+              )}
+              {generatedImage ? (
+                <img 
+                  src={generatedImage} 
+                  alt="Generated" 
+                  className="max-w-full max-h-[550px] object-contain rounded-lg shadow-lg relative"
+                />
+              ) : (
+                <div className="text-center text-muted-foreground">
+                  <Image className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p>Your generated images will appear here</p>
+                </div>
+              )}
+            </Card>
+          </div>
         </div>
       </div>
     </BaseLayout>
