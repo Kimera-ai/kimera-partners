@@ -378,7 +378,7 @@ const PromptMaker = () => {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="absolute bottom-3 left-3 text-muted-foreground hover:bg-primary/20 hover:text-primary transition-colors"
+                        className="absolute bottom-3 left-3 text-primary/70 hover:text-primary hover:bg-primary/10 hover:scale-110 transition-all hover:shadow-[0_0_15px_rgba(155,135,245,0.3)] backdrop-blur-sm"
                         onClick={handleImprovePrompt}
                       >
                         <Sparkles className="h-4 w-4" />
