@@ -381,7 +381,7 @@ const PromptMaker = () => {
                         className="absolute bottom-2 right-2 text-muted-foreground hover:text-foreground"
                         onClick={handleImprovePrompt}
                       >
-                        <Lightbulb className="h-4 w-4" />
+                        <Sparkles className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
