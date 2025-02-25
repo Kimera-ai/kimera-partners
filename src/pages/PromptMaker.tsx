@@ -70,8 +70,8 @@ const PromptMaker = () => {
     if (isProcessing) {
       setElapsedTime(0);
       timerRef.current = setInterval(() => {
-        setElapsedTime(prev => prev + 1);
-      }, 1000);
+        setElapsedTime(prev => prev + 10);
+      }, 10);
     } else {
       if (timerRef.current) {
         clearInterval(timerRef.current);
@@ -85,10 +85,12 @@ const PromptMaker = () => {
     };
   }, [isProcessing]);
 
-  const formatTime = (seconds: number) => {
+  const formatTime = (milliseconds: number) => {
+    const seconds = Math.floor(milliseconds / 1000);
+    const ms = milliseconds % 1000;
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, '0')}.${ms.toString().padStart(3, '0')}`;
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -314,16 +316,18 @@ const PromptMaker = () => {
 
           <Card className="p-6 bg-background/50 backdrop-blur min-h-[600px] flex items-center justify-center relative">
             {isProcessing && (
-              <div className="absolute top-4 right-4 flex items-center gap-2 bg-background/80 backdrop-blur px-3 py-1.5 rounded-full text-sm">
-                <Clock className="w-4 h-4 animate-pulse" />
-                <span>{formatTime(elapsedTime)}</span>
+              <div className="absolute inset-0 flex items-center justify-center z-10">
+                <div className="flex items-center gap-2 bg-background/80 backdrop-blur px-6 py-3 rounded-full text-lg font-mono">
+                  <Clock className="w-6 h-6 animate-pulse" />
+                  <span>{formatTime(elapsedTime)}</span>
+                </div>
               </div>
             )}
             {generatedImage ? (
               <img 
                 src={generatedImage} 
                 alt="Generated" 
-                className="max-w-full max-h-[550px] object-contain rounded-lg shadow-lg"
+                className="max-w-full max-h-[550px] object-contain rounded-lg shadow-lg relative"
               />
             ) : (
               <div className="text-center text-muted-foreground">
