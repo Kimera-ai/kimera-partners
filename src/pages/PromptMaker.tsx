@@ -91,10 +91,16 @@ const PromptMaker = () => {
       const { data, error } = await supabase
         .from('generated_images')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(12);
 
       if (error) throw error;
-      setPreviousGenerations(data || []);
+      
+      const uniqueGenerations = data?.filter((gen, index, self) =>
+        index === self.findIndex(g => g.image_url === gen.image_url)
+      ) || [];
+      
+      setPreviousGenerations(uniqueGenerations);
     } catch (error) {
       console.error('Error fetching previous generations:', error);
     }
