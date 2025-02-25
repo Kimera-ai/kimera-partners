@@ -1,3 +1,4 @@
+
 import { createBrowserRouter, Navigate } from "react-router-dom"
 import MarketingKit from "@/pages/MarketingKit"
 import Login from "@/pages/Login"
@@ -6,6 +7,7 @@ import Dashboard from "@/pages/Dashboard"
 import Pricing from "@/pages/Pricing"
 import ThankYou from "@/pages/ThankYou"
 import EmbedThemes from "@/pages/EmbedThemes"
+import PromptMaker from "@/pages/PromptMaker"
 import { useSession } from "@/hooks/useSession"
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -72,6 +74,14 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <Dashboard />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/prompt-maker",
+    element: (
+      <ProtectedRoute>
+        <PromptMaker />
       </ProtectedRoute>
     ),
   },
