@@ -1,4 +1,3 @@
-
 import { useState, useRef, useCallback } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { Input } from "@/components/ui/input";
@@ -73,14 +72,12 @@ const PromptMaker = () => {
     try {
       setIsUploading(true);
 
-      // Show preview immediately
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
       };
       reader.readAsDataURL(file);
 
-      // Upload to Supabase
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `${fileName}`;
@@ -131,44 +128,11 @@ const PromptMaker = () => {
     try {
       setIsProcessing(true);
 
-      // Upload to Kimera
-      const kimeraResponse = await fetch('https://api.kimera.ai/v1/upload', {
-        method: 'POST',
-        headers: {
-          'x-api-key': API_KEY,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ url: uploadedImageUrl })
-      });
-
-      if (!kimeraResponse.ok) {
-        const errorData = await kimeraResponse.json();
-        console.error("Kimera upload error:", errorData);
-        throw new Error('Failed to process image with Kimera');
-      }
-
-      const kimeraUrl = await kimeraResponse.json();
-      console.log("Kimera response:", kimeraUrl);
-
-      // Save to database
-      const { error: dbError } = await supabase
-        .from('uploaded_images')
-        .insert([{ 
-          image_url: kimeraUrl,
-          original_url: uploadedImageUrl
-        }]);
-
-      if (dbError) {
-        console.error("Database error:", dbError);
-        throw new Error('Failed to save image to database');
-      }
-
-      // Run pipeline
       const requestBody = {
         pipeline_id: PIPELINE_ID,
-        imageUrl: kimeraUrl,
+        imageUrl: [uploadedImageUrl],
         ratio: "2:3",
-        prompt: prompt || "Enhance this image"
+        prompt: [prompt || "Enhance this image"]
       };
 
       console.log("Sending request with body:", requestBody);
@@ -191,7 +155,6 @@ const PromptMaker = () => {
       const { id: jobId } = await pipelineResponse.json();
       console.log("Job started with ID:", jobId);
 
-      // Poll for results
       const pollInterval = setInterval(async () => {
         const statusResponse = await fetch(`https://api.kimera.ai/v1/pipeline/run/${jobId}`, {
           headers: {
