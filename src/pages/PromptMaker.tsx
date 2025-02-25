@@ -521,16 +521,29 @@ const PromptMaker = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {previousGenerations.map((gen) => (
                       <div key={gen.id} className="space-y-3">
-                        <button 
-                          className="w-full text-left"
-                          onClick={() => handleImageClick(gen)}
-                        >
-                          <img 
-                            src={gen.image_url} 
-                            alt={gen.prompt} 
-                            className="w-full aspect-square object-cover rounded-lg hover:opacity-90 transition-opacity"
-                          />
-                        </button>
+                        <div className="relative group">
+                          <button 
+                            className="w-full text-left"
+                            onClick={() => handleImageClick(gen)}
+                          >
+                            <img 
+                              src={gen.image_url} 
+                              alt={gen.prompt} 
+                              className="w-full aspect-square object-cover rounded-lg hover:opacity-90 transition-opacity"
+                            />
+                          </button>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDownload(gen.image_url);
+                            }}
+                            className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity bg-background/50 backdrop-blur hover:bg-background/80"
+                          >
+                            <Download className="h-4 w-4" />
+                          </Button>
+                        </div>
                         <div className="flex gap-3 text-xs text-white/70">
                           <span>Style: {gen.style}</span>
                           <span>Ratio: {gen.ratio}</span>
