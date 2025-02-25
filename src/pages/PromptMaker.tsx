@@ -173,7 +173,7 @@ const PromptMaker = () => {
         
         if (status.status === 'completed') {
           clearInterval(pollInterval);
-          setGeneratedImage(status.source);
+          setGeneratedImage(status.result); // Changed from status.source to status.result
           setIsProcessing(false);
           toast({
             title: "Success",
