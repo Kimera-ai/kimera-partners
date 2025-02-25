@@ -574,7 +574,7 @@ const PromptMaker = () => {
       </div>
 
       <Dialog open={showPromptDialog} onOpenChange={setShowPromptDialog}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-[90vw] md:max-w-[800px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
               Generation Details
@@ -592,14 +592,16 @@ const PromptMaker = () => {
           </DialogHeader>
           {selectedGeneration && (
             <div className="space-y-4">
-              <img 
-                src={selectedGeneration.image_url} 
-                alt={selectedGeneration.prompt}
-                className="w-full rounded-lg"
-              />
+              <div className="relative max-h-[60vh] overflow-hidden rounded-lg">
+                <img 
+                  src={selectedGeneration.image_url} 
+                  alt={selectedGeneration.prompt}
+                  className="w-full h-full object-contain"
+                />
+              </div>
               <div className="space-y-2">
                 <Label>Prompt</Label>
-                <p className="text-sm text-white/90 bg-background/50 p-4 rounded-lg">
+                <p className="text-sm text-white/90 bg-background/50 p-4 rounded-lg max-h-[15vh] overflow-y-auto">
                   {selectedGeneration.prompt}
                 </p>
                 <div className="flex gap-4 text-sm text-white/70">
