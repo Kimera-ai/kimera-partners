@@ -391,10 +391,6 @@ const PromptMaker = () => {
             </h1>
             <div className="flex gap-2">
               <Button variant="outline" size="sm">
-                <Wand2 className="w-4 h-4 mr-2" />
-                Random Prompt
-              </Button>
-              <Button variant="outline" size="sm">
                 <Settings className="w-4 h-4 mr-2" />
                 Advanced Settings
               </Button>
