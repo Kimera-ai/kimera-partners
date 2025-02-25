@@ -237,11 +237,38 @@ const PromptMaker = () => {
     setGeneratedImage(null);
   }, []);
 
-  const handleImprovePrompt = () => {
-    toast({
-      title: "Prompt Tips",
-      description: "Try being more specific with details like color, style, mood, and composition. Add descriptive adjectives and artistic references.",
-    });
+  const handleImprovePrompt = async () => {
+    if (!prompt) {
+      toast({
+        title: "Empty Prompt",
+        description: "Please enter a prompt to improve",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.functions.invoke('improve-prompt', {
+        body: { prompt },
+      });
+
+      if (error) throw error;
+
+      if (data?.improvedPrompt) {
+        setPrompt(data.improvedPrompt);
+        toast({
+          title: "Prompt Improved",
+          description: "Your prompt has been enhanced with more details.",
+        });
+      }
+    } catch (error) {
+      console.error('Error improving prompt:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to improve the prompt. Please try again.",
+      });
+    }
   };
 
   return (
