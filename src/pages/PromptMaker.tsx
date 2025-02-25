@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { Input } from "@/components/ui/input";
@@ -9,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Image, Settings, Sparkles, Upload, Wand2, X } from "lucide-react";
 import { DotPattern } from "@/components/ui/dot-pattern";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const API_KEY = "1712edc40e3eb72c858332fe7500bf33e885324f8c1cd52b8cded2cdfd724cee";
 const PIPELINE_ID = "803a4MBY";
@@ -20,6 +20,7 @@ const PromptMaker = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,7 +41,7 @@ const PromptMaker = () => {
       const formData = new FormData();
       formData.append('file', file);
 
-      // First upload the image to get a URL
+      // Upload the image to Kimera API
       const uploadResponse = await fetch('https://api.kimera.ai/v1/upload', {
         method: 'POST',
         headers: {
@@ -56,6 +57,20 @@ const PromptMaker = () => {
       const { imageUrl } = await uploadResponse.json();
       console.log("Image uploaded successfully:", imageUrl);
 
+      // Save the image URL to the database
+      const { data, error } = await supabase
+        .from('uploaded_images')
+        .insert([{ image_url: imageUrl }])
+        .select()
+        .single();
+
+      if (error) {
+        throw new Error('Failed to save image to database');
+      }
+
+      setUploadedImageUrl(imageUrl);
+      console.log("Image saved to database:", data);
+
     } catch (error) {
       toast({
         variant: "destructive",
@@ -68,7 +83,7 @@ const PromptMaker = () => {
   };
 
   const handleGenerate = async () => {
-    if (!imagePreview) {
+    if (!uploadedImageUrl) {
       toast({
         variant: "destructive",
         title: "Error",
@@ -80,7 +95,7 @@ const PromptMaker = () => {
     try {
       setIsProcessing(true);
       
-      // Start the pipeline with the uploaded image URL
+      // Start the pipeline with the saved image URL
       const pipelineResponse = await fetch('https://api.kimera.ai/v1/pipeline/run', {
         method: 'POST',
         headers: {
@@ -89,7 +104,7 @@ const PromptMaker = () => {
         },
         body: JSON.stringify({
           pipeline_id: PIPELINE_ID,
-          imageUrl: imagePreview,
+          imageUrl: uploadedImageUrl,
           ratio: "2:3",
           prompt: prompt || "Enhance this image"
         })
@@ -148,6 +163,7 @@ const PromptMaker = () => {
     e.stopPropagation();
     setImagePreview(null);
     setGeneratedImage(null);
+    setUploadedImageUrl(null);
   };
 
   return (
