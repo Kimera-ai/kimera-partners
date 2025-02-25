@@ -46,7 +46,7 @@ const PromptMaker = () => {
             </div>
           </div>
 
-          {/* Moved Prompt Input to top */}
+          {/* Prompt Input Section */}
           <Card className="p-6 bg-background/50 backdrop-blur mb-6">
             <div className="space-y-4">
               <div>
@@ -80,32 +80,30 @@ const PromptMaker = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left Panel - Tabs */}
-            <div className="lg:col-span-1 space-y-6">
-              <Card className="p-6 bg-background/50 backdrop-blur">
-                <div className="flex gap-4 mb-6 border-b border-primary/20">
-                  <TabButton 
-                    icon={Sparkles}
-                    active={activeTab === "create"}
-                    onClick={() => setActiveTab("create")}
-                  >
-                    Create
-                  </TabButton>
-                  <TabButton 
-                    icon={Image}
-                    active={activeTab === "history"}
-                    onClick={() => setActiveTab("history")}
-                  >
-                    History
-                  </TabButton>
-                  <TabButton 
-                    icon={Settings}
-                    active={activeTab === "settings"}
-                    onClick={() => setActiveTab("settings")}
-                  >
-                    Settings
-                  </TabButton>
-                </div>
-              </Card>
+            <div className="lg:col-span-1">
+              <div className="flex gap-4 mb-6 border-b border-primary/20">
+                <TabButton 
+                  icon={Sparkles}
+                  active={activeTab === "create"}
+                  onClick={() => setActiveTab("create")}
+                >
+                  Create
+                </TabButton>
+                <TabButton 
+                  icon={Image}
+                  active={activeTab === "history"}
+                  onClick={() => setActiveTab("history")}
+                >
+                  History
+                </TabButton>
+                <TabButton 
+                  icon={Settings}
+                  active={activeTab === "settings"}
+                  onClick={() => setActiveTab("settings")}
+                >
+                  Settings
+                </TabButton>
+              </div>
             </div>
 
             {/* Right Panel - Generated Images */}
