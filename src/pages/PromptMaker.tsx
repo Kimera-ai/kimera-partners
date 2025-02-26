@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/useSession";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const ImagePreview = ({
   imagePreview,
@@ -461,7 +462,16 @@ const PromptMaker = () => {
 
                   <div className="grid grid-cols-4 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="ratio" className="text-sm font-medium block truncate">Aspect Ratio</Label>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Label htmlFor="ratio" className="text-sm font-medium block truncate">Aspect Ratio</Label>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Aspect Ratio</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                       <Select value={ratio} onValueChange={setRatio}>
                         <SelectTrigger id="ratio" className="w-full">
                           <SelectValue placeholder="Select ratio" />
@@ -474,7 +484,16 @@ const PromptMaker = () => {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="style" className="text-sm font-medium block truncate">Style</Label>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Label htmlFor="style" className="text-sm font-medium block truncate">Style</Label>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Style</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                       <Select value={style} onValueChange={setStyle}>
                         <SelectTrigger id="style" className="w-full">
                           <SelectValue placeholder="Select style" />
@@ -494,7 +513,16 @@ const PromptMaker = () => {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="loraScale" className="text-sm font-medium block truncate">Character Ref. Strength</Label>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Label htmlFor="loraScale" className="text-sm font-medium block truncate">Character Ref. Strength</Label>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Character Reference Strength</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                       <Select value={loraScale} onValueChange={setLoraScale} disabled={workflow === 'no-reference'}>
                         <SelectTrigger id="loraScale" className={`w-full ${workflow === 'no-reference' ? 'opacity-50' : ''}`}>
                           <SelectValue placeholder="Select strength" />
@@ -513,7 +541,16 @@ const PromptMaker = () => {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="seed" className="text-sm font-medium block truncate">Seed</Label>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Label htmlFor="seed" className="text-sm font-medium block truncate">Seed</Label>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Seed</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                       <Select value={seed} onValueChange={setSeed}>
                         <SelectTrigger id="seed" className="w-full">
                           <SelectValue placeholder="Select seed" />
