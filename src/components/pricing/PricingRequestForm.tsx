@@ -44,10 +44,10 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center overflow-hidden h-screen">
-      <div className="h-full w-full animate-fade-in">
-        <div className="bg-[#1A1123] border border-white/10 rounded-2xl w-full max-w-5xl mx-auto h-full flex flex-col">
-          <div className="sticky top-0 bg-[#1A1123]/95 backdrop-blur-sm border-b border-white/10 p-6 flex items-center justify-between">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50">
+      <div className="w-screen h-screen flex items-center justify-center p-0">
+        <div className="bg-[#1A1123] border border-white/10 rounded-2xl w-[95vw] h-[95vh] flex flex-col">
+          <div className="bg-[#1A1123]/95 backdrop-blur-sm border-b border-white/10 p-6 flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
                 Pricing Request
@@ -62,7 +62,7 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
             </button>
           </div>
           
-          <div className="flex-1 p-8 relative overflow-y-auto">
+          <div className="flex-1 overflow-hidden">
             {isLoading && (
               <div className="absolute inset-0 flex items-center justify-center bg-[#1A1123]/80 backdrop-blur-sm z-10">
                 <Loader className="w-8 h-8 text-purple-400 animate-spin" />
@@ -72,7 +72,7 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
               src={`https://kimeracrm.netlify.app/embed/event-form?${formParams.toString()}`}
               width="100%" 
               height="100%"
-              className="rounded-xl bg-transparent min-h-[800px]"
+              className="w-full h-full"
               style={{ border: 'none' }}
               title="Event Request Form"
               onLoad={() => setIsLoading(false)}
