@@ -215,6 +215,16 @@ const PromptMaker = () => {
       });
       return;
     }
+
+    if ((workflow === 'with-reference' || workflow === 'animated') && !uploadedImageUrl) {
+      toast({
+        title: "Image Required",
+        description: `Please upload an image when using the ${workflow === 'with-reference' ? 'With Image Reference' : 'Animated'} workflow.`,
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       setIsProcessing(true);
       setElapsedTime(0);
