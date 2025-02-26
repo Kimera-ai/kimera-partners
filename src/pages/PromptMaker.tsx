@@ -13,6 +13,7 @@ import { useSession } from "@/hooks/useSession";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
 const ImagePreview = ({
   imagePreview,
   isUploading,
@@ -38,7 +39,9 @@ const ImagePreview = ({
       <X className="absolute inset-0 m-auto h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
     </button>;
 };
+
 const CREDITS_PER_GENERATION = 14;
+
 const PromptMaker = () => {
   const [prompt, setPrompt] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -58,6 +61,7 @@ const PromptMaker = () => {
   const [credits, setCredits] = useState<number | null>(null);
   const [isLoadingCredits, setIsLoadingCredits] = useState(true);
   const [workflow, setWorkflow] = useState("no-reference");
+
   const {
     session
   } = useSession();
@@ -66,12 +70,14 @@ const PromptMaker = () => {
   } = useToast();
   const previewRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<NodeJS.Timeout>();
+
   useEffect(() => {
     if (session?.user) {
       fetchPreviousGenerations();
       fetchUserCredits();
     }
   }, [session?.user]);
+
   const fetchUserCredits = async () => {
     try {
       setIsLoadingCredits(true);
@@ -92,6 +98,7 @@ const PromptMaker = () => {
       setIsLoadingCredits(false);
     }
   };
+
   const updateUserCredits = async (creditsToDeduct: number) => {
     try {
       const {
@@ -109,6 +116,7 @@ const PromptMaker = () => {
       return false;
     }
   };
+
   const fetchPreviousGenerations = async () => {
     try {
       const {
@@ -124,6 +132,7 @@ const PromptMaker = () => {
       console.error('Error fetching previous generations:', error);
     }
   };
+
   useEffect(() => {
     if (isProcessing) {
       setElapsedTime(0);
@@ -141,6 +150,7 @@ const PromptMaker = () => {
       }
     };
   }, [isProcessing]);
+
   const formatTime = (milliseconds: number) => {
     const seconds = Math.floor(milliseconds / 1000);
     const ms = milliseconds % 1000;
@@ -148,6 +158,7 @@ const PromptMaker = () => {
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}.${ms.toString().padStart(3, '0')}`;
   };
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -191,6 +202,7 @@ const PromptMaker = () => {
       setIsUploading(false);
     }
   };
+
   const handleGenerate = async () => {
     if (!session?.user) {
       toast({
@@ -318,6 +330,7 @@ const PromptMaker = () => {
       });
     }
   };
+
   const removeImage = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -325,6 +338,7 @@ const PromptMaker = () => {
     setUploadedImageUrl(null);
     setGeneratedImage(null);
   }, []);
+
   const handleImprovePrompt = async () => {
     if (!prompt) {
       toast({
@@ -363,13 +377,19 @@ const PromptMaker = () => {
       setIsImprovingPrompt(false);
     }
   };
+
   const handleImageClick = (generation: any) => {
     setSelectedGeneration(generation);
     setShowPromptDialog(true);
   };
+
   const handleDownload = async (imageUrl: string) => {
     try {
-      const response = await fetch(imageUrl);
+      const proxyUrl = imageUrl.split('?')[0];
+      
+      const response = await fetch(proxyUrl);
+      if (!response.ok) throw new Error('Network response was not ok');
+      
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -379,6 +399,7 @@ const PromptMaker = () => {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
+      
       toast({
         title: "Success",
         description: "Image downloaded successfully"
@@ -388,10 +409,11 @@ const PromptMaker = () => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to download image"
+        description: "Failed to download image. Please try again."
       });
     }
   };
+
   return <BaseLayout>
       <div className="relative min-h-screen">
         <div className="absolute inset-0 pointer-events-none">
@@ -658,4 +680,5 @@ const PromptMaker = () => {
       </Dialog>
     </BaseLayout>;
 };
+
 export default PromptMaker;
