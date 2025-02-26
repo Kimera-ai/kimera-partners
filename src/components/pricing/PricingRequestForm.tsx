@@ -20,7 +20,7 @@ interface PricingRequestFormProps {
 const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: PricingRequestFormProps) => {
   const { session } = useSession();
   const userEmail = session?.user?.email || '';
-  const userName = session?.user?.name || '';
+  const userName = session?.user?.user_metadata?.full_name || '';
   const [isLoading, setIsLoading] = useState(true);
   
   // Calculate expected runs (70% usage rate)
