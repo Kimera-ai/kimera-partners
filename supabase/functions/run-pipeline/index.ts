@@ -1,5 +1,5 @@
 
-import { serve } from "https://deno.fresh.dev/std@v9.6.1/http/server.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { corsHeaders } from "../_shared/cors.ts";
 
 const KIMERA_API_KEY = "1712edc40e3eb72c858332fe7500bf33e885324f8c1cd52b8cded2cdfd724cee";
