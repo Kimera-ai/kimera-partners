@@ -5,27 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Image, Settings, Sparkles, Wand2, X, Clock, Lightbulb, History, Loader2, Download } from "lucide-react";
+import { Image, Settings, Sparkles, Wand2, X, Clock, Lightbulb, History, Loader2, Download, Coins } from "lucide-react";
 import { DotPattern } from "@/components/ui/dot-pattern";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useSession } from "@/hooks/useSession";
 
-const API_KEY = "1712edc40e3eb72c858332fe7500bf33e885324f8c1cd52b8cded2cdfd724cee";
-const PIPELINE_ID = "803a4MBY";
+const CREDITS_PER_GENERATION = 14;
 
 const ImagePreview = ({ 
   imagePreview, 
@@ -82,6 +67,8 @@ const PromptMaker = () => {
   const [isImprovingPrompt, setIsImprovingPrompt] = useState(false);
   const [selectedGeneration, setSelectedGeneration] = useState<any | null>(null);
   const [showPromptDialog, setShowPromptDialog] = useState(false);
+  const [credits, setCredits] = useState<number | null>(null);
+  const [isLoadingCredits, setIsLoadingCredits] = useState(true);
   const { session } = useSession();
   const { toast } = useToast();
   const previewRef = useRef<HTMLDivElement>(null);
@@ -90,8 +77,53 @@ const PromptMaker = () => {
   useEffect(() => {
     if (session?.user) {
       fetchPreviousGenerations();
+      fetchUserCredits();
     }
   }, [session?.user]);
+
+  const fetchUserCredits = async () => {
+    try {
+      setIsLoadingCredits(true);
+      const { data, error } = await supabase
+        .from('user_credits')
+        .select('credits')
+        .eq('user_id', session?.user?.id)
+        .single();
+
+      if (error) throw error;
+      setCredits(data?.credits ?? null);
+    } catch (error) {
+      console.error('Error fetching credits:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch credits",
+      });
+    } finally {
+      setIsLoadingCredits(false);
+    }
+  };
+
+  const updateUserCredits = async (creditsToDeduct: number) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_credits')
+        .update({ 
+          credits: (credits ?? 0) - creditsToDeduct,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', session?.user?.id)
+        .select('credits')
+        .single();
+
+      if (error) throw error;
+      setCredits(data?.credits ?? null);
+      return true;
+    } catch (error) {
+      console.error('Error updating credits:', error);
+      return false;
+    }
+  };
 
   const fetchPreviousGenerations = async () => {
     try {
@@ -199,6 +231,15 @@ const PromptMaker = () => {
       return;
     }
 
+    if (credits !== null && credits < CREDITS_PER_GENERATION) {
+      toast({
+        title: "Insufficient Credits",
+        description: `You need ${CREDITS_PER_GENERATION} credits to generate an image. Your current balance is ${credits} credits.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setIsProcessing(true);
       setElapsedTime(0);
@@ -254,6 +295,16 @@ const PromptMaker = () => {
           clearInterval(pollInterval);
           setGeneratedImage(status.result);
           setIsProcessing(false);
+
+          const creditUpdateSuccess = await updateUserCredits(CREDITS_PER_GENERATION);
+          if (!creditUpdateSuccess) {
+            toast({
+              variant: "destructive",
+              title: "Error",
+              description: "Failed to update credits",
+            });
+            return;
+          }
 
           const { error: dbError } = await supabase
             .from('generated_images')
@@ -385,10 +436,22 @@ const PromptMaker = () => {
         </div>
         
         <div className="relative z-10">
-          <div className="flex items-center justify-center mb-6">
+          <div className="flex items-center justify-between mb-6">
             <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Kimera Image Generation
             </h1>
+            {session?.user && (
+              <div className="flex items-center gap-2 bg-background/50 backdrop-blur px-4 py-2 rounded-full">
+                <Coins className="w-4 h-4 text-yellow-500" />
+                <span className="font-mono">
+                  {isLoadingCredits ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    `${credits ?? 0} credits`
+                  )}
+                </span>
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

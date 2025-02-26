@@ -180,6 +180,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_credits: {
+        Row: {
+          created_at: string | null
+          credits: number
+          last_reset: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          credits?: number
+          last_reset?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          credits?: number
+          last_reset?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       videos: {
         Row: {
           created_at: string
@@ -218,6 +242,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      reset_monthly_credits: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       sync_event_photos: {
         Args: Record<PropertyKey, never>
         Returns: undefined
