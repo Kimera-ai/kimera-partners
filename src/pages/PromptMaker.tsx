@@ -9,8 +9,20 @@ import { Image, Settings, Sparkles, Wand2, X, Clock, Lightbulb, History, Loader2
 import { DotPattern } from "@/components/ui/dot-pattern";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-
-const CREDITS_PER_GENERATION = 14;
+import { useSession } from "@/hooks/useSession";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const ImagePreview = ({ 
   imagePreview, 
@@ -52,6 +64,8 @@ const ImagePreview = ({
     </button>
   );
 };
+
+const CREDITS_PER_GENERATION = 14;
 
 const PromptMaker = () => {
   const [prompt, setPrompt] = useState("");
