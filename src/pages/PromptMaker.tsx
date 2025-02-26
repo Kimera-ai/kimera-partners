@@ -216,10 +216,10 @@ const PromptMaker = () => {
       return;
     }
 
-    if ((workflow === 'with-reference' || workflow === 'animated') && !uploadedImageUrl) {
+    if ((workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl) {
       toast({
         title: "Image Required",
-        description: `Please upload an image when using the ${workflow === 'with-reference' ? 'With Image Reference' : 'Animated'} workflow.`,
+        description: `Please upload an image when using the ${workflow === 'with-reference' ? 'With Image Reference' : 'Cartoon'} workflow.`,
         variant: "destructive"
       });
       return;
@@ -234,7 +234,7 @@ const PromptMaker = () => {
         switch (workflow) {
           case "with-reference":
             return "FYpcEIUj";
-          case "animated":
+          case "cartoon":
           case "no-reference":
           default:
             return "803a4MBY";
@@ -453,7 +453,7 @@ const PromptMaker = () => {
                         <SelectContent>
                           <SelectItem value="no-reference">No Image Reference</SelectItem>
                           <SelectItem value="with-reference">With Image Reference</SelectItem>
-                          <SelectItem value="animated">Animated</SelectItem>
+                          <SelectItem value="cartoon">Cartoon</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -574,11 +574,11 @@ const PromptMaker = () => {
 
                   <Button 
                     className="w-full" 
-                    disabled={isProcessing || ((workflow === 'with-reference' || workflow === 'animated') && !uploadedImageUrl)} 
+                    disabled={isProcessing || ((workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl)} 
                     onClick={handleGenerate}
                   >
                     <Sparkles className="w-4 h-4 mr-2" />
-                    {isProcessing ? "Processing..." : ((workflow === 'with-reference' || workflow === 'animated') && !uploadedImageUrl) ? "Upload an image" : "Generate"}
+                    {isProcessing ? "Processing..." : ((workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl) ? "Upload an image" : "Generate"}
                   </Button>
                 </div>
               </Card>
