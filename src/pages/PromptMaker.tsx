@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/useSession";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+
 const ImagePreview = ({
   imagePreview,
   isUploading,
@@ -35,7 +36,9 @@ const ImagePreview = ({
       <X className="absolute inset-0 m-auto h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
     </button>;
 };
+
 const CREDITS_PER_GENERATION = 14;
+
 const PromptMaker = () => {
   const [prompt, setPrompt] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -60,12 +63,14 @@ const PromptMaker = () => {
   } = useToast();
   const previewRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<NodeJS.Timeout>();
+
   useEffect(() => {
     if (session?.user) {
       fetchPreviousGenerations();
       fetchUserCredits();
     }
   }, [session?.user]);
+
   const fetchUserCredits = async () => {
     try {
       setIsLoadingCredits(true);
@@ -86,6 +91,7 @@ const PromptMaker = () => {
       setIsLoadingCredits(false);
     }
   };
+
   const updateUserCredits = async (creditsToDeduct: number) => {
     try {
       const {
@@ -103,6 +109,7 @@ const PromptMaker = () => {
       return false;
     }
   };
+
   const fetchPreviousGenerations = async () => {
     try {
       const {
@@ -118,6 +125,7 @@ const PromptMaker = () => {
       console.error('Error fetching previous generations:', error);
     }
   };
+
   useEffect(() => {
     if (isProcessing) {
       setElapsedTime(0);
@@ -135,6 +143,7 @@ const PromptMaker = () => {
       }
     };
   }, [isProcessing]);
+
   const formatTime = (milliseconds: number) => {
     const seconds = Math.floor(milliseconds / 1000);
     const ms = milliseconds % 1000;
@@ -142,6 +151,7 @@ const PromptMaker = () => {
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}.${ms.toString().padStart(3, '0')}`;
   };
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -185,6 +195,7 @@ const PromptMaker = () => {
       setIsUploading(false);
     }
   };
+
   const handleGenerate = async () => {
     if (!session?.user) {
       toast({
@@ -293,6 +304,7 @@ const PromptMaker = () => {
       });
     }
   };
+
   const removeImage = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -300,6 +312,7 @@ const PromptMaker = () => {
     setUploadedImageUrl(null);
     setGeneratedImage(null);
   }, []);
+
   const handleImprovePrompt = async () => {
     if (!prompt) {
       toast({
@@ -338,10 +351,12 @@ const PromptMaker = () => {
       setIsImprovingPrompt(false);
     }
   };
+
   const handleImageClick = (generation: any) => {
     setSelectedGeneration(generation);
     setShowPromptDialog(true);
   };
+
   const handleDownload = async (imageUrl: string) => {
     try {
       const response = await fetch(imageUrl);
@@ -367,6 +382,7 @@ const PromptMaker = () => {
       });
     }
   };
+
   return <BaseLayout>
       <div className="relative min-h-screen">
         <div className="absolute inset-0 pointer-events-none">
@@ -378,12 +394,14 @@ const PromptMaker = () => {
             <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Kimera Image Generation
             </h1>
-            {session?.user && <div className="flex items-center gap-2 backdrop-blur px-4 py-2 rounded-full bg-purple-600">
+            {session?.user && (
+              <div className="flex items-center gap-2 backdrop-blur px-4 py-2 rounded-full bg-background/50">
                 <Coins className="w-4 h-4 text-yellow-500" />
-                <span className="font-mono">
+                <span className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                   {isLoadingCredits ? <Loader2 className="w-4 h-4 animate-spin" /> : `${credits ?? 0} credits`}
                 </span>
-              </div>}
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -534,4 +552,5 @@ const PromptMaker = () => {
       </Dialog>
     </BaseLayout>;
 };
+
 export default PromptMaker;
