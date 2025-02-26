@@ -229,6 +229,7 @@ const PromptMaker = () => {
         }
       };
       console.log("Sending request with body:", requestBody);
+      
       const pipelineResponse = await fetch('https://api.kimera.ai/v1/pipeline/run', {
         method: 'POST',
         headers: {
@@ -237,29 +238,37 @@ const PromptMaker = () => {
         },
         body: JSON.stringify(requestBody)
       });
+
       if (!pipelineResponse.ok) {
         const errorData = await pipelineResponse.json();
         console.error("Pipeline error response:", errorData);
         throw new Error('Failed to process image');
       }
-      const { id: jobId } = await pipelineResponse.json();
+
+      const responseData = await pipelineResponse.json();
+      const jobId = responseData.id;
       console.log("Job started with ID:", jobId);
+
       const pollInterval = setInterval(async () => {
         const statusResponse = await fetch(`https://api.kimera.ai/v1/pipeline/run/${jobId}`, {
           headers: {
             'x-api-key': "1712edc40e3eb72c858332fe7500bf33e885324f8c1cd52b8cded2cdfd724cee"
           }
         });
+
         if (!statusResponse.ok) {
           clearInterval(pollInterval);
           throw new Error('Failed to check status');
         }
+
         const status = await statusResponse.json();
         console.log("Current status:", status);
+
         if (status.status === 'completed') {
           clearInterval(pollInterval);
           setGeneratedImage(status.result);
           setIsProcessing(false);
+
           const creditUpdateSuccess = await updateUserCredits(CREDITS_PER_GENERATION);
           if (!creditUpdateSuccess) {
             toast({
@@ -269,20 +278,24 @@ const PromptMaker = () => {
             });
             return;
           }
-          const { error: dbError } = await supabase.from('generated_images').insert({
-            user_id: session.user.id,
-            image_url: status.result,
-            prompt: prompt,
-            style: style,
-            ratio: ratio,
-            seed: seed,
-            lora_scale: loraScale
-          });
+
+          const { error: dbError } = await supabase
+            .from('generated_images')
+            .insert({
+              user_id: session.user.id,
+              image_url: status.result,
+              prompt: prompt,
+              style: style,
+              ratio: ratio,
+              lora_scale: loraScale
+            });
+
           if (dbError) {
             console.error('Error storing generation:', dbError);
-            throw new Error('Failed to store generation');
+          } else {
+            await fetchPreviousGenerations();
           }
-          await fetchPreviousGenerations();
+
           toast({
             title: "Success",
             description: "Image has been generated successfully!"
@@ -295,6 +308,7 @@ const PromptMaker = () => {
       }, 2000);
     } catch (error) {
       setIsProcessing(false);
+      console.error('Generation error:', error);
       toast({
         variant: "destructive",
         title: "Error",
