@@ -493,10 +493,10 @@ const PromptMaker = () => {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className={`space-y-2 ${workflow === 'no-reference' ? 'opacity-50 pointer-events-none' : ''}`}>
+                    <div className="space-y-2">
                       <Label htmlFor="loraScale" className="text-sm font-medium block">Character Reference Strength</Label>
                       <Select value={loraScale} onValueChange={setLoraScale} disabled={workflow === 'no-reference'}>
-                        <SelectTrigger id="loraScale" className="w-full">
+                        <SelectTrigger id="loraScale" className={`w-full ${workflow === 'no-reference' ? 'opacity-50' : ''}`}>
                           <SelectValue placeholder="Select strength" />
                         </SelectTrigger>
                         <SelectContent>
