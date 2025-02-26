@@ -20,6 +20,7 @@ interface PricingRequestFormProps {
 const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: PricingRequestFormProps) => {
   const { session } = useSession();
   const userEmail = session?.user?.email || '';
+  const userName = session?.user?.name || '';
   const [isLoading, setIsLoading] = useState(true);
   
   // Calculate expected runs (70% usage rate)
@@ -34,9 +35,12 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
     .map(feature => `${feature} (${expectedRuns} runs)`)
     .join(', ');
   
-  // Create URL parameters for the form
+  // Create URL parameters for the form with all available parameters
   const formParams = new URLSearchParams({
-    email: userEmail,
+    event_type: 'ai_photo_event',
+    event_date: new Date().toISOString().split('T')[0], // Today's date as default
+    client_name: userName,
+    client_email: userEmail,
     package_type: selectedFeatures.basePackage || '',
     guest_count: selectedFeatures.guestCount.toString(),
     total_price: totalPrice.toString(),
@@ -67,6 +71,17 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
           </div>
           
           <div className="p-8 space-y-6 relative">
+            <div className="bg-white/5 rounded-lg p-4 mb-6">
+              <h3 className="text-lg font-semibold text-white mb-2">Request Summary</h3>
+              <div className="space-y-2 text-sm text-gray-300">
+                <p><span className="text-gray-400">Name:</span> {userName}</p>
+                <p><span className="text-gray-400">Email:</span> {userEmail}</p>
+                <p><span className="text-gray-400">Package:</span> {selectedFeatures.basePackage}</p>
+                <p><span className="text-gray-400">Total Price:</span> ${totalPrice}</p>
+                <p><span className="text-gray-400">Guest Count:</span> {selectedFeatures.guestCount}</p>
+              </div>
+            </div>
+            
             {isLoading && (
               <div className="absolute inset-0 flex items-center justify-center bg-[#1A1123]/80 backdrop-blur-sm z-10">
                 <Loader className="w-8 h-8 text-purple-400 animate-spin" />
