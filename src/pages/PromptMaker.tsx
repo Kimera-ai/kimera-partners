@@ -1,3 +1,4 @@
+
 import { useState, useRef, useCallback, useEffect } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { Input } from "@/components/ui/input";
@@ -434,12 +435,19 @@ const PromptMaker = () => {
             <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Kimera Image Generation
             </h1>
-            {session?.user && <div className="flex items-center gap-2 backdrop-blur px-4 py-2 rounded-full bg-background/50">
-                <Coins className="w-4 h-4 text-yellow-500" />
-                <span className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                  {isLoadingCredits ? <Loader2 className="w-4 h-4 animate-spin" /> : `${credits ?? 0} credits`}
-                </span>
-              </div>}
+            {session?.user && (
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 backdrop-blur px-4 py-2 rounded-full bg-background/50">
+                  <Coins className="w-4 h-4 text-yellow-500" />
+                  <span className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                    {isLoadingCredits ? <Loader2 className="w-4 h-4 animate-spin" /> : `${credits ?? 0} credits`}
+                  </span>
+                </div>
+                <div className="text-sm text-muted-foreground backdrop-blur px-4 py-2 rounded-full bg-background/50">
+                  Cost per generation: {CREDITS_PER_GENERATION} credits
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
