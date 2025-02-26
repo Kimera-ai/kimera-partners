@@ -242,9 +242,7 @@ const PromptMaker = () => {
         console.error("Pipeline error response:", errorData);
         throw new Error('Failed to process image');
       }
-      const {
-        id: jobId
-      } = await pipelineResponse.json();
+      const { id: jobId } = await pipelineResponse.json();
       console.log("Job started with ID:", jobId);
       const pollInterval = setInterval(async () => {
         const statusResponse = await fetch(`https://api.kimera.ai/v1/pipeline/run/${jobId}`, {
@@ -271,9 +269,7 @@ const PromptMaker = () => {
             });
             return;
           }
-          const {
-            error: dbError
-          } = await supabase.from('generated_images').insert({
+          const { error: dbError } = await supabase.from('generated_images').insert({
             user_id: session.user.id,
             image_url: status.result,
             prompt: prompt,

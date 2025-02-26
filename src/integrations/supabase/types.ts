@@ -68,6 +68,7 @@ export type Database = {
           created_at: string
           id: string
           image_url: string
+          lora_scale: string | null
           prompt: string | null
           ratio: string | null
           style: string | null
@@ -78,6 +79,7 @@ export type Database = {
           created_at?: string
           id?: string
           image_url: string
+          lora_scale?: string | null
           prompt?: string | null
           ratio?: string | null
           style?: string | null
@@ -88,6 +90,7 @@ export type Database = {
           created_at?: string
           id?: string
           image_url?: string
+          lora_scale?: string | null
           prompt?: string | null
           ratio?: string | null
           style?: string | null
