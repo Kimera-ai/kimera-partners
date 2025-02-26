@@ -215,9 +215,11 @@ const PromptMaker = () => {
     try {
       setIsProcessing(true);
       setElapsedTime(0);
+      const defaultImageUrl = "https://cdn.discordapp.com/attachments/1276822658083979275/1344299399907381258/Untitled-1.jpg?ex=67c067e0&is=67bf1660&hm=f4c5e15bae4887d9fd5efb6deb7c15065341f8a035ee7b6424e5fcf95d403ee2&";
+      
       const requestBody = {
         pipeline_id: "803a4MBY",
-        imageUrl: uploadedImageUrl || "",
+        imageUrl: uploadedImageUrl || defaultImageUrl,
         ratio: ratio,
         prompt: `${style} style: ${prompt}` || `${style} this image`,
         data: {
