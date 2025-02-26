@@ -503,9 +503,11 @@ const PromptMaker = () => {
 
             <Card className="p-6 bg-background/50 backdrop-blur relative aspect-[2/3] flex items-center justify-center">
               {isProcessing && <div className="absolute inset-0 flex items-center justify-center z-10">
-                  <div className="flex items-center gap-2 bg-background/80 backdrop-blur px-6 py-3 rounded-full text-lg font-mono">
+                  <div className="flex items-center gap-2 bg-background/80 backdrop-blur px-6 py-3 rounded-full">
                     <Clock className="w-6 h-6 animate-pulse" />
-                    <span>{formatTime(elapsedTime)}</span>
+                    <span className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                      {formatTime(elapsedTime)}
+                    </span>
                   </div>
                 </div>}
               {generatedImage ? <img src={generatedImage} alt="Generated" className="w-full h-full object-cover rounded-lg shadow-lg" /> : <div className="text-center text-muted-foreground">
