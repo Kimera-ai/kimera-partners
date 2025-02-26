@@ -385,16 +385,25 @@ const PromptMaker = () => {
 
   const handleDownload = async (imageUrl: string) => {
     try {
-      const proxyUrl = imageUrl.split('?')[0];
+      // Extract the S3 URL directly
+      const s3Url = imageUrl.split('format=jpeg/')[1];
+      if (!s3Url) throw new Error('Invalid image URL');
       
-      const response = await fetch(proxyUrl);
+      const response = await fetch(s3Url, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'Accept': 'image/jpeg,image/png,image/*'
+        }
+      });
+      
       if (!response.ok) throw new Error('Network response was not ok');
       
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `generated-image-${Date.now()}.png`;
+      a.download = `generated-image-${Date.now()}.jpg`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -409,7 +418,7 @@ const PromptMaker = () => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to download image. Please try again."
+        description: "Failed to download image. Please try again or right-click and 'Save Image As'"
       });
     }
   };
