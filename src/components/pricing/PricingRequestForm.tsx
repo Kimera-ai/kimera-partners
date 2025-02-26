@@ -35,19 +35,23 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
     .map(feature => `${feature} (${expectedRuns} runs)`)
     .join(', ');
   
-  // Create URL parameters for the form with all available parameters
-  const formParams = new URLSearchParams({
-    event_type: 'ai_photo_event',
-    event_date: new Date().toISOString().split('T')[0], // Today's date as default
-    client_name: userName,
-    client_email: userEmail,
-    package_type: selectedFeatures.basePackage || '',
-    guest_count: selectedFeatures.guestCount.toString(),
-    total_price: totalPrice.toString(),
-    image_features: imageFeatureRuns,
-    video_features: videoFeatureRuns,
-    custom_workflows: selectedFeatures.customWorkflows.toString()
-  });
+  // Create URL parameters for the form
+  const formParams = new URLSearchParams();
+  
+  // Add core parameters
+  formParams.append('event_type', 'ai_photo_event');
+  formParams.append('event_date', new Date().toISOString().split('T')[0]);
+  formParams.append('client_name', userName);
+  formParams.append('client_email', userEmail);
+  formParams.append('package_type', selectedFeatures.basePackage || '');
+  formParams.append('guest_count', selectedFeatures.guestCount.toString());
+  formParams.append('total_price', totalPrice.toString());
+  formParams.append('image_features', imageFeatureRuns);
+  formParams.append('video_features', videoFeatureRuns);
+  formParams.append('custom_workflows', selectedFeatures.customWorkflows.toString());
+  
+  // Encode the parameters to ensure special characters are handled correctly
+  const encodedParams = formParams.toString();
   
   if (!isOpen) return null;
 
@@ -88,7 +92,7 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
               </div>
             )}
             <iframe 
-              src={`https://kimeracrm.netlify.app/embed/event-form?${formParams.toString()}`}
+              src={`https://kimeracrm.netlify.app/embed/event-form?${encodedParams}`}
               width="100%" 
               height="800px"
               className="rounded-xl bg-transparent"
