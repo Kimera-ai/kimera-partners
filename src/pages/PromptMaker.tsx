@@ -572,9 +572,13 @@ const PromptMaker = () => {
                     </div>
                   </div>
 
-                  <Button className="w-full" disabled={isProcessing} onClick={handleGenerate}>
+                  <Button 
+                    className="w-full" 
+                    disabled={isProcessing || ((workflow === 'with-reference' || workflow === 'animated') && !uploadedImageUrl)} 
+                    onClick={handleGenerate}
+                  >
                     <Sparkles className="w-4 h-4 mr-2" />
-                    {isProcessing ? "Processing..." : "Generate"}
+                    {isProcessing ? "Processing..." : ((workflow === 'with-reference' || workflow === 'animated') && !uploadedImageUrl) ? "Upload an image" : "Generate"}
                   </Button>
                 </div>
               </Card>
