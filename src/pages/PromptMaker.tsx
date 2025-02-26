@@ -276,7 +276,9 @@ const PromptMaker = () => {
             image_url: status.result,
             prompt: prompt,
             style: style,
-            ratio: ratio
+            ratio: ratio,
+            seed: seed,
+            lora_scale: loraScale
           });
           if (dbError) {
             console.error('Error storing generation:', dbError);
@@ -514,15 +516,21 @@ const PromptMaker = () => {
                             <img src={gen.image_url} alt={gen.prompt} className="w-full aspect-square object-cover rounded-lg hover:opacity-90 transition-opacity" />
                           </button>
                           <Button variant="outline" size="icon" onClick={e => {
-                        e.stopPropagation();
-                        handleDownload(gen.image_url);
-                      }} className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity bg-background/50 backdrop-blur hover:bg-background/80">
+                            e.stopPropagation();
+                            handleDownload(gen.image_url);
+                          }} className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity bg-background/50 backdrop-blur hover:bg-background/80">
                             <Download className="h-4 w-4" />
                           </Button>
                         </div>
-                        <div className="flex gap-3 text-xs text-white/70">
-                          <span>Style: {gen.style}</span>
-                          <span>Ratio: {gen.ratio}</span>
+                        <div className="space-y-1 text-xs text-white/70">
+                          <div className="flex flex-wrap gap-2">
+                            <span>Style: {gen.style}</span>
+                            <span>Ratio: {gen.ratio}</span>
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            <span>Seed: {gen.seed || "random"}</span>
+                            <span>Strength: {gen.lora_scale || "0.5"}</span>
+                          </div>
                         </div>
                       </div>)}
                   </div>
@@ -567,7 +575,7 @@ const PromptMaker = () => {
                 <p className="text-sm text-white/90 bg-background/50 p-4 rounded-lg max-h-[15vh] overflow-y-auto">
                   {selectedGeneration.prompt}
                 </p>
-                <div className="flex gap-4 text-sm text-white/70">
+                <div className="grid grid-cols-2 gap-4 text-sm text-white/70">
                   <div>
                     <Label>Style</Label>
                     <p>{selectedGeneration.style}</p>
@@ -575,6 +583,14 @@ const PromptMaker = () => {
                   <div>
                     <Label>Ratio</Label>
                     <p>{selectedGeneration.ratio}</p>
+                  </div>
+                  <div>
+                    <Label>Seed</Label>
+                    <p>{selectedGeneration.seed || "random"}</p>
+                  </div>
+                  <div>
+                    <Label>Character Reference Strength</Label>
+                    <p>{selectedGeneration.lora_scale || "0.5"}</p>
                   </div>
                 </div>
               </div>
