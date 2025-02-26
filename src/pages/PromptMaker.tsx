@@ -51,7 +51,7 @@ const PromptMaker = () => {
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [ratio, setRatio] = useState("2:3");
-  const [style, setStyle] = useState("Enhance");
+  const [style, setStyle] = useState("Photographic");
   const [loraScale, setLoraScale] = useState("0.5");
   const [seed, setSeed] = useState("random");
   const [previousGenerations, setPreviousGenerations] = useState<any[]>([]);
