@@ -57,6 +57,7 @@ const PromptMaker = () => {
   const [showPromptDialog, setShowPromptDialog] = useState(false);
   const [credits, setCredits] = useState<number | null>(null);
   const [isLoadingCredits, setIsLoadingCredits] = useState(true);
+  const [workflow, setWorkflow] = useState("no-reference");
   const { session } = useSession();
   const { toast } = useToast();
   const previewRef = useRef<HTMLDivElement>(null);
@@ -217,8 +218,19 @@ const PromptMaker = () => {
       setElapsedTime(0);
       const defaultImageUrl = "https://cdn.discordapp.com/attachments/1276822658083979275/1344299399907381258/Untitled-1.jpg?ex=67c067e0&is=67bf1660&hm=f4c5e15bae4887d9fd5efb6deb7c15065341f8a035ee7b6424e5fcf95d403ee2&";
       
+      const getPipelineId = () => {
+        switch (workflow) {
+          case "with-reference":
+            return "FYpcEIUj";
+          case "animated":
+          case "no-reference":
+          default:
+            return "803a4MBY";
+        }
+      };
+
       const requestBody = {
-        pipeline_id: "803a4MBY",
+        pipeline_id: getPipelineId(),
         imageUrl: uploadedImageUrl || defaultImageUrl,
         ratio: ratio,
         prompt: `${style} style: ${prompt}` || `${style} this image`,
@@ -228,7 +240,6 @@ const PromptMaker = () => {
           seed: seed === "random" ? -1 : 1234
         }
       };
-      console.log("Sending request with body:", requestBody);
       
       const pipelineResponse = await fetch('https://api.kimera.ai/v1/pipeline/run', {
         method: 'POST',
@@ -420,6 +431,22 @@ const PromptMaker = () => {
             <div className="space-y-6">
               <Card className="p-6 bg-background/50 backdrop-blur">
                 <div className="space-y-4">
+                  <div className="grid grid-cols-1 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="workflow" className="text-sm font-medium block">Workflow</Label>
+                      <Select value={workflow} onValueChange={setWorkflow}>
+                        <SelectTrigger id="workflow" className="w-full">
+                          <SelectValue placeholder="Select workflow" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="no-reference">No Image Reference</SelectItem>
+                          <SelectItem value="with-reference">With Image Reference</SelectItem>
+                          <SelectItem value="animated">Animated</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-4 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="ratio" className="text-sm font-medium block">Aspect Ratio</Label>
