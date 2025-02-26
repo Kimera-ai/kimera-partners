@@ -49,6 +49,7 @@ const PromptMaker = () => {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [ratio, setRatio] = useState("2:3");
   const [style, setStyle] = useState("Enhance");
+  const [loraScale, setLoraScale] = useState("0.5");
   const [previousGenerations, setPreviousGenerations] = useState<any[]>([]);
   const [isImprovingPrompt, setIsImprovingPrompt] = useState(false);
   const [selectedGeneration, setSelectedGeneration] = useState<any | null>(null);
@@ -223,7 +224,7 @@ const PromptMaker = () => {
         ratio: ratio,
         prompt: `${style} style: ${prompt}` || `${style} this image`,
         data: {
-          lora_scale: 0.5,
+          lora_scale: parseFloat(loraScale),
           style: style,
           seed: -1
         }
@@ -408,7 +409,7 @@ const PromptMaker = () => {
             <div className="space-y-6">
               <Card className="p-6 bg-background/50 backdrop-blur">
                 <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-3 gap-4">
                     <div>
                       <Label htmlFor="ratio">Aspect Ratio</Label>
                       <Select value={ratio} onValueChange={setRatio}>
@@ -439,6 +440,25 @@ const PromptMaker = () => {
                           <SelectItem value="Comic book">Comic book</SelectItem>
                           <SelectItem value="Lowpoly">Lowpoly</SelectItem>
                           <SelectItem value="Line art">Line art</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="loraScale">Character Reference Strength</Label>
+                      <Select value={loraScale} onValueChange={setLoraScale}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select strength" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="0.2">0.2</SelectItem>
+                          <SelectItem value="0.3">0.3</SelectItem>
+                          <SelectItem value="0.4">0.4</SelectItem>
+                          <SelectItem value="0.5">0.5</SelectItem>
+                          <SelectItem value="0.6">0.6</SelectItem>
+                          <SelectItem value="0.7">0.7</SelectItem>
+                          <SelectItem value="0.8">0.8</SelectItem>
+                          <SelectItem value="0.9">0.9</SelectItem>
+                          <SelectItem value="1.0">1.0</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
