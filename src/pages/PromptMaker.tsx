@@ -10,63 +10,32 @@ import { DotPattern } from "@/components/ui/dot-pattern";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/useSession";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-
-const ImagePreview = ({ 
-  imagePreview, 
-  isUploading, 
-  isProcessing, 
-  onRemove 
-}: { 
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+const ImagePreview = ({
+  imagePreview,
+  isUploading,
+  isProcessing,
+  onRemove
+}: {
   imagePreview: string | null;
   isUploading: boolean;
   isProcessing: boolean;
   onRemove: (e: React.MouseEvent) => void;
 }) => {
   if (!imagePreview) {
-    return (
-      <label
-        htmlFor="reference-image"
-        className="cursor-pointer block"
-      >
+    return <label htmlFor="reference-image" className="cursor-pointer block">
         <div className="h-8 w-8 rounded-md bg-white/10 backdrop-blur border border-white/20 p-1.5 hover:bg-white/20 flex items-center justify-center">
           <Image className="h-full w-full text-white/70" />
         </div>
-      </label>
-    );
+      </label>;
   }
-
-  return (
-    <button
-      type="button"
-      className="h-8 w-8 rounded-md bg-white/10 backdrop-blur border border-white/20 p-0.5 hover:bg-white/20 group relative"
-      onClick={onRemove}
-      disabled={isUploading || isProcessing}
-    >
-      <img 
-        src={imagePreview} 
-        alt="Reference" 
-        className="w-full h-full object-cover rounded transition-opacity group-hover:opacity-50"
-      />
+  return <button type="button" className="h-8 w-8 rounded-md bg-white/10 backdrop-blur border border-white/20 p-0.5 hover:bg-white/20 group relative" onClick={onRemove} disabled={isUploading || isProcessing}>
+      <img src={imagePreview} alt="Reference" className="w-full h-full object-cover rounded transition-opacity group-hover:opacity-50" />
       <X className="absolute inset-0 m-auto h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
-    </button>
-  );
+    </button>;
 };
-
 const CREDITS_PER_GENERATION = 14;
-
 const PromptMaker = () => {
   const [prompt, setPrompt] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -83,27 +52,27 @@ const PromptMaker = () => {
   const [showPromptDialog, setShowPromptDialog] = useState(false);
   const [credits, setCredits] = useState<number | null>(null);
   const [isLoadingCredits, setIsLoadingCredits] = useState(true);
-  const { session } = useSession();
-  const { toast } = useToast();
+  const {
+    session
+  } = useSession();
+  const {
+    toast
+  } = useToast();
   const previewRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<NodeJS.Timeout>();
-
   useEffect(() => {
     if (session?.user) {
       fetchPreviousGenerations();
       fetchUserCredits();
     }
   }, [session?.user]);
-
   const fetchUserCredits = async () => {
     try {
       setIsLoadingCredits(true);
-      const { data, error } = await supabase
-        .from('user_credits')
-        .select('credits')
-        .eq('user_id', session?.user?.id)
-        .single();
-
+      const {
+        data,
+        error
+      } = await supabase.from('user_credits').select('credits').eq('user_id', session?.user?.id).single();
       if (error) throw error;
       setCredits(data?.credits ?? null);
     } catch (error) {
@@ -111,25 +80,21 @@ const PromptMaker = () => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to fetch credits",
+        description: "Failed to fetch credits"
       });
     } finally {
       setIsLoadingCredits(false);
     }
   };
-
   const updateUserCredits = async (creditsToDeduct: number) => {
     try {
-      const { data, error } = await supabase
-        .from('user_credits')
-        .update({ 
-          credits: (credits ?? 0) - creditsToDeduct,
-          updated_at: new Date().toISOString()
-        })
-        .eq('user_id', session?.user?.id)
-        .select('credits')
-        .single();
-
+      const {
+        data,
+        error
+      } = await supabase.from('user_credits').update({
+        credits: (credits ?? 0) - creditsToDeduct,
+        updated_at: new Date().toISOString()
+      }).eq('user_id', session?.user?.id).select('credits').single();
       if (error) throw error;
       setCredits(data?.credits ?? null);
       return true;
@@ -138,26 +103,21 @@ const PromptMaker = () => {
       return false;
     }
   };
-
   const fetchPreviousGenerations = async () => {
     try {
-      const { data, error } = await supabase
-        .from('generated_images')
-        .select('*')
-        .order('created_at', { ascending: false });
-
+      const {
+        data,
+        error
+      } = await supabase.from('generated_images').select('*').order('created_at', {
+        ascending: false
+      });
       if (error) throw error;
-      
-      const uniqueGenerations = data?.filter((gen, index, self) =>
-        index === self.findIndex(g => g.image_url === gen.image_url)
-      ) || [];
-      
+      const uniqueGenerations = data?.filter((gen, index, self) => index === self.findIndex(g => g.image_url === gen.image_url)) || [];
       setPreviousGenerations(uniqueGenerations);
     } catch (error) {
       console.error('Error fetching previous generations:', error);
     }
   };
-
   useEffect(() => {
     if (isProcessing) {
       setElapsedTime(0);
@@ -169,14 +129,12 @@ const PromptMaker = () => {
         clearInterval(timerRef.current);
       }
     }
-
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
     };
   }, [isProcessing]);
-
   const formatTime = (milliseconds: number) => {
     const seconds = Math.floor(milliseconds / 1000);
     const ms = milliseconds % 1000;
@@ -184,49 +142,42 @@ const PromptMaker = () => {
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}.${ms.toString().padStart(3, '0')}`;
   };
-
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     try {
       setIsUploading(true);
-
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
       };
       reader.readAsDataURL(file);
-
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `${fileName}`;
-
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('images')
-        .upload(filePath, file);
-
+      const {
+        data: uploadData,
+        error: uploadError
+      } = await supabase.storage.from('images').upload(filePath, file);
       if (uploadError) {
         throw new Error('Failed to upload image to storage');
       }
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('images')
-        .getPublicUrl(filePath);
-
+      const {
+        data: {
+          publicUrl
+        }
+      } = supabase.storage.from('images').getPublicUrl(filePath);
       setUploadedImageUrl(publicUrl);
-      
       toast({
         title: "Success",
-        description: "Image uploaded successfully",
+        description: "Image uploaded successfully"
       });
-
     } catch (error) {
       console.error("Upload error:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to upload image",
+        description: error instanceof Error ? error.message : "Failed to upload image"
       });
       setImagePreview(null);
       setUploadedImageUrl(null);
@@ -234,31 +185,27 @@ const PromptMaker = () => {
       setIsUploading(false);
     }
   };
-
   const handleGenerate = async () => {
     if (!session?.user) {
       toast({
         title: "Authentication Required",
         description: "Please sign in to generate images.",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     if (credits !== null && credits < CREDITS_PER_GENERATION) {
       toast({
         title: "Insufficient Credits",
         description: "You've run out of credits. Please contact support at support@lovable.ai to purchase more credits.",
         variant: "destructive",
-        duration: 6000,
+        duration: 6000
       });
       return;
     }
-
     try {
       setIsProcessing(true);
       setElapsedTime(0);
-
       const requestBody = {
         pipeline_id: "803a4MBY",
         imageUrl: uploadedImageUrl || "",
@@ -270,9 +217,7 @@ const PromptMaker = () => {
           seed: -1
         }
       };
-
       console.log("Sending request with body:", requestBody);
-      
       const pipelineResponse = await fetch('https://api.kimera.ai/v1/pipeline/run', {
         method: 'POST',
         headers: {
@@ -281,66 +226,57 @@ const PromptMaker = () => {
         },
         body: JSON.stringify(requestBody)
       });
-
       if (!pipelineResponse.ok) {
         const errorData = await pipelineResponse.json();
         console.error("Pipeline error response:", errorData);
         throw new Error('Failed to process image');
       }
-
-      const { id: jobId } = await pipelineResponse.json();
+      const {
+        id: jobId
+      } = await pipelineResponse.json();
       console.log("Job started with ID:", jobId);
-
       const pollInterval = setInterval(async () => {
         const statusResponse = await fetch(`https://api.kimera.ai/v1/pipeline/run/${jobId}`, {
           headers: {
             'x-api-key': "1712edc40e3eb72c858332fe7500bf33e885324f8c1cd52b8cded2cdfd724cee"
           }
         });
-
         if (!statusResponse.ok) {
           clearInterval(pollInterval);
           throw new Error('Failed to check status');
         }
-
         const status = await statusResponse.json();
         console.log("Current status:", status);
-        
         if (status.status === 'completed') {
           clearInterval(pollInterval);
           setGeneratedImage(status.result);
           setIsProcessing(false);
-
           const creditUpdateSuccess = await updateUserCredits(CREDITS_PER_GENERATION);
           if (!creditUpdateSuccess) {
             toast({
               variant: "destructive",
               title: "Error",
-              description: "Failed to update credits",
+              description: "Failed to update credits"
             });
             return;
           }
-
-          const { error: dbError } = await supabase
-            .from('generated_images')
-            .insert({
-              user_id: session.user.id,
-              image_url: status.result,
-              prompt: prompt,
-              style: style,
-              ratio: ratio
-            });
-
+          const {
+            error: dbError
+          } = await supabase.from('generated_images').insert({
+            user_id: session.user.id,
+            image_url: status.result,
+            prompt: prompt,
+            style: style,
+            ratio: ratio
+          });
           if (dbError) {
             console.error('Error storing generation:', dbError);
             throw new Error('Failed to store generation');
           }
-
           await fetchPreviousGenerations();
-
           toast({
             title: "Success",
-            description: "Image has been generated successfully!",
+            description: "Image has been generated successfully!"
           });
         } else if (status.status === 'failed' || status.status === 'Error') {
           clearInterval(pollInterval);
@@ -348,17 +284,15 @@ const PromptMaker = () => {
           throw new Error('Processing failed');
         }
       }, 2000);
-
     } catch (error) {
       setIsProcessing(false);
       toast({
         variant: "destructive",
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to process image",
+        description: error instanceof Error ? error.message : "Failed to process image"
       });
     }
   };
-
   const removeImage = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -366,30 +300,31 @@ const PromptMaker = () => {
     setUploadedImageUrl(null);
     setGeneratedImage(null);
   }, []);
-
   const handleImprovePrompt = async () => {
     if (!prompt) {
       toast({
         title: "Empty Prompt",
         description: "Please enter a prompt to improve",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     try {
       setIsImprovingPrompt(true);
-      const { data, error } = await supabase.functions.invoke('improve-prompt', {
-        body: { prompt },
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('improve-prompt', {
+        body: {
+          prompt
+        }
       });
-
       if (error) throw error;
-
       if (data?.improvedPrompt) {
         setPrompt(data.improvedPrompt);
         toast({
           title: "Prompt Improved",
-          description: "Your prompt has been enhanced with more details.",
+          description: "Your prompt has been enhanced with more details."
         });
       }
     } catch (error) {
@@ -397,18 +332,16 @@ const PromptMaker = () => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to improve the prompt. Please try again.",
+        description: "Failed to improve the prompt. Please try again."
       });
     } finally {
       setIsImprovingPrompt(false);
     }
   };
-
   const handleImageClick = (generation: any) => {
     setSelectedGeneration(generation);
     setShowPromptDialog(true);
   };
-
   const handleDownload = async (imageUrl: string) => {
     try {
       const response = await fetch(imageUrl);
@@ -421,33 +354,23 @@ const PromptMaker = () => {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-      
       toast({
         title: "Success",
-        description: "Image downloaded successfully",
+        description: "Image downloaded successfully"
       });
     } catch (error) {
       console.error('Error downloading image:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to download image",
+        description: "Failed to download image"
       });
     }
   };
-
-  return (
-    <BaseLayout>
+  return <BaseLayout>
       <div className="relative min-h-screen">
         <div className="absolute inset-0 pointer-events-none">
-          <DotPattern 
-            width={24} 
-            height={24} 
-            className="[mask-image:radial-gradient(900px_circle_at_center,white,transparent)]"
-            cx={1}
-            cy={1}
-            cr={1}
-          />
+          <DotPattern width={24} height={24} className="[mask-image:radial-gradient(900px_circle_at_center,white,transparent)]" cx={1} cy={1} cr={1} />
         </div>
         
         <div className="relative z-10">
@@ -455,18 +378,12 @@ const PromptMaker = () => {
             <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Kimera Image Generation
             </h1>
-            {session?.user && (
-              <div className="flex items-center gap-2 bg-background/50 backdrop-blur px-4 py-2 rounded-full">
+            {session?.user && <div className="flex items-center gap-2 backdrop-blur px-4 py-2 rounded-full bg-purple-600">
                 <Coins className="w-4 h-4 text-yellow-500" />
                 <span className="font-mono">
-                  {isLoadingCredits ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    `${credits ?? 0} credits`
-                  )}
+                  {isLoadingCredits ? <Loader2 className="w-4 h-4 animate-spin" /> : `${credits ?? 0} credits`}
                 </span>
-              </div>
-            )}
+              </div>}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -512,61 +429,25 @@ const PromptMaker = () => {
                   <div>
                     <Label htmlFor="prompt">Prompt</Label>
                     <div className="relative">
-                      <Input
-                        id="reference-image"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="hidden"
-                        disabled={isUploading || isProcessing}
-                      />
+                      <Input id="reference-image" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={isUploading || isProcessing} />
                       <div className="relative">
-                        <div 
-                          ref={previewRef}
-                          className="absolute left-3 top-3 z-[9999] pointer-events-auto"
-                          style={{ 
-                            position: 'absolute',
-                            isolation: 'isolate'
-                          }}
-                        >
-                          <ImagePreview 
-                            imagePreview={imagePreview}
-                            isUploading={isUploading}
-                            isProcessing={isProcessing}
-                            onRemove={removeImage}
-                          />
+                        <div ref={previewRef} className="absolute left-3 top-3 z-[9999] pointer-events-auto" style={{
+                        position: 'absolute',
+                        isolation: 'isolate'
+                      }}>
+                          <ImagePreview imagePreview={imagePreview} isUploading={isUploading} isProcessing={isProcessing} onRemove={removeImage} />
                         </div>
                         <div className="relative">
-                          <Textarea
-                            id="prompt"
-                            placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..."
-                            value={prompt}
-                            onChange={(e) => setPrompt(e.target.value)}
-                            className="h-32 resize-none bg-background/50 pl-14"
-                          />
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="absolute bottom-3 left-3 text-primary/70 hover:text-primary hover:bg-primary/10 hover:scale-110 transition-all hover:shadow-[0_0_15px_rgba(155,135,245,0.3)] backdrop-blur-sm"
-                            onClick={handleImprovePrompt}
-                            disabled={isImprovingPrompt}
-                          >
-                            {isImprovingPrompt ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <Sparkles className="h-4 w-4" />
-                            )}
+                          <Textarea id="prompt" placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..." value={prompt} onChange={e => setPrompt(e.target.value)} className="h-32 resize-none bg-background/50 pl-14" />
+                          <Button variant="ghost" size="icon" className="absolute bottom-3 left-3 text-primary/70 hover:text-primary hover:bg-primary/10 hover:scale-110 transition-all hover:shadow-[0_0_15px_rgba(155,135,245,0.3)] backdrop-blur-sm" onClick={handleImprovePrompt} disabled={isImprovingPrompt}>
+                            {isImprovingPrompt ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                           </Button>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <Button 
-                    className="w-full" 
-                    disabled={isProcessing}
-                    onClick={handleGenerate}
-                  >
+                  <Button className="w-full" disabled={isProcessing} onClick={handleGenerate}>
                     <Sparkles className="w-4 h-4 mr-2" />
                     {isProcessing ? "Processing..." : "Generate"}
                   </Button>
@@ -580,28 +461,15 @@ const PromptMaker = () => {
                 </h2>
                 <div className="max-h-[400px] overflow-y-auto pr-2">
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    {previousGenerations.map((gen) => (
-                      <div key={gen.id} className="space-y-3">
+                    {previousGenerations.map(gen => <div key={gen.id} className="space-y-3">
                         <div className="relative group">
-                          <button 
-                            className="w-full text-left"
-                            onClick={() => handleImageClick(gen)}
-                          >
-                            <img 
-                              src={gen.image_url} 
-                              alt={gen.prompt} 
-                              className="w-full aspect-square object-cover rounded-lg hover:opacity-90 transition-opacity"
-                            />
+                          <button className="w-full text-left" onClick={() => handleImageClick(gen)}>
+                            <img src={gen.image_url} alt={gen.prompt} className="w-full aspect-square object-cover rounded-lg hover:opacity-90 transition-opacity" />
                           </button>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDownload(gen.image_url);
-                            }}
-                            className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity bg-background/50 backdrop-blur hover:bg-background/80"
-                          >
+                          <Button variant="outline" size="icon" onClick={e => {
+                        e.stopPropagation();
+                        handleDownload(gen.image_url);
+                      }} className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity bg-background/50 backdrop-blur hover:bg-background/80">
                             <Download className="h-4 w-4" />
                           </Button>
                         </div>
@@ -609,34 +477,23 @@ const PromptMaker = () => {
                           <span>Style: {gen.style}</span>
                           <span>Ratio: {gen.ratio}</span>
                         </div>
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
                 </div>
               </Card>
             </div>
 
             <Card className="p-6 bg-background/50 backdrop-blur relative aspect-[2/3] flex items-center justify-center">
-              {isProcessing && (
-                <div className="absolute inset-0 flex items-center justify-center z-10">
+              {isProcessing && <div className="absolute inset-0 flex items-center justify-center z-10">
                   <div className="flex items-center gap-2 bg-background/80 backdrop-blur px-6 py-3 rounded-full text-lg font-mono">
                     <Clock className="w-6 h-6 animate-pulse" />
                     <span>{formatTime(elapsedTime)}</span>
                   </div>
-                </div>
-              )}
-              {generatedImage ? (
-                <img 
-                  src={generatedImage} 
-                  alt="Generated" 
-                  className="w-full h-full object-cover rounded-lg shadow-lg"
-                />
-              ) : (
-                <div className="text-center text-muted-foreground">
+                </div>}
+              {generatedImage ? <img src={generatedImage} alt="Generated" className="w-full h-full object-cover rounded-lg shadow-lg" /> : <div className="text-center text-muted-foreground">
                   <Image className="w-12 h-12 mx-auto mb-4 opacity-50" />
                   <p>Your generated images will appear here</p>
-                </div>
-              )}
+                </div>}
             </Card>
           </div>
         </div>
@@ -647,26 +504,14 @@ const PromptMaker = () => {
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
               Generation Details
-              {selectedGeneration && (
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handleDownload(selectedGeneration.image_url)}
-                  className="h-8 w-8"
-                >
+              {selectedGeneration && <Button variant="outline" size="icon" onClick={() => handleDownload(selectedGeneration.image_url)} className="h-8 w-8">
                   <Download className="h-4 w-4" />
-                </Button>
-              )}
+                </Button>}
             </DialogTitle>
           </DialogHeader>
-          {selectedGeneration && (
-            <div className="space-y-4 h-full">
+          {selectedGeneration && <div className="space-y-4 h-full">
               <div className="relative h-[calc(90vh-12rem)] flex items-center justify-center rounded-lg bg-background/50">
-                <img 
-                  src={selectedGeneration.image_url} 
-                  alt={selectedGeneration.prompt}
-                  className="max-w-full max-h-full object-contain"
-                />
+                <img src={selectedGeneration.image_url} alt={selectedGeneration.prompt} className="max-w-full max-h-full object-contain" />
               </div>
               <div className="space-y-2">
                 <Label>Prompt</Label>
@@ -684,12 +529,9 @@ const PromptMaker = () => {
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            </div>}
         </DialogContent>
       </Dialog>
-    </BaseLayout>
-  );
+    </BaseLayout>;
 };
-
 export default PromptMaker;
