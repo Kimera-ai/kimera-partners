@@ -17,21 +17,23 @@ const ImagePreview = ({
   imagePreview,
   isUploading,
   isProcessing,
-  onRemove
+  onRemove,
+  disabled
 }: {
   imagePreview: string | null;
   isUploading: boolean;
   isProcessing: boolean;
   onRemove: (e: React.MouseEvent) => void;
+  disabled?: boolean;
 }) => {
   if (!imagePreview) {
-    return <label htmlFor="reference-image" className="cursor-pointer block">
+    return <label htmlFor="reference-image" className={`cursor-pointer block ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
         <div className="h-8 w-8 rounded-md bg-white/10 backdrop-blur border border-white/20 p-1.5 hover:bg-white/20 flex items-center justify-center">
           <Image className="h-full w-full text-white/70" />
         </div>
       </label>;
   }
-  return <button type="button" className="h-8 w-8 rounded-md bg-white/10 backdrop-blur border border-white/20 p-0.5 hover:bg-white/20 group relative" onClick={onRemove} disabled={isUploading || isProcessing}>
+  return <button type="button" className={`h-8 w-8 rounded-md bg-white/10 backdrop-blur border border-white/20 p-0.5 hover:bg-white/20 group relative ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`} onClick={onRemove} disabled={isUploading || isProcessing || disabled}>
       <img src={imagePreview} alt="Reference" className="w-full h-full object-cover rounded transition-opacity group-hover:opacity-50" />
       <X className="absolute inset-0 m-auto h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
     </button>;
@@ -481,9 +483,9 @@ const PromptMaker = () => {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="space-y-2">
+                    <div className={`space-y-2 ${workflow === 'no-reference' ? 'opacity-50 pointer-events-none' : ''}`}>
                       <Label htmlFor="loraScale" className="text-sm font-medium block">Character Reference Strength</Label>
-                      <Select value={loraScale} onValueChange={setLoraScale}>
+                      <Select value={loraScale} onValueChange={setLoraScale} disabled={workflow === 'no-reference'}>
                         <SelectTrigger id="loraScale" className="w-full">
                           <SelectValue placeholder="Select strength" />
                         </SelectTrigger>
@@ -517,17 +519,42 @@ const PromptMaker = () => {
                   <div>
                     <Label htmlFor="prompt">Prompt</Label>
                     <div className="relative">
-                      <Input id="reference-image" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={isUploading || isProcessing} />
+                      <Input 
+                        id="reference-image" 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleImageUpload} 
+                        className="hidden" 
+                        disabled={isUploading || isProcessing || workflow === 'no-reference'} 
+                      />
                       <div className="relative">
                         <div ref={previewRef} className="absolute left-3 top-3 z-[9999] pointer-events-auto" style={{
                         position: 'absolute',
                         isolation: 'isolate'
                       }}>
-                          <ImagePreview imagePreview={imagePreview} isUploading={isUploading} isProcessing={isProcessing} onRemove={removeImage} />
+                          <ImagePreview 
+                            imagePreview={imagePreview} 
+                            isUploading={isUploading} 
+                            isProcessing={isProcessing} 
+                            onRemove={removeImage}
+                            disabled={workflow === 'no-reference'}
+                          />
                         </div>
                         <div className="relative">
-                          <Textarea id="prompt" placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..." value={prompt} onChange={e => setPrompt(e.target.value)} className="h-32 resize-none bg-background/50 pl-14" />
-                          <Button variant="ghost" size="icon" className="absolute bottom-3 left-3 text-primary/70 hover:text-primary hover:bg-primary/10 hover:scale-110 transition-all hover:shadow-[0_0_15px_rgba(155,135,245,0.3)] backdrop-blur-sm" onClick={handleImprovePrompt} disabled={isImprovingPrompt}>
+                          <Textarea 
+                            id="prompt" 
+                            placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..." 
+                            value={prompt} 
+                            onChange={e => setPrompt(e.target.value)} 
+                            className="h-32 resize-none bg-background/50 pl-14" 
+                          />
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="absolute bottom-3 left-3 text-primary/70 hover:text-primary hover:bg-primary/10 hover:scale-110 transition-all hover:shadow-[0_0_15px_rgba(155,135,245,0.3)] backdrop-blur-sm" 
+                            onClick={handleImprovePrompt} 
+                            disabled={isImprovingPrompt}
+                          >
                             {isImprovingPrompt ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                           </Button>
                         </div>
