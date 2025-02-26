@@ -71,8 +71,7 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
             <iframe 
               src={`https://kimeracrm.netlify.app/embed/event-form?${formParams.toString()}`}
               width="100%" 
-              height="800px"
-              className="rounded-xl bg-transparent"
+              className="rounded-xl bg-transparent h-[calc(100vh-12rem)] min-h-[600px] md:h-[calc(100vh-16rem)] lg:h-[calc(100vh-20rem)]"
               style={{ border: 'none' }}
               title="Event Request Form"
               onLoad={() => setIsLoading(false)}
