@@ -461,7 +461,7 @@ const PromptMaker = () => {
 
                   <div className="grid grid-cols-4 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="ratio" className="text-sm font-medium block">Aspect Ratio</Label>
+                      <Label htmlFor="ratio" className="text-sm font-medium block truncate">Aspect Ratio</Label>
                       <Select value={ratio} onValueChange={setRatio}>
                         <SelectTrigger id="ratio" className="w-full">
                           <SelectValue placeholder="Select ratio" />
@@ -474,7 +474,7 @@ const PromptMaker = () => {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="style" className="text-sm font-medium block">Style</Label>
+                      <Label htmlFor="style" className="text-sm font-medium block truncate">Style</Label>
                       <Select value={style} onValueChange={setStyle}>
                         <SelectTrigger id="style" className="w-full">
                           <SelectValue placeholder="Select style" />
@@ -493,10 +493,10 @@ const PromptMaker = () => {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className={`space-y-2 ${workflow === 'no-reference' ? 'opacity-50 pointer-events-none' : ''}`}>
-                      <Label htmlFor="loraScale" className="text-sm font-medium block">Character Reference Strength</Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="loraScale" className="text-sm font-medium block truncate whitespace-nowrap text-ellipsis">Character Reference Strength</Label>
                       <Select value={loraScale} onValueChange={setLoraScale} disabled={workflow === 'no-reference'}>
-                        <SelectTrigger id="loraScale" className="w-full">
+                        <SelectTrigger id="loraScale" className={`w-full ${workflow === 'no-reference' ? 'opacity-50' : ''}`}>
                           <SelectValue placeholder="Select strength" />
                         </SelectTrigger>
                         <SelectContent>
@@ -513,7 +513,7 @@ const PromptMaker = () => {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="seed" className="text-sm font-medium block">Seed</Label>
+                      <Label htmlFor="seed" className="text-sm font-medium block truncate">Seed</Label>
                       <Select value={seed} onValueChange={setSeed}>
                         <SelectTrigger id="seed" className="w-full">
                           <SelectValue placeholder="Select seed" />
