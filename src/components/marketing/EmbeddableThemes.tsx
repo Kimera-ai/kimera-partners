@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { GalleryHorizontal, Loader2, AlertCircle, X } from 'lucide-react';
@@ -28,8 +29,7 @@ const EmbeddableThemes = () => {
       console.log('Starting to fetch themes...');
       const { data: themeData, error: themeError } = await supabase
         .from('themes')
-        .select('*')
-        .order('title');
+        .select('*');
 
       if (themeError) {
         console.error('Error fetching themes:', themeError);
@@ -37,7 +37,7 @@ const EmbeddableThemes = () => {
         return;
       }
 
-      if (!themeData || themeData.length === 0) {
+      if (!themeData) {
         setError('No themes found in the database');
         return;
       }
@@ -192,7 +192,6 @@ const EmbeddableThemes = () => {
         ))}
       </div>
 
-      {/* Image Preview Modal */}
       {selectedImage && (
         <div 
           className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
