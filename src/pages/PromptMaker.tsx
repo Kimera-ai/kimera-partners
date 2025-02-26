@@ -13,7 +13,6 @@ import { useSession } from "@/hooks/useSession";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-
 const ImagePreview = ({
   imagePreview,
   isUploading,
@@ -39,9 +38,7 @@ const ImagePreview = ({
       <X className="absolute inset-0 m-auto h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
     </button>;
 };
-
 const CREDITS_PER_GENERATION = 14;
-
 const PromptMaker = () => {
   const [prompt, setPrompt] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -61,18 +58,20 @@ const PromptMaker = () => {
   const [credits, setCredits] = useState<number | null>(null);
   const [isLoadingCredits, setIsLoadingCredits] = useState(true);
   const [workflow, setWorkflow] = useState("no-reference");
-  const { session } = useSession();
-  const { toast } = useToast();
+  const {
+    session
+  } = useSession();
+  const {
+    toast
+  } = useToast();
   const previewRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<NodeJS.Timeout>();
-
   useEffect(() => {
     if (session?.user) {
       fetchPreviousGenerations();
       fetchUserCredits();
     }
   }, [session?.user]);
-
   const fetchUserCredits = async () => {
     try {
       setIsLoadingCredits(true);
@@ -93,7 +92,6 @@ const PromptMaker = () => {
       setIsLoadingCredits(false);
     }
   };
-
   const updateUserCredits = async (creditsToDeduct: number) => {
     try {
       const {
@@ -111,7 +109,6 @@ const PromptMaker = () => {
       return false;
     }
   };
-
   const fetchPreviousGenerations = async () => {
     try {
       const {
@@ -127,7 +124,6 @@ const PromptMaker = () => {
       console.error('Error fetching previous generations:', error);
     }
   };
-
   useEffect(() => {
     if (isProcessing) {
       setElapsedTime(0);
@@ -145,7 +141,6 @@ const PromptMaker = () => {
       }
     };
   }, [isProcessing]);
-
   const formatTime = (milliseconds: number) => {
     const seconds = Math.floor(milliseconds / 1000);
     const ms = milliseconds % 1000;
@@ -153,7 +148,6 @@ const PromptMaker = () => {
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}.${ms.toString().padStart(3, '0')}`;
   };
-
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -197,7 +191,6 @@ const PromptMaker = () => {
       setIsUploading(false);
     }
   };
-
   const handleGenerate = async () => {
     if (!session?.user) {
       toast({
@@ -216,7 +209,6 @@ const PromptMaker = () => {
       });
       return;
     }
-
     if ((workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl) {
       toast({
         title: "Image Required",
@@ -225,12 +217,10 @@ const PromptMaker = () => {
       });
       return;
     }
-
     try {
       setIsProcessing(true);
       setElapsedTime(0);
       const defaultImageUrl = "https://cdn.discordapp.com/attachments/1276822658083979275/1344299399907381258/Untitled-1.jpg?ex=67c067e0&is=67bf1660&hm=f4c5e15bae4887d9fd5efb6deb7c15065341f8a035ee7b6424e5fcf95d403ee2&";
-      
       const getPipelineId = () => {
         switch (workflow) {
           case "with-reference":
@@ -241,7 +231,6 @@ const PromptMaker = () => {
             return "803a4MBY";
         }
       };
-
       const requestBody = {
         pipeline_id: getPipelineId(),
         imageUrl: uploadedImageUrl || defaultImageUrl,
@@ -253,7 +242,6 @@ const PromptMaker = () => {
           seed: seed === "random" ? -1 : 1234
         }
       };
-      
       const pipelineResponse = await fetch('https://api.kimera.ai/v1/pipeline/run', {
         method: 'POST',
         headers: {
@@ -262,37 +250,30 @@ const PromptMaker = () => {
         },
         body: JSON.stringify(requestBody)
       });
-
       if (!pipelineResponse.ok) {
         const errorData = await pipelineResponse.json();
         console.error("Pipeline error response:", errorData);
         throw new Error('Failed to process image');
       }
-
       const responseData = await pipelineResponse.json();
       const jobId = responseData.id;
       console.log("Job started with ID:", jobId);
-
       const pollInterval = setInterval(async () => {
         const statusResponse = await fetch(`https://api.kimera.ai/v1/pipeline/run/${jobId}`, {
           headers: {
             'x-api-key': "1712edc40e3eb72c858332fe7500bf33e885324f8c1cd52b8cded2cdfd724cee"
           }
         });
-
         if (!statusResponse.ok) {
           clearInterval(pollInterval);
           throw new Error('Failed to check status');
         }
-
         const status = await statusResponse.json();
         console.log("Current status:", status);
-
         if (status.status === 'completed') {
           clearInterval(pollInterval);
           setGeneratedImage(status.result);
           setIsProcessing(false);
-
           const creditUpdateSuccess = await updateUserCredits(CREDITS_PER_GENERATION);
           if (!creditUpdateSuccess) {
             toast({
@@ -302,24 +283,21 @@ const PromptMaker = () => {
             });
             return;
           }
-
-          const { error: dbError } = await supabase
-            .from('generated_images')
-            .insert({
-              user_id: session.user.id,
-              image_url: status.result,
-              prompt: prompt,
-              style: style,
-              ratio: ratio,
-              lora_scale: loraScale
-            });
-
+          const {
+            error: dbError
+          } = await supabase.from('generated_images').insert({
+            user_id: session.user.id,
+            image_url: status.result,
+            prompt: prompt,
+            style: style,
+            ratio: ratio,
+            lora_scale: loraScale
+          });
           if (dbError) {
             console.error('Error storing generation:', dbError);
           } else {
             await fetchPreviousGenerations();
           }
-
           toast({
             title: "Success",
             description: "Image has been generated successfully!"
@@ -340,7 +318,6 @@ const PromptMaker = () => {
       });
     }
   };
-
   const removeImage = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -348,7 +325,6 @@ const PromptMaker = () => {
     setUploadedImageUrl(null);
     setGeneratedImage(null);
   }, []);
-
   const handleImprovePrompt = async () => {
     if (!prompt) {
       toast({
@@ -387,12 +363,10 @@ const PromptMaker = () => {
       setIsImprovingPrompt(false);
     }
   };
-
   const handleImageClick = (generation: any) => {
     setSelectedGeneration(generation);
     setShowPromptDialog(true);
   };
-
   const handleDownload = async (imageUrl: string) => {
     try {
       const response = await fetch(imageUrl);
@@ -418,7 +392,6 @@ const PromptMaker = () => {
       });
     }
   };
-
   return <BaseLayout>
       <div className="relative min-h-screen">
         <div className="absolute inset-0 pointer-events-none">
@@ -430,14 +403,12 @@ const PromptMaker = () => {
             <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Kimera Image Generation
             </h1>
-            {session?.user && (
-              <div className="flex items-center gap-2 backdrop-blur px-4 py-2 rounded-full bg-background/50">
+            {session?.user && <div className="flex items-center gap-2 backdrop-blur px-4 py-2 rounded-full bg-background/50">
                 <Coins className="w-4 h-4 text-yellow-500" />
                 <span className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                   {isLoadingCredits ? <Loader2 className="w-4 h-4 animate-spin" /> : `${credits ?? 0} credits`}
                 </span>
-              </div>
-            )}
+              </div>}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -566,42 +537,17 @@ const PromptMaker = () => {
                   <div>
                     <Label htmlFor="prompt">Prompt</Label>
                     <div className="relative">
-                      <Input 
-                        id="reference-image" 
-                        type="file" 
-                        accept="image/*" 
-                        onChange={handleImageUpload} 
-                        className="hidden" 
-                        disabled={isUploading || isProcessing || workflow === 'no-reference'} 
-                      />
+                      <Input id="reference-image" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={isUploading || isProcessing || workflow === 'no-reference'} />
                       <div className="relative">
                         <div ref={previewRef} className="absolute left-3 top-3 z-[9999] pointer-events-auto" style={{
                         position: 'absolute',
                         isolation: 'isolate'
                       }}>
-                          <ImagePreview 
-                            imagePreview={imagePreview} 
-                            isUploading={isUploading} 
-                            isProcessing={isProcessing} 
-                            onRemove={removeImage}
-                            disabled={workflow === 'no-reference'}
-                          />
+                          <ImagePreview imagePreview={imagePreview} isUploading={isUploading} isProcessing={isProcessing} onRemove={removeImage} disabled={workflow === 'no-reference'} />
                         </div>
                         <div className="relative">
-                          <Textarea 
-                            id="prompt" 
-                            placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..." 
-                            value={prompt} 
-                            onChange={e => setPrompt(e.target.value)} 
-                            className="h-32 resize-none bg-background/50 pl-14" 
-                          />
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="absolute bottom-3 left-3 text-primary/70 hover:text-primary hover:bg-primary/10 hover:scale-110 transition-all hover:shadow-[0_0_15px_rgba(155,135,245,0.3)] backdrop-blur-sm" 
-                            onClick={handleImprovePrompt} 
-                            disabled={isImprovingPrompt}
-                          >
+                          <Textarea id="prompt" placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..." value={prompt} onChange={e => setPrompt(e.target.value)} className="h-32 resize-none bg-background/50 pl-14" />
+                          <Button variant="ghost" size="icon" className="absolute bottom-3 left-3 text-primary/70 hover:text-primary hover:bg-primary/10 hover:scale-110 transition-all hover:shadow-[0_0_15px_rgba(155,135,245,0.3)] backdrop-blur-sm" onClick={handleImprovePrompt} disabled={isImprovingPrompt}>
                             {isImprovingPrompt ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                           </Button>
                         </div>
@@ -609,13 +555,9 @@ const PromptMaker = () => {
                     </div>
                   </div>
 
-                  <Button 
-                    className="w-full" 
-                    disabled={isProcessing || ((workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl)} 
-                    onClick={handleGenerate}
-                  >
+                  <Button className="w-full" disabled={isProcessing || (workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl} onClick={handleGenerate}>
                     <Sparkles className="w-4 h-4 mr-2" />
-                    {isProcessing ? "Processing..." : ((workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl) ? "Upload an image" : "Generate"}
+                    {isProcessing ? "Processing..." : (workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl ? "Upload an image" : "Generate"}
                   </Button>
                 </div>
               </Card>
@@ -633,9 +575,9 @@ const PromptMaker = () => {
                             <img src={gen.image_url} alt={gen.prompt} className="w-full aspect-square object-cover rounded-lg hover:opacity-90 transition-opacity" />
                           </button>
                           <Button variant="outline" size="icon" onClick={e => {
-                            e.stopPropagation();
-                            handleDownload(gen.image_url);
-                          }} className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity bg-background/50 backdrop-blur hover:bg-background/80">
+                        e.stopPropagation();
+                        handleDownload(gen.image_url);
+                      }} className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity bg-background/50 backdrop-blur hover:bg-background/80">
                             <Download className="h-4 w-4" />
                           </Button>
                         </div>
@@ -657,7 +599,7 @@ const PromptMaker = () => {
 
             <Card className="p-6 bg-background/50 backdrop-blur relative aspect-[2/3] flex items-center justify-center">
               {isProcessing && <div className="absolute inset-0 flex items-center justify-center z-10">
-                  <div className="flex items-center gap-2 bg-background/80 backdrop-blur px-6 py-3 rounded-full">
+                  <div className="flex items-center gap-2 backdrop-blur px-6 py-3 rounded-full bg-violet-900">
                     <Clock className="w-6 h-6 animate-pulse" />
                     <span className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                       {formatTime(elapsedTime)}
@@ -716,5 +658,4 @@ const PromptMaker = () => {
       </Dialog>
     </BaseLayout>;
 };
-
 export default PromptMaker;
