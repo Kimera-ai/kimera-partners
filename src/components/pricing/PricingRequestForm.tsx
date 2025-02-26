@@ -39,6 +39,7 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
   formParams.append('total_price', `$${totalPrice}`);
   formParams.append('image_features', imageFeaturesList);
   formParams.append('video_features', videoFeaturesList);
+  formParams.append('custom_workflows', `Custom workflow (${selectedFeatures.customWorkflows} workflows)`);
   
   if (!isOpen) return null;
 
