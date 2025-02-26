@@ -50,18 +50,15 @@ const PromptMaker = () => {
   const [ratio, setRatio] = useState("2:3");
   const [style, setStyle] = useState("Enhance");
   const [loraScale, setLoraScale] = useState("0.5");
+  const [seed, setSeed] = useState("random");
   const [previousGenerations, setPreviousGenerations] = useState<any[]>([]);
   const [isImprovingPrompt, setIsImprovingPrompt] = useState(false);
   const [selectedGeneration, setSelectedGeneration] = useState<any | null>(null);
   const [showPromptDialog, setShowPromptDialog] = useState(false);
   const [credits, setCredits] = useState<number | null>(null);
   const [isLoadingCredits, setIsLoadingCredits] = useState(true);
-  const {
-    session
-  } = useSession();
-  const {
-    toast
-  } = useToast();
+  const { session } = useSession();
+  const { toast } = useToast();
   const previewRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<NodeJS.Timeout>();
 
@@ -226,7 +223,7 @@ const PromptMaker = () => {
         data: {
           lora_scale: parseFloat(loraScale),
           style: style,
-          seed: -1
+          seed: seed === "random" ? -1 : 1234
         }
       };
       console.log("Sending request with body:", requestBody);
@@ -409,7 +406,7 @@ const PromptMaker = () => {
             <div className="space-y-6">
               <Card className="p-6 bg-background/50 backdrop-blur">
                 <div className="space-y-4">
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-4 gap-4">
                     <div>
                       <Label htmlFor="ratio">Aspect Ratio</Label>
                       <Select value={ratio} onValueChange={setRatio}>
@@ -459,6 +456,18 @@ const PromptMaker = () => {
                           <SelectItem value="0.8">0.8</SelectItem>
                           <SelectItem value="0.9">0.9</SelectItem>
                           <SelectItem value="1.0">1.0</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="seed">Seed</Label>
+                      <Select value={seed} onValueChange={setSeed}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select seed" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="random">Random</SelectItem>
+                          <SelectItem value="steady">Steady</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
