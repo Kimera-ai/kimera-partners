@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Image, Settings, Sparkles, Wand2, X, Clock, Lightbulb, History, Loader2, Download, Coins } from "lucide-react";
 import { DotPattern } from "@/components/ui/dot-pattern";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/useSession";
 import {
@@ -248,8 +248,9 @@ const PromptMaker = () => {
     if (credits !== null && credits < CREDITS_PER_GENERATION) {
       toast({
         title: "Insufficient Credits",
-        description: `You need ${CREDITS_PER_GENERATION} credits to generate an image. Your current balance is ${credits} credits.`,
+        description: "You've run out of credits. Please contact support at support@lovable.ai to purchase more credits.",
         variant: "destructive",
+        duration: 6000,
       });
       return;
     }
