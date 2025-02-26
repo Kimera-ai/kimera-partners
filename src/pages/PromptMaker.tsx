@@ -407,10 +407,10 @@ const PromptMaker = () => {
               <Card className="p-6 bg-background/50 backdrop-blur">
                 <div className="space-y-4">
                   <div className="grid grid-cols-4 gap-4">
-                    <div>
-                      <Label htmlFor="ratio">Aspect Ratio</Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="ratio" className="text-sm font-medium block">Aspect Ratio</Label>
                       <Select value={ratio} onValueChange={setRatio}>
-                        <SelectTrigger className="w-full">
+                        <SelectTrigger id="ratio" className="w-full">
                           <SelectValue placeholder="Select ratio" />
                         </SelectTrigger>
                         <SelectContent>
@@ -420,10 +420,10 @@ const PromptMaker = () => {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div>
-                      <Label htmlFor="style">Style</Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="style" className="text-sm font-medium block">Style</Label>
                       <Select value={style} onValueChange={setStyle}>
-                        <SelectTrigger className="w-full">
+                        <SelectTrigger id="style" className="w-full">
                           <SelectValue placeholder="Select style" />
                         </SelectTrigger>
                         <SelectContent>
@@ -440,10 +440,10 @@ const PromptMaker = () => {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div>
-                      <Label htmlFor="loraScale">Character Reference Strength</Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="loraScale" className="text-sm font-medium block">Character Reference Strength</Label>
                       <Select value={loraScale} onValueChange={setLoraScale}>
-                        <SelectTrigger className="w-full">
+                        <SelectTrigger id="loraScale" className="w-full">
                           <SelectValue placeholder="Select strength" />
                         </SelectTrigger>
                         <SelectContent>
@@ -459,10 +459,10 @@ const PromptMaker = () => {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div>
-                      <Label htmlFor="seed">Seed</Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="seed" className="text-sm font-medium block">Seed</Label>
                       <Select value={seed} onValueChange={setSeed}>
-                        <SelectTrigger className="w-full">
+                        <SelectTrigger id="seed" className="w-full">
                           <SelectValue placeholder="Select seed" />
                         </SelectTrigger>
                         <SelectContent>
