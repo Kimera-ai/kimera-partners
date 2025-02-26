@@ -131,7 +131,7 @@ export function PricingCalculator({ initialBase, initialCustomWorkflows = 0 }: P
       <div className="space-y-6 mb-6">
         <div className="space-y-4">
           <Label htmlFor="guestCount" className="text-lg text-center block">
-            Expected Number of Guests
+            Expected Number of runs
           </Label>
           <div className="max-w-md mx-auto">
             <div className="relative group">
