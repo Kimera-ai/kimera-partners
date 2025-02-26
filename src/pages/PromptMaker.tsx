@@ -1,4 +1,3 @@
-
 import { useState, useRef, useCallback, useEffect } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { Input } from "@/components/ui/input";
@@ -386,7 +385,6 @@ const PromptMaker = () => {
 
   const handleDownload = async (imageUrl: string) => {
     try {
-      // Extract the S3 URL directly
       const s3Url = imageUrl.split('format=jpeg/')[1];
       if (!s3Url) throw new Error('Invalid image URL');
       
@@ -628,6 +626,10 @@ const PromptMaker = () => {
                           <div className="flex flex-wrap gap-2">
                             <span>Seed: {gen.seed || "random"}</span>
                             <span>Strength: {gen.lora_scale || "0.5"}</span>
+                          </div>
+                          <div className="flex items-center gap-1 text-yellow-500">
+                            <Coins className="h-3 w-3" />
+                            <span>{CREDITS_PER_GENERATION} credits</span>
                           </div>
                         </div>
                       </div>)}
