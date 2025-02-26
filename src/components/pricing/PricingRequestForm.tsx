@@ -45,8 +45,8 @@ const PricingRequestForm = ({ isOpen, onClose, totalPrice, selectedFeatures }: P
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50">
-      <div className="w-screen h-screen flex items-center justify-center p-0">
-        <div className="bg-[#1A1123] border border-white/10 rounded-2xl w-[95vw] h-[95vh] flex flex-col">
+      <div className="w-screen h-screen flex items-center justify-center">
+        <div className="bg-[#1A1123] border border-white/10 rounded-2xl w-full max-w-4xl h-screen flex flex-col">
           <div className="bg-[#1A1123]/95 backdrop-blur-sm border-b border-white/10 p-6 flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
