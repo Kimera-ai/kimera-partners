@@ -489,11 +489,11 @@ x-api-key: YOUR_API_KEY`}</code>
                     <div className="bg-background/40 rounded-lg p-4 my-4">
                       <h6 className="font-semibold text-white">Example CSS usage:</h6>
                       <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full mt-2">
-                        <pre><code>.header-background {
+                        <pre><code>{`.header-background {
   background-image: url('https://www.jeann.online/cdn-cgi/image/width=1200,height=400,fit=cover/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg');
   background-size: cover;
   background-position: center;
-}</code></pre>
+}`}</code></pre>
                       </div>
                     </div>
                   </div>
