@@ -3,7 +3,7 @@ import BaseLayout from "@/components/layouts/BaseLayout";
 import { Card } from "@/components/ui/card";
 import { DotPattern } from "@/components/ui/dot-pattern";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Code, Database, Server, ChevronDown, ChevronUp } from "lucide-react";
+import { Code, Database, Server, ChevronDown, ChevronUp, Image } from "lucide-react";
 import { useState } from "react";
 
 const API = () => {
@@ -12,7 +12,8 @@ const API = () => {
     pipeline: false,
     status: false,
     response: false,
-    rateLimits: false
+    rateLimits: false,
+    imageUrl: false
   });
 
   const toggleSection = (section: keyof typeof openSections) => {
@@ -195,6 +196,146 @@ x-api-key: YOUR_API_KEY`}</code>
   "created_at": "2023-01-01T00:00:00Z"
 }`}</code>
                     </pre>
+                  </div>
+                </div>
+              )}
+            </Card>
+            
+            {/* Image URL Control - Collapsible */}
+            <Card className="p-4 bg-background/50 backdrop-blur">
+              <button 
+                onClick={() => toggleSection('imageUrl')}
+                className="w-full flex items-center gap-3"
+              >
+                <div className="bg-primary/20 p-2 rounded-md">
+                  <Image className="h-5 w-5 text-primary" />
+                </div>
+                <h3 className="text-lg font-semibold flex-1 text-left">Image URL Control</h3>
+                {openSections.imageUrl ? 
+                  <ChevronUp className="h-5 w-5 text-primary" /> : 
+                  <ChevronDown className="h-5 w-5 text-primary" />
+                }
+              </button>
+              
+              {openSections.imageUrl && (
+                <div className="mt-4 pl-10">
+                  <div className="text-gray-300 space-y-4">
+                    <h4 className="font-semibold text-white text-lg">Guide to Manipulating Image URLs for Optimal Display</h4>
+                    <p>
+                      This guide explains how to modify image URLs to control their display size, proportions, and other visual aspects. 
+                      By adding parameters to image URLs, you can optimize images for your specific needs without requiring server-side image processing.
+                    </p>
+                    <p className="italic">Note: For best results, the original source image should be in a 1:1 ratio.</p>
+                    
+                    <h5 className="font-semibold text-white">Basic URL Structure</h5>
+                    <p>Image transformation parameters are typically added to a URL in the following format:</p>
+                    <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full">
+                      <code className="text-sm">https://domain.com/cdn-cgi/image/[parameters]/[original-image-path]</code>
+                    </div>
+                    
+                    <p>Example:</p>
+                    <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full">
+                      <code className="text-sm">https://www.jeann.online/cdn-cgi/image/width=800,height=1230,fit=cover/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg</code>
+                    </div>
+                    
+                    <h5 className="font-semibold text-white">Common Parameters</h5>
+                    <h6 className="font-semibold text-white">Width and Height</h6>
+                    <p><strong>width</strong> - Specifies maximum width of the image in pixels. Behavior depends on the fit mode.</p>
+                    <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full">
+                      <code className="text-sm">width=250</code>
+                    </div>
+                    
+                    <p>You can also use:</p>
+                    <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full">
+                      <code className="text-sm">width=auto</code>
+                    </div>
+                    <p>This automatically serves the image in the most optimal width based on the browser and device (supported only by Chromium browsers).</p>
+                    
+                    <p><strong>height</strong> - Specifies maximum height of the image in pixels.</p>
+                    <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full">
+                      <code className="text-sm">height=250</code>
+                    </div>
+                    
+                    <p className="italic font-semibold">Best Practice: Image sizes should match the exact dimensions at which they are displayed on the page. For responsive images, use the HTML srcset element with appropriate width parameters.</p>
+                    
+                    <h5 className="font-semibold text-white">Fit Modes</h5>
+                    <p>The fit parameter determines how the image is resized within the specified dimensions.</p>
+                    
+                    <p><strong>fit=scale-down</strong> - Similar to contain, but the image is never enlarged. If the image is larger than given width or height, it will be resized; otherwise, its original size will be kept.</p>
+                    <p>Example:</p>
+                    <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full">
+                      <code className="text-sm">https://www.jeann.online/cdn-cgi/image/width=800,height=600,fit=scale-down/https://example.com/original-image.jpg</code>
+                    </div>
+                    
+                    <p><strong>fit=contain</strong> - Image will be resized (shrunk or enlarged) to be as large as possible within the given width or height while preserving the aspect ratio.</p>
+                    <p>Example:</p>
+                    <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full">
+                      <code className="text-sm">https://www.jeann.online/cdn-cgi/image/width=800,height=600,fit=contain/https://example.com/original-image.jpg</code>
+                    </div>
+                    
+                    <p><strong>fit=cover</strong> - Resizes (shrinks or enlarges) to fill the entire area of width and height. If the image has a different aspect ratio, it will be cropped to fit.</p>
+                    <p>Example:</p>
+                    <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full">
+                      <code className="text-sm">https://www.jeann.online/cdn-cgi/image/width=800,height=600,fit=cover/https://example.com/original-image.jpg</code>
+                    </div>
+                    
+                    <p><strong>fit=crop</strong> - Image will be shrunk and cropped to fit within the specified area. The image will not be enlarged. For smaller images, it behaves like scale-down; for larger images, it behaves like cover.</p>
+                    <p>Example:</p>
+                    <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full">
+                      <code className="text-sm">https://www.jeann.online/cdn-cgi/image/width=800,height=600,fit=crop/https://example.com/original-image.jpg</code>
+                    </div>
+                    
+                    <p><strong>fit=pad</strong> - Resizes to the maximum size that fits within the given dimensions, then fills the remaining area with a background color (white by default).</p>
+                    <p>Example:</p>
+                    <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full">
+                      <code className="text-sm">https://www.jeann.online/cdn-cgi/image/width=800,height=600,fit=pad/https://example.com/original-image.jpg</code>
+                    </div>
+                    
+                    <h5 className="font-semibold text-white">Gravity</h5>
+                    <p>When cropping with fit=cover or fit=crop, the gravity parameter defines which part of the image should be preserved.</p>
+                    
+                    <p><strong>gravity=auto</strong> - Automatically selects focal point based on saliency detection.</p>
+                    <p>Example:</p>
+                    <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full">
+                      <code className="text-sm">https://www.jeann.online/cdn-cgi/image/width=800,height=600,fit=cover,gravity=auto/https://example.com/original-image.jpg</code>
+                    </div>
+                    
+                    <p><strong>Directional gravity</strong> - You can specify a side (left, right, top, bottom) or precise coordinates.</p>
+                    <p>Examples:</p>
+                    <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full">
+                      <code className="text-sm">https://www.jeann.online/cdn-cgi/image/width=800,height=600,fit=cover,gravity=left/https://example.com/original-image.jpg</code>
+                    </div>
+                    
+                    <p>Using coordinates (from 0.0 to 1.0):</p>
+                    <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full">
+                      <code className="text-sm">https://www.jeann.online/cdn-cgi/image/width=800,height=600,fit=cover,gravity=0.5x0.2/https://example.com/original-image.jpg</code>
+                    </div>
+                    <p className="italic">Note: The coordinates 0.5x0.2 preserve the area around a point at 20% of the height and center of the width.</p>
+                    
+                    <h5 className="font-semibold text-white">Practical Examples</h5>
+                    <p><strong>Creating a Square Thumbnail</strong></p>
+                    <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full">
+                      <code className="text-sm">https://www.jeann.online/cdn-cgi/image/width=250,height=250,fit=cover,gravity=auto/https://example.com/original-image.jpg</code>
+                    </div>
+                    <p>This creates a 250×250 square thumbnail, automatically focusing on the most important part of the image.</p>
+                    
+                    <p><strong>Responsive Banner Image</strong></p>
+                    <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full">
+                      <code className="text-sm">https://www.jeann.online/cdn-cgi/image/width=1200,height=400,fit=cover,gravity=0.5x0.33/https://example.com/original-image.jpg</code>
+                    </div>
+                    <p>This creates a widescreen banner image (1200×400) that focuses on the top third of the image.</p>
+                    
+                    <p><strong>Product Image with Preserved Dimensions</strong></p>
+                    <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full">
+                      <code className="text-sm">https://www.jeann.online/cdn-cgi/image/width=600,fit=scale-down/https://example.com/original-image.jpg</code>
+                    </div>
+                    <p>This ensures a product image is no wider than 600px but preserves smaller images at their original size.</p>
+                    
+                    <p><strong>Profile Picture</strong></p>
+                    <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full">
+                      <code className="text-sm">https://www.jeann.online/cdn-cgi/image/width=150,height=150,fit=cover,gravity=auto/https://example.com/original-image.jpg</code>
+                    </div>
+                    <p>This creates a square profile picture that automatically focuses on faces or other important features.</p>
                   </div>
                 </div>
               )}
