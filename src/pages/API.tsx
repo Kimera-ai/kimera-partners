@@ -3,9 +3,25 @@ import BaseLayout from "@/components/layouts/BaseLayout";
 import { Card } from "@/components/ui/card";
 import { DotPattern } from "@/components/ui/dot-pattern";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Code, Database, Server } from "lucide-react";
+import { Code, Database, Server, ChevronDown, ChevronUp } from "lucide-react";
+import { useState } from "react";
 
 const API = () => {
+  const [openSections, setOpenSections] = useState({
+    documentation: false,
+    pipeline: false,
+    status: false,
+    response: false,
+    rateLimits: false
+  });
+
+  const toggleSection = (section: keyof typeof openSections) => {
+    setOpenSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
   return (
     <BaseLayout>
       <div className="relative min-h-screen bg-background">
@@ -25,6 +41,7 @@ const API = () => {
             API Documentation
           </h1>
           
+          {/* Getting Started Video - Not Collapsible */}
           <Card className="p-6 mb-10 bg-background/50 backdrop-blur">
             <h2 className="text-2xl font-semibold mb-4">Getting Started</h2>
             <div className="mb-6">
@@ -41,32 +58,59 @@ const API = () => {
             </p>
           </Card>
           
-          <Card className="p-6 mb-10 bg-background/50 backdrop-blur overflow-hidden">
-            <h2 className="text-2xl font-semibold mb-4">Full API Documentation</h2>
-            <div className="rounded-lg overflow-hidden bg-white">
-              <iframe 
-                src="https://api.kimera.ai/api-docs/" 
-                className="w-full h-[600px] border-0"
-                title="Kimera AI API Documentation"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                loading="lazy"
-              ></iframe>
-            </div>
+          {/* Full API Documentation - Collapsible */}
+          <Card className="p-6 mb-10 bg-background/50 backdrop-blur">
+            <button 
+              onClick={() => toggleSection('documentation')}
+              className="w-full flex justify-between items-center text-left"
+            >
+              <h2 className="text-2xl font-semibold">Full API Documentation</h2>
+              {openSections.documentation ? 
+                <ChevronUp className="h-6 w-6 text-primary" /> : 
+                <ChevronDown className="h-6 w-6 text-primary" />
+              }
+            </button>
+            
+            {openSections.documentation && (
+              <div className="mt-4 rounded-lg overflow-hidden bg-white">
+                <iframe 
+                  src="https://api.kimera.ai/api-docs/" 
+                  className="w-full h-[600px] border-0"
+                  title="Kimera AI API Documentation"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  loading="lazy"
+                ></iframe>
+              </div>
+            )}
           </Card>
           
           <div className="grid gap-8 mb-10">
+            {/* Running a Pipeline - Collapsible */}
             <Card className="p-6 bg-background/50 backdrop-blur">
-              <div className="flex flex-col items-center text-center">
+              <button 
+                onClick={() => toggleSection('pipeline')}
+                className="w-full flex flex-col items-center text-center"
+              >
                 <div className="bg-primary/20 p-3 rounded-lg mb-4">
                   <Server className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">Running a Pipeline</h3>
-                <p className="text-gray-300 mb-4">
-                  Use our API to run image generation pipelines programmatically.
-                </p>
-                <div className="bg-gray-900 p-4 rounded-lg overflow-x-auto w-full">
-                  <pre className="text-sm text-gray-300 text-left">
-                    <code>{`POST /v1/pipeline/run HTTP/1.1
+                <div className="flex justify-center items-center mt-2">
+                  {openSections.pipeline ? 
+                    <ChevronUp className="h-5 w-5 text-primary" /> : 
+                    <ChevronDown className="h-5 w-5 text-primary" />
+                  }
+                </div>
+              </button>
+              
+              {openSections.pipeline && (
+                <div className="mt-4">
+                  <p className="text-gray-300 mb-4 text-center">
+                    Use our API to run image generation pipelines programmatically.
+                  </p>
+                  <div className="bg-gray-900 p-4 rounded-lg overflow-x-auto w-full">
+                    <pre className="text-sm text-gray-300 text-left">
+                      <code>{`POST /v1/pipeline/run HTTP/1.1
 Host: api.kimera.ai
 x-api-key: YOUR_API_KEY
 Content-Type: application/json
@@ -83,42 +127,72 @@ Content-Length: 145
     "seed": -1
   }
 }`}</code>
-                  </pre>
+                    </pre>
+                  </div>
                 </div>
-              </div>
+              )}
             </Card>
             
+            {/* Checking Pipeline Status - Collapsible */}
             <Card className="p-6 bg-background/50 backdrop-blur">
-              <div className="flex flex-col items-center text-center">
+              <button 
+                onClick={() => toggleSection('status')}
+                className="w-full flex flex-col items-center text-center"
+              >
                 <div className="bg-primary/20 p-3 rounded-lg mb-4">
                   <Database className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">Checking Pipeline Status</h3>
-                <p className="text-gray-300 mb-4">
-                  Monitor the status of your pipeline runs with the GET endpoint.
-                </p>
-                <div className="bg-gray-900 p-4 rounded-lg overflow-x-auto w-full">
-                  <pre className="text-sm text-gray-300 text-left">
-                    <code>{`GET /v1/pipeline/run/replace with the response id from post response HTTP/1.1
+                <div className="flex justify-center items-center mt-2">
+                  {openSections.status ? 
+                    <ChevronUp className="h-5 w-5 text-primary" /> : 
+                    <ChevronDown className="h-5 w-5 text-primary" />
+                  }
+                </div>
+              </button>
+              
+              {openSections.status && (
+                <div className="mt-4">
+                  <p className="text-gray-300 mb-4 text-center">
+                    Monitor the status of your pipeline runs with the GET endpoint.
+                  </p>
+                  <div className="bg-gray-900 p-4 rounded-lg overflow-x-auto w-full">
+                    <pre className="text-sm text-gray-300 text-left">
+                      <code>{`GET /v1/pipeline/run/replace with the response id from post response HTTP/1.1
 Host: api.kimera.ai
 x-api-key: YOUR_API_KEY`}</code>
-                  </pre>
+                    </pre>
+                  </div>
                 </div>
-              </div>
+              )}
             </Card>
             
+            {/* Response Format - Collapsible */}
             <Card className="p-6 bg-background/50 backdrop-blur">
-              <div className="flex flex-col items-center text-center">
+              <button 
+                onClick={() => toggleSection('response')}
+                className="w-full flex flex-col items-center text-center"
+              >
                 <div className="bg-primary/20 p-3 rounded-lg mb-4">
                   <Code className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">Response Format</h3>
-                <p className="text-gray-300 mb-4">
-                  Our API returns JSON responses with the following structure:
-                </p>
-                <div className="bg-gray-900 p-4 rounded-lg overflow-x-auto w-full">
-                  <pre className="text-sm text-gray-300 text-left">
-                    <code>{`{
+                <div className="flex justify-center items-center mt-2">
+                  {openSections.response ? 
+                    <ChevronUp className="h-5 w-5 text-primary" /> : 
+                    <ChevronDown className="h-5 w-5 text-primary" />
+                  }
+                </div>
+              </button>
+              
+              {openSections.response && (
+                <div className="mt-4">
+                  <p className="text-gray-300 mb-4 text-center">
+                    Our API returns JSON responses with the following structure:
+                  </p>
+                  <div className="bg-gray-900 p-4 rounded-lg overflow-x-auto w-full">
+                    <pre className="text-sm text-gray-300 text-left">
+                      <code>{`{
   "id": "pipeline-run-id",
   "status": "completed", // pending, processing, completed, failed
   "output": {
@@ -126,25 +200,41 @@ x-api-key: YOUR_API_KEY`}</code>
   },
   "created_at": "2023-01-01T00:00:00Z"
 }`}</code>
-                  </pre>
+                    </pre>
+                  </div>
                 </div>
-              </div>
+              )}
             </Card>
           </div>
           
+          {/* Rate Limits - Collapsible */}
           <Card className="p-6 mb-10 bg-background/50 backdrop-blur">
-            <h2 className="text-2xl font-semibold mb-4">Rate Limits</h2>
-            <p className="text-gray-300">
-              Your account is subject to the following rate limits:
-            </p>
-            <ul className="list-disc list-inside mt-2 space-y-2 text-gray-300">
-              <li>100 API requests per minute</li>
-              <li>1,000 API requests per hour</li>
-              <li>10,000 API requests per day</li>
-            </ul>
-            <p className="mt-4 text-gray-300">
-              Exceeding these limits will result in a 429 Too Many Requests response.
-            </p>
+            <button 
+              onClick={() => toggleSection('rateLimits')}
+              className="w-full flex justify-between items-center text-left"
+            >
+              <h2 className="text-2xl font-semibold">Rate Limits</h2>
+              {openSections.rateLimits ? 
+                <ChevronUp className="h-6 w-6 text-primary" /> : 
+                <ChevronDown className="h-6 w-6 text-primary" />
+              }
+            </button>
+            
+            {openSections.rateLimits && (
+              <div className="mt-4">
+                <p className="text-gray-300">
+                  Your account is subject to the following rate limits:
+                </p>
+                <ul className="list-disc list-inside mt-2 space-y-2 text-gray-300">
+                  <li>100 API requests per minute</li>
+                  <li>1,000 API requests per hour</li>
+                  <li>10,000 API requests per day</li>
+                </ul>
+                <p className="mt-4 text-gray-300">
+                  Exceeding these limits will result in a 429 Too Many Requests response.
+                </p>
+              </div>
+            )}
           </Card>
         </div>
       </div>
