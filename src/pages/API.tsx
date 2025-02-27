@@ -41,17 +41,6 @@ const API = () => {
             API Documentation
           </h1>
           
-          {/* External Image Display */}
-          <Card className="p-4 mb-6 overflow-hidden bg-background/50 backdrop-blur">
-            <div className="w-full">
-              <img 
-                src="https://claude.site/artifacts/f7e7133d-4955-4257-a34a-0aa41dfd6327" 
-                alt="API Documentation Diagram" 
-                className="w-full h-auto rounded-lg"
-              />
-            </div>
-          </Card>
-          
           {/* Getting Started Video - Not Collapsible */}
           <Card className="p-6 mb-6 bg-background/50 backdrop-blur">
             <h2 className="text-2xl font-semibold mb-4">Getting Started</h2>
