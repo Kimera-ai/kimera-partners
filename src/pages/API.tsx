@@ -41,6 +41,19 @@ const API = () => {
             </p>
           </Card>
           
+          <Card className="p-6 mb-10 bg-background/50 backdrop-blur overflow-hidden">
+            <h2 className="text-2xl font-semibold mb-4">Full API Documentation</h2>
+            <div className="rounded-lg overflow-hidden bg-white">
+              <iframe 
+                src="https://api.kimera.ai/api-docs/" 
+                className="w-full h-[600px] border-0"
+                title="Kimera AI API Documentation"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                loading="lazy"
+              ></iframe>
+            </div>
+          </Card>
+          
           <div className="grid gap-8 mb-10">
             <Card className="p-6 bg-background/50 backdrop-blur">
               <div className="flex items-start gap-4">
