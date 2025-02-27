@@ -56,18 +56,17 @@ const API = () => {
           
           <div className="grid gap-8 mb-10">
             <Card className="p-6 bg-background/50 backdrop-blur">
-              <div className="flex items-start gap-4">
-                <div className="bg-primary/20 p-3 rounded-lg">
+              <div className="flex flex-col items-center text-center">
+                <div className="bg-primary/20 p-3 rounded-lg mb-4">
                   <Server className="h-6 w-6 text-primary" />
                 </div>
-                <div>
-                  <h3 className="text-xl font-semibold mb-2">Running a Pipeline</h3>
-                  <p className="text-gray-300 mb-4">
-                    Use our API to run image generation pipelines programmatically.
-                  </p>
-                  <div className="bg-gray-900 p-4 rounded-lg overflow-x-auto">
-                    <pre className="text-sm text-gray-300">
-                      <code>{`POST /v1/pipeline/run HTTP/1.1
+                <h3 className="text-xl font-semibold mb-2">Running a Pipeline</h3>
+                <p className="text-gray-300 mb-4">
+                  Use our API to run image generation pipelines programmatically.
+                </p>
+                <div className="bg-gray-900 p-4 rounded-lg overflow-x-auto w-full">
+                  <pre className="text-sm text-gray-300 text-left">
+                    <code>{`POST /v1/pipeline/run HTTP/1.1
 Host: api.kimera.ai
 x-api-key: YOUR_API_KEY
 Content-Type: application/json
@@ -84,46 +83,42 @@ Content-Length: 145
     "seed": -1
   }
 }`}</code>
-                    </pre>
-                  </div>
+                  </pre>
                 </div>
               </div>
             </Card>
             
             <Card className="p-6 bg-background/50 backdrop-blur">
-              <div className="flex items-start gap-4">
-                <div className="bg-primary/20 p-3 rounded-lg">
+              <div className="flex flex-col items-center text-center">
+                <div className="bg-primary/20 p-3 rounded-lg mb-4">
                   <Database className="h-6 w-6 text-primary" />
                 </div>
-                <div>
-                  <h3 className="text-xl font-semibold mb-2">Checking Pipeline Status</h3>
-                  <p className="text-gray-300 mb-4">
-                    Monitor the status of your pipeline runs with the GET endpoint.
-                  </p>
-                  <div className="bg-gray-900 p-4 rounded-lg overflow-x-auto">
-                    <pre className="text-sm text-gray-300">
-                      <code>{`GET /v1/pipeline/run/replace with the response id from post response HTTP/1.1
+                <h3 className="text-xl font-semibold mb-2">Checking Pipeline Status</h3>
+                <p className="text-gray-300 mb-4">
+                  Monitor the status of your pipeline runs with the GET endpoint.
+                </p>
+                <div className="bg-gray-900 p-4 rounded-lg overflow-x-auto w-full">
+                  <pre className="text-sm text-gray-300 text-left">
+                    <code>{`GET /v1/pipeline/run/replace with the response id from post response HTTP/1.1
 Host: api.kimera.ai
 x-api-key: YOUR_API_KEY`}</code>
-                    </pre>
-                  </div>
+                  </pre>
                 </div>
               </div>
             </Card>
             
             <Card className="p-6 bg-background/50 backdrop-blur">
-              <div className="flex items-start gap-4">
-                <div className="bg-primary/20 p-3 rounded-lg">
+              <div className="flex flex-col items-center text-center">
+                <div className="bg-primary/20 p-3 rounded-lg mb-4">
                   <Code className="h-6 w-6 text-primary" />
                 </div>
-                <div>
-                  <h3 className="text-xl font-semibold mb-2">Response Format</h3>
-                  <p className="text-gray-300 mb-4">
-                    Our API returns JSON responses with the following structure:
-                  </p>
-                  <div className="bg-gray-900 p-4 rounded-lg overflow-x-auto">
-                    <pre className="text-sm text-gray-300">
-                      <code>{`{
+                <h3 className="text-xl font-semibold mb-2">Response Format</h3>
+                <p className="text-gray-300 mb-4">
+                  Our API returns JSON responses with the following structure:
+                </p>
+                <div className="bg-gray-900 p-4 rounded-lg overflow-x-auto w-full">
+                  <pre className="text-sm text-gray-300 text-left">
+                    <code>{`{
   "id": "pipeline-run-id",
   "status": "completed", // pending, processing, completed, failed
   "output": {
@@ -131,8 +126,7 @@ x-api-key: YOUR_API_KEY`}</code>
   },
   "created_at": "2023-01-01T00:00:00Z"
 }`}</code>
-                    </pre>
-                  </div>
+                  </pre>
                 </div>
               </div>
             </Card>
