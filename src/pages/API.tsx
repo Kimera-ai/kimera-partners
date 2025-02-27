@@ -42,7 +42,7 @@ const API = () => {
           </h1>
           
           {/* Getting Started Video - Not Collapsible */}
-          <Card className="p-6 mb-10 bg-background/50 backdrop-blur">
+          <Card className="p-6 mb-6 bg-background/50 backdrop-blur">
             <h2 className="text-2xl font-semibold mb-4">Getting Started</h2>
             <div className="mb-6">
               <AspectRatio ratio={16/9} className="overflow-hidden rounded-lg bg-black">
@@ -59,15 +59,15 @@ const API = () => {
           </Card>
           
           {/* Full API Documentation - Collapsible */}
-          <Card className="p-6 mb-10 bg-background/50 backdrop-blur">
+          <Card className="p-4 mb-4 bg-background/50 backdrop-blur">
             <button 
               onClick={() => toggleSection('documentation')}
               className="w-full flex justify-between items-center text-left"
             >
-              <h2 className="text-2xl font-semibold">Full API Documentation</h2>
+              <h2 className="text-xl font-semibold">Full API Documentation</h2>
               {openSections.documentation ? 
-                <ChevronUp className="h-6 w-6 text-primary" /> : 
-                <ChevronDown className="h-6 w-6 text-primary" />
+                <ChevronUp className="h-5 w-5 text-primary" /> : 
+                <ChevronDown className="h-5 w-5 text-primary" />
               }
             </button>
             
@@ -84,31 +84,29 @@ const API = () => {
             )}
           </Card>
           
-          <div className="grid gap-8 mb-10">
+          <div className="grid gap-4 mb-6">
             {/* Running a Pipeline - Collapsible */}
-            <Card className="p-6 bg-background/50 backdrop-blur">
+            <Card className="p-4 bg-background/50 backdrop-blur">
               <button 
                 onClick={() => toggleSection('pipeline')}
-                className="w-full flex flex-col items-center text-center"
+                className="w-full flex items-center gap-3"
               >
-                <div className="bg-primary/20 p-3 rounded-lg mb-4">
-                  <Server className="h-6 w-6 text-primary" />
+                <div className="bg-primary/20 p-2 rounded-md">
+                  <Server className="h-5 w-5 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Running a Pipeline</h3>
-                <div className="flex justify-center items-center mt-2">
-                  {openSections.pipeline ? 
-                    <ChevronUp className="h-5 w-5 text-primary" /> : 
-                    <ChevronDown className="h-5 w-5 text-primary" />
-                  }
-                </div>
+                <h3 className="text-lg font-semibold flex-1 text-left">Running a Pipeline</h3>
+                {openSections.pipeline ? 
+                  <ChevronUp className="h-5 w-5 text-primary" /> : 
+                  <ChevronDown className="h-5 w-5 text-primary" />
+                }
               </button>
               
               {openSections.pipeline && (
-                <div className="mt-4">
-                  <p className="text-gray-300 mb-4 text-center">
+                <div className="mt-4 pl-10">
+                  <p className="text-gray-300 mb-4">
                     Use our API to run image generation pipelines programmatically.
                   </p>
-                  <div className="bg-gray-900 p-4 rounded-lg overflow-x-auto w-full">
+                  <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full">
                     <pre className="text-sm text-gray-300 text-left">
                       <code>{`POST /v1/pipeline/run HTTP/1.1
 Host: api.kimera.ai
@@ -134,29 +132,27 @@ Content-Length: 145
             </Card>
             
             {/* Checking Pipeline Status - Collapsible */}
-            <Card className="p-6 bg-background/50 backdrop-blur">
+            <Card className="p-4 bg-background/50 backdrop-blur">
               <button 
                 onClick={() => toggleSection('status')}
-                className="w-full flex flex-col items-center text-center"
+                className="w-full flex items-center gap-3"
               >
-                <div className="bg-primary/20 p-3 rounded-lg mb-4">
-                  <Database className="h-6 w-6 text-primary" />
+                <div className="bg-primary/20 p-2 rounded-md">
+                  <Database className="h-5 w-5 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Checking Pipeline Status</h3>
-                <div className="flex justify-center items-center mt-2">
-                  {openSections.status ? 
-                    <ChevronUp className="h-5 w-5 text-primary" /> : 
-                    <ChevronDown className="h-5 w-5 text-primary" />
-                  }
-                </div>
+                <h3 className="text-lg font-semibold flex-1 text-left">Checking Pipeline Status</h3>
+                {openSections.status ? 
+                  <ChevronUp className="h-5 w-5 text-primary" /> : 
+                  <ChevronDown className="h-5 w-5 text-primary" />
+                }
               </button>
               
               {openSections.status && (
-                <div className="mt-4">
-                  <p className="text-gray-300 mb-4 text-center">
+                <div className="mt-4 pl-10">
+                  <p className="text-gray-300 mb-4">
                     Monitor the status of your pipeline runs with the GET endpoint.
                   </p>
-                  <div className="bg-gray-900 p-4 rounded-lg overflow-x-auto w-full">
+                  <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full">
                     <pre className="text-sm text-gray-300 text-left">
                       <code>{`GET /v1/pipeline/run/replace with the response id from post response HTTP/1.1
 Host: api.kimera.ai
@@ -168,29 +164,27 @@ x-api-key: YOUR_API_KEY`}</code>
             </Card>
             
             {/* Response Format - Collapsible */}
-            <Card className="p-6 bg-background/50 backdrop-blur">
+            <Card className="p-4 bg-background/50 backdrop-blur">
               <button 
                 onClick={() => toggleSection('response')}
-                className="w-full flex flex-col items-center text-center"
+                className="w-full flex items-center gap-3"
               >
-                <div className="bg-primary/20 p-3 rounded-lg mb-4">
-                  <Code className="h-6 w-6 text-primary" />
+                <div className="bg-primary/20 p-2 rounded-md">
+                  <Code className="h-5 w-5 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Response Format</h3>
-                <div className="flex justify-center items-center mt-2">
-                  {openSections.response ? 
-                    <ChevronUp className="h-5 w-5 text-primary" /> : 
-                    <ChevronDown className="h-5 w-5 text-primary" />
-                  }
-                </div>
+                <h3 className="text-lg font-semibold flex-1 text-left">Response Format</h3>
+                {openSections.response ? 
+                  <ChevronUp className="h-5 w-5 text-primary" /> : 
+                  <ChevronDown className="h-5 w-5 text-primary" />
+                }
               </button>
               
               {openSections.response && (
-                <div className="mt-4">
-                  <p className="text-gray-300 mb-4 text-center">
+                <div className="mt-4 pl-10">
+                  <p className="text-gray-300 mb-4">
                     Our API returns JSON responses with the following structure:
                   </p>
-                  <div className="bg-gray-900 p-4 rounded-lg overflow-x-auto w-full">
+                  <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full">
                     <pre className="text-sm text-gray-300 text-left">
                       <code>{`{
   "id": "pipeline-run-id",
@@ -208,15 +202,15 @@ x-api-key: YOUR_API_KEY`}</code>
           </div>
           
           {/* Rate Limits - Collapsible */}
-          <Card className="p-6 mb-10 bg-background/50 backdrop-blur">
+          <Card className="p-4 mb-6 bg-background/50 backdrop-blur">
             <button 
               onClick={() => toggleSection('rateLimits')}
               className="w-full flex justify-between items-center text-left"
             >
-              <h2 className="text-2xl font-semibold">Rate Limits</h2>
+              <h2 className="text-xl font-semibold">Rate Limits</h2>
               {openSections.rateLimits ? 
-                <ChevronUp className="h-6 w-6 text-primary" /> : 
-                <ChevronDown className="h-6 w-6 text-primary" />
+                <ChevronUp className="h-5 w-5 text-primary" /> : 
+                <ChevronDown className="h-5 w-5 text-primary" />
               }
             </button>
             
