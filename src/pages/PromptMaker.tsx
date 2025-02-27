@@ -1,3 +1,4 @@
+
 import { useState, useRef, useCallback, useEffect } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { Input } from "@/components/ui/input";
@@ -224,7 +225,7 @@ const PromptMaker = () => {
     if ((workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl) {
       toast({
         title: "Image Required",
-        description: `Please upload an image when using the ${workflow === 'with-reference' ? 'With Image Reference' : 'Cartoon'} workflow.`,
+        description: `Please upload an image when using the ${workflow === 'with-reference' ? 'Basic with image reference' : 'Cartoon'} workflow.`,
         variant: "destructive"
       });
       return;
@@ -460,8 +461,8 @@ const PromptMaker = () => {
                           <SelectValue placeholder="Select workflow" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="no-reference">No Image Reference</SelectItem>
-                          <SelectItem value="with-reference">With Image Reference</SelectItem>
+                          <SelectItem value="no-reference">Basic image generation</SelectItem>
+                          <SelectItem value="with-reference">Basic with image reference</SelectItem>
                           <SelectItem value="cartoon">Cartoon</SelectItem>
                         </SelectContent>
                       </Select>
