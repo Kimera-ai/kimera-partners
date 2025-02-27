@@ -453,7 +453,36 @@ const PromptMaker = () => {
             <div className="space-y-6">
               <Card className="p-6 bg-card/60 backdrop-blur border border-white/5 shadow-lg">
                 <div className="space-y-4">
-                  <div className="grid grid-cols-1 gap-4">
+                  {/* Moved prompt section to the top */}
+                  <div>
+                    <Label htmlFor="prompt" className="text-sm font-medium block text-white/80">Prompt</Label>
+                    <div className="relative">
+                      <Input id="reference-image" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={isUploading || isProcessing || workflow === 'no-reference'} />
+                      <div className="relative">
+                        <div ref={previewRef} className="absolute left-3 top-3 z-[9999] pointer-events-auto" style={{
+                        position: 'absolute',
+                        isolation: 'isolate'
+                      }}>
+                          <ImagePreview imagePreview={imagePreview} isUploading={isUploading} isProcessing={isProcessing} onRemove={removeImage} disabled={workflow === 'no-reference'} />
+                        </div>
+                        <div className="relative">
+                          <Textarea id="prompt" placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..." value={prompt} onChange={e => setPrompt(e.target.value)} className="h-32 resize-none bg-background/50 border-white/10 text-white pl-14" />
+                          <Button variant="ghost" size="icon" className="absolute bottom-3 left-3 text-primary/70 hover:text-primary hover:bg-primary/10 hover:scale-110 transition-all hover:shadow-[0_0_15px_rgba(155,135,245,0.3)] backdrop-blur-sm" onClick={handleImprovePrompt} disabled={isImprovingPrompt}>
+                            {isImprovingPrompt ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Generate button remains after the prompt */}
+                  <Button className="w-full bg-primary hover:bg-primary/90 text-white" disabled={isProcessing || (workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl} onClick={handleGenerate}>
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    {isProcessing ? "Processing..." : (workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl ? "Upload an image" : "Generate"}
+                  </Button>
+
+                  {/* Moved workflow selector below the prompt and generate button */}
+                  <div className="grid grid-cols-1 gap-4 pt-3 border-t border-white/5">
                     <div className="space-y-2">
                       <Label htmlFor="workflow" className="text-sm font-medium block text-white/80">Workflow</Label>
                       <Select value={workflow} onValueChange={setWorkflow}>
@@ -469,6 +498,7 @@ const PromptMaker = () => {
                     </div>
                   </div>
 
+                  {/* Settings grid moved to the bottom */}
                   <div className="grid grid-cols-4 gap-4">
                     <div className="space-y-2">
                       <TooltipProvider>
@@ -571,32 +601,6 @@ const PromptMaker = () => {
                       </Select>
                     </div>
                   </div>
-
-                  <div>
-                    <Label htmlFor="prompt" className="text-sm font-medium block text-white/80">Prompt</Label>
-                    <div className="relative">
-                      <Input id="reference-image" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={isUploading || isProcessing || workflow === 'no-reference'} />
-                      <div className="relative">
-                        <div ref={previewRef} className="absolute left-3 top-3 z-[9999] pointer-events-auto" style={{
-                        position: 'absolute',
-                        isolation: 'isolate'
-                      }}>
-                          <ImagePreview imagePreview={imagePreview} isUploading={isUploading} isProcessing={isProcessing} onRemove={removeImage} disabled={workflow === 'no-reference'} />
-                        </div>
-                        <div className="relative">
-                          <Textarea id="prompt" placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..." value={prompt} onChange={e => setPrompt(e.target.value)} className="h-32 resize-none bg-background/50 border-white/10 text-white pl-14" />
-                          <Button variant="ghost" size="icon" className="absolute bottom-3 left-3 text-primary/70 hover:text-primary hover:bg-primary/10 hover:scale-110 transition-all hover:shadow-[0_0_15px_rgba(155,135,245,0.3)] backdrop-blur-sm" onClick={handleImprovePrompt} disabled={isImprovingPrompt}>
-                            {isImprovingPrompt ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <Button className="w-full bg-primary hover:bg-primary/90 text-white" disabled={isProcessing || (workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl} onClick={handleGenerate}>
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    {isProcessing ? "Processing..." : (workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl ? "Upload an image" : "Generate"}
-                  </Button>
                 </div>
               </Card>
 
