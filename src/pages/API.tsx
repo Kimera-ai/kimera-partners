@@ -1,4 +1,3 @@
-
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { Card } from "@/components/ui/card";
 import { DotPattern } from "@/components/ui/dot-pattern";
@@ -218,221 +217,135 @@ x-api-key: YOUR_API_KEY`}</code>
               </button>
               
               {openSections.imageUrl && (
-                <div className="mt-4 pl-10">
+                <div className="mt-4 pl-4 md:pl-10 max-w-full overflow-x-auto">
                   <div className="text-gray-300 space-y-4">
-                    <h4 className="font-semibold text-white text-lg">Guide to Manipulating Image URLs for Optimal Display</h4>
-                    <p>
-                      This guide explains how to modify image URLs to control their display size, proportions, and other visual aspects. 
-                      By adding parameters to image URLs, you can optimize images for your specific needs without requiring server-side image processing.
-                    </p>
-                    
                     {/* Original Example Image */}
                     <div className="flex flex-col items-center my-6">
                       <h5 className="font-semibold text-white mb-4">Original Example Image</h5>
                       <img 
                         src="https://www.jeann.online/cdn-cgi/image/width=800,height=1230,fit=cover/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg" 
                         alt="Example image" 
-                        className="max-w-[400px] rounded-lg"
+                        className="w-full max-w-[300px] sm:max-w-[400px] rounded-lg"
                       />
                     </div>
                     
-                    <div className="bg-background/40 border-l-4 border-primary/50 p-4 rounded-r-lg">
-                      <strong>Note:</strong> For best results, the original source image should be in a 1:1 ratio.
-                    </div>
-                    
-                    <h5 className="font-semibold text-white">Basic URL Structure</h5>
-                    <p>Image transformation parameters are typically added to a URL in the following format:</p>
+                    {/* Code examples */}
                     <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full">
-                      <code className="text-sm">https://domain.com/cdn-cgi/image/[parameters]/[original-image-path]</code>
+                      <code className="text-sm whitespace-pre-wrap break-words">{`https://www.jeann.online/cdn-cgi/image/width=250,height=250,fit=cover,gravity=auto/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg`}</code>
                     </div>
                     
-                    <p>Example:</p>
-                    <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full">
-                      <code className="text-sm">https://www.jeann.online/cdn-cgi/image/width=800,height=1230,fit=cover/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg</code>
-                    </div>
-                    
-                    <h5 className="font-semibold text-white mt-6">Common Parameters</h5>
-                    <h6 className="font-semibold text-white">Width and Height</h6>
-                    <p><strong>width</strong> - Specifies maximum width of the image in pixels. Behavior depends on the fit mode.</p>
-                    <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full">
-                      <code className="text-sm">width=250</code>
-                    </div>
-                    
-                    <p>You can also use:</p>
-                    <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full">
-                      <code className="text-sm">width=auto</code>
-                    </div>
-                    <p>This automatically serves the image in the most optimal width based on the browser and device (supported only by Chromium browsers).</p>
-                    
-                    <p><strong>height</strong> - Specifies maximum height of the image in pixels.</p>
-                    <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full">
-                      <code className="text-sm">height=250</code>
-                    </div>
-                    
-                    <p className="italic font-semibold">Best Practice: Image sizes should match the exact dimensions at which they are displayed on the page. For responsive images, use the HTML srcset element with appropriate width parameters.</p>
-                    
-                    <h5 className="font-semibold text-white mt-6">Fit Modes Comparison</h5>
-                    <div className="overflow-x-auto">
-                      <table className="w-full border-collapse my-4">
-                        <thead>
-                          <tr>
-                            <th className="border border-white/10 bg-background/40 p-2 text-left">Fit Mode</th>
-                            <th className="border border-white/10 bg-background/40 p-2 text-left">Description</th>
-                            <th className="border border-white/10 bg-background/40 p-2 text-left">Example (400x300)</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td className="border border-white/10 p-2"><code>scale-down</code></td>
-                            <td className="border border-white/10 p-2">Similar to <code>contain</code>, but the image is never enlarged. If the image is larger than given dimensions, it will be resized; otherwise, its original size will be kept.</td>
-                            <td className="border border-white/10 p-2">
-                              <img 
-                                src="https://www.jeann.online/cdn-cgi/image/width=400,height=300,fit=scale-down/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg" 
-                                alt="scale-down example" 
-                                className="max-w-full rounded-lg"
-                              />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td className="border border-white/10 p-2"><code>contain</code></td>
-                            <td className="border border-white/10 p-2">Image will be resized to be as large as possible within the given dimensions while preserving the aspect ratio.</td>
-                            <td className="border border-white/10 p-2">
-                              <img 
-                                src="https://www.jeann.online/cdn-cgi/image/width=400,height=300,fit=contain/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg" 
-                                alt="contain example" 
-                                className="max-w-full rounded-lg"
-                              />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td className="border border-white/10 p-2"><code>cover</code></td>
-                            <td className="border border-white/10 p-2">Resizes to fill the entire area. If the image has a different aspect ratio, it will be cropped to fit.</td>
-                            <td className="border border-white/10 p-2">
-                              <img 
-                                src="https://www.jeann.online/cdn-cgi/image/width=400,height=300,fit=cover/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg" 
-                                alt="cover example" 
-                                className="max-w-full rounded-lg"
-                              />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td className="border border-white/10 p-2"><code>crop</code></td>
-                            <td className="border border-white/10 p-2">Image will be shrunk and cropped to fit. The image will not be enlarged.</td>
-                            <td className="border border-white/10 p-2">
-                              <img 
-                                src="https://www.jeann.online/cdn-cgi/image/width=400,height=300,fit=crop/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg" 
-                                alt="crop example" 
-                                className="max-w-full rounded-lg"
-                              />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td className="border border-white/10 p-2"><code>pad</code></td>
-                            <td className="border border-white/10 p-2">Resizes to fit and fills remaining area with a background color.</td>
-                            <td className="border border-white/10 p-2">
-                              <img 
-                                src="https://www.jeann.online/cdn-cgi/image/width=400,height=300,fit=pad/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg" 
-                                alt="pad example" 
-                                className="max-w-full rounded-lg"
-                              />
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                    
-                    <h5 className="font-semibold text-white mt-6">Gravity Comparison</h5>
-                    <p>When cropping with <code>fit=cover</code> or <code>fit=crop</code>, the <code>gravity</code> parameter defines which part of the image should be preserved.</p>
-                    
-                    <div className="overflow-x-auto">
-                      <table className="w-full border-collapse my-4">
-                        <thead>
-                          <tr>
-                            <th className="border border-white/10 bg-background/40 p-2 text-left">Gravity</th>
-                            <th className="border border-white/10 bg-background/40 p-2 text-left">Description</th>
-                            <th className="border border-white/10 bg-background/40 p-2 text-left">Example (400x300)</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td className="border border-white/10 p-2"><code>auto</code></td>
-                            <td className="border border-white/10 p-2">Automatically selects focal point based on saliency detection.</td>
-                            <td className="border border-white/10 p-2">
-                              <img 
-                                src="https://www.jeann.online/cdn-cgi/image/width=400,height=300,fit=cover,gravity=auto/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg" 
-                                alt="gravity auto example" 
-                                className="max-w-full rounded-lg"
-                              />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td className="border border-white/10 p-2"><code>left</code></td>
-                            <td className="border border-white/10 p-2">Preserves the left side of the image when cropping.</td>
-                            <td className="border border-white/10 p-2">
-                              <img 
-                                src="https://www.jeann.online/cdn-cgi/image/width=400,height=300,fit=cover,gravity=left/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg" 
-                                alt="gravity left example" 
-                                className="max-w-full rounded-lg"
-                              />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td className="border border-white/10 p-2"><code>right</code></td>
-                            <td className="border border-white/10 p-2">Preserves the right side of the image when cropping.</td>
-                            <td className="border border-white/10 p-2">
-                              <img 
-                                src="https://www.jeann.online/cdn-cgi/image/width=400,height=300,fit=cover,gravity=right/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg" 
-                                alt="gravity right example" 
-                                className="max-w-full rounded-lg"
-                              />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td className="border border-white/10 p-2"><code>top</code></td>
-                            <td className="border border-white/10 p-2">Preserves the top of the image when cropping.</td>
-                            <td className="border border-white/10 p-2">
-                              <img 
-                                src="https://www.jeann.online/cdn-cgi/image/width=400,height=300,fit=cover,gravity=top/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg" 
-                                alt="gravity top example" 
-                                className="max-w-full rounded-lg"
-                              />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td className="border border-white/10 p-2"><code>0.5x0.2</code></td>
-                            <td className="border border-white/10 p-2">Preserves the area around a point at 20% from the top and centered horizontally.</td>
-                            <td className="border border-white/10 p-2">
-                              <img 
-                                src="https://www.jeann.online/cdn-cgi/image/width=400,height=300,fit=cover,gravity=0.5x0.2/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg" 
-                                alt="gravity coordinates example" 
-                                className="max-w-full rounded-lg"
-                              />
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                    
-                    <h5 className="font-semibold text-white mt-6">Practical Examples</h5>
-                    
-                    <div className="bg-background/40 rounded-lg p-4 my-4">
-                      <h6 className="font-semibold text-white">Square Thumbnail (250×250):</h6>
-                      <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full mt-2">
-                        <code className="text-sm">https://www.jeann.online/cdn-cgi/image/width=250,height=250,fit=cover,gravity=auto/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg</code>
-                      </div>
-                      <div className="mt-3 flex justify-center">
-                        <img 
-                          src="https://www.jeann.online/cdn-cgi/image/width=250,height=250,fit=cover,gravity=auto/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg" 
-                          alt="Square thumbnail example" 
-                          className="rounded-lg"
-                        />
+                    {/* Tables */}
+                    <div className="overflow-x-auto -mx-4 sm:mx-0">
+                      <div className="min-w-full inline-block align-middle">
+                        <div className="overflow-hidden">
+                          <table className="min-w-full divide-y divide-white/10">
+                            <thead>
+                              <tr>
+                                <th className="border border-white/10 bg-background/40 p-2 text-left">Fit Mode</th>
+                                <th className="border border-white/10 bg-background/40 p-2 text-left">Description</th>
+                                <th className="border border-white/10 bg-background/40 p-2 text-left">Example (400x300)</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td className="border border-white/10 p-2"><code>scale-down</code></td>
+                                <td className="border border-white/10 p-2">Similar to <code>contain</code>, but the image is never enlarged. If the image is larger than given dimensions, it will be resized; otherwise, its original size will be kept.</td>
+                                <td className="border border-white/10 p-2">
+                                  <img 
+                                    src="https://www.jeann.online/cdn-cgi/image/width=400,height=300,fit=scale-down/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg" 
+                                    alt="scale-down example" 
+                                    className="max-w-full rounded-lg"
+                                  />
+                                </td>
+                              </tr>
+                              <tr>
+                                <td className="border border-white/10 p-2"><code>contain</code></td>
+                                <td className="border border-white/10 p-2">Image will be resized to be as large as possible within the given dimensions while preserving the aspect ratio.</td>
+                                <td className="border border-white/10 p-2">
+                                  <img 
+                                    src="https://www.jeann.online/cdn-cgi/image/width=400,height=300,fit=contain/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg" 
+                                    alt="contain example" 
+                                    className="max-w-full rounded-lg"
+                                  />
+                                </td>
+                              </tr>
+                              <tr>
+                                <td className="border border-white/10 p-2"><code>cover</code></td>
+                                <td className="border border-white/10 p-2">Resizes to fill the entire area. If the image has a different aspect ratio, it will be cropped to fit.</td>
+                                <td className="border border-white/10 p-2">
+                                  <img 
+                                    src="https://www.jeann.online/cdn-cgi/image/width=400,height=300,fit=cover/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg" 
+                                    alt="cover example" 
+                                    className="max-w-full rounded-lg"
+                                  />
+                                </td>
+                              </tr>
+                              <tr>
+                                <td className="border border-white/10 p-2"><code>crop</code></td>
+                                <td className="border border-white/10 p-2">Image will be shrunk and cropped to fit. The image will not be enlarged.</td>
+                                <td className="border border-white/10 p-2">
+                                  <img 
+                                    src="https://www.jeann.online/cdn-cgi/image/width=400,height=300,fit=crop/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg" 
+                                    alt="crop example" 
+                                    className="max-w-full rounded-lg"
+                                  />
+                                </td>
+                              </tr>
+                              <tr>
+                                <td className="border border-white/10 p-2"><code>pad</code></td>
+                                <td className="border border-white/10 p-2">Resizes to fit and fills remaining area with a background color.</td>
+                                <td className="border border-white/10 p-2">
+                                  <img 
+                                    src="https://www.jeann.online/cdn-cgi/image/width=400,height=300,fit=pad/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg" 
+                                    alt="pad example" 
+                                    className="max-w-full rounded-lg"
+                                  />
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
                     </div>
                     
-                    <div className="bg-background/40 rounded-lg p-4 my-4">
-                      <h6 className="font-semibold text-white">Widescreen Banner (800×300):</h6>
-                      <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full mt-2">
-                        <code className="text-sm">https://www.jeann.online/cdn-cgi/image/width=800,height=300,fit=cover,gravity=0.5x0.33/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg</code>
+                    {/* Example sections */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Square Thumbnail */}
+                      <div className="bg-background/40 rounded-lg p-4">
+                        <h6 className="font-semibold text-white">Square Thumbnail (250×250)</h6>
+                        <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto mt-2">
+                          <code className="text-sm break-all">https://www.jeann.online/cdn-cgi/image/width=250,height=250,fit=cover,gravity=auto/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg</code>
+                        </div>
+                        <div className="mt-3 flex justify-center">
+                          <img 
+                            src="https://www.jeann.online/cdn-cgi/image/width=250,height=250,fit=cover,gravity=auto/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg" 
+                            alt="Square thumbnail example" 
+                            className="rounded-lg"
+                          />
+                        </div>
+                      </div>
+                      
+                      {/* Profile Picture */}
+                      <div className="bg-background/40 rounded-lg p-4">
+                        <h6 className="font-semibold text-white">Profile Picture (150×150)</h6>
+                        <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto mt-2">
+                          <code className="text-sm break-all">https://www.jeann.online/cdn-cgi/image/width=150,height=150,fit=cover,gravity=auto/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg</code>
+                        </div>
+                        <div className="mt-3 flex justify-center">
+                          <img 
+                            src="https://www.jeann.online/cdn-cgi/image/width=150,height=150,fit=cover,gravity=auto/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg" 
+                            alt="Profile picture example" 
+                            className="rounded-lg"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Widescreen Banner */}
+                    <div className="bg-background/40 rounded-lg p-4">
+                      <h6 className="font-semibold text-white">Widescreen Banner (800×300)</h6>
+                      <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto mt-2">
+                        <code className="text-sm break-all">https://www.jeann.online/cdn-cgi/image/width=800,height=300,fit=cover,gravity=0.5x0.33/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg</code>
                       </div>
                       <div className="mt-3">
                         <img 
@@ -443,57 +356,49 @@ x-api-key: YOUR_API_KEY`}</code>
                       </div>
                     </div>
                     
-                    <div className="bg-background/40 rounded-lg p-4 my-4">
-                      <h6 className="font-semibold text-white">Product Image (max width 400px):</h6>
-                      <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full mt-2">
-                        <code className="text-sm">https://www.jeann.online/cdn-cgi/image/width=400,fit=scale-down/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg</code>
+                    {/* Product Image */}
+                    <div className="bg-background/40 rounded-lg p-4">
+                      <h6 className="font-semibold text-white">Product Image (max width 400px)</h6>
+                      <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto mt-2">
+                        <code className="text-sm break-all">https://www.jeann.online/cdn-cgi/image/width=400,fit=scale-down/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg</code>
                       </div>
                       <div className="mt-3 flex justify-center">
                         <img 
                           src="https://www.jeann.online/cdn-cgi/image/width=400,fit=scale-down/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg" 
                           alt="Product image example" 
-                          className="rounded-lg"
+                          className="rounded-lg max-w-full"
                         />
                       </div>
                     </div>
                     
-                    <div className="bg-background/40 rounded-lg p-4 my-4">
-                      <h6 className="font-semibold text-white">Profile Picture (150×150):</h6>
-                      <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full mt-2">
-                        <code className="text-sm">https://www.jeann.online/cdn-cgi/image/width=150,height=150,fit=cover,gravity=auto/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg</code>
-                      </div>
-                      <div className="mt-3 flex justify-center">
-                        <img 
-                          src="https://www.jeann.online/cdn-cgi/image/width=150,height=150,fit=cover,gravity=auto/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg" 
-                          alt="Profile picture example" 
-                          className="rounded-lg"
-                        />
-                      </div>
-                    </div>
-                    
-                    <h5 className="font-semibold text-white mt-6">How to Use These URLs</h5>
-                    <p>You can use these transformed image URLs in various ways:</p>
-                    <ul className="list-disc list-inside space-y-1 ml-4">
-                      <li>As the <code>src</code> attribute in an <code>&lt;img&gt;</code> tag</li>
-                      <li>As the background image in CSS with <code>background-image: url(...)</code></li>
-                      <li>In responsive image solutions with <code>&lt;picture&gt;</code> or <code>srcset</code> attributes</li>
-                    </ul>
+                    {/* Usage Examples */}
+                    <div className="space-y-4">
+                      <h5 className="font-semibold text-white mt-6">How to Use These URLs</h5>
+                      <p>You can use these transformed image URLs in various ways:</p>
+                      <ul className="list-disc list-inside space-y-1 ml-4">
+                        <li>As the <code>src</code> attribute in an <code>&lt;img&gt;</code> tag</li>
+                        <li>As the background image in CSS with <code>background-image: url(...)</code></li>
+                        <li>In responsive image solutions with <code>&lt;picture&gt;</code> or <code>srcset</code> attributes</li>
+                      </ul>
 
-                    <div className="bg-background/40 rounded-lg p-4 my-4">
-                      <h6 className="font-semibold text-white">Example HTML usage:</h6>
-                      <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full mt-2">
-                        <pre><code>&lt;img src="https://www.jeann.online/cdn-cgi/image/width=800,height=600,fit=cover/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg" alt="Example image" /&gt;</code></pre>
-                      </div>
-                    </div>
+                      <div className="grid grid-cols-1 gap-4">
+                        <div className="bg-background/40 rounded-lg p-4">
+                          <h6 className="font-semibold text-white">Example HTML usage:</h6>
+                          <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto mt-2">
+                            <pre className="text-sm"><code>&lt;img src="https://www.jeann.online/cdn-cgi/image/width=800,height=600,fit=cover/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg" alt="Example image" /&gt;</code></pre>
+                          </div>
+                        </div>
 
-                    <div className="bg-background/40 rounded-lg p-4 my-4">
-                      <h6 className="font-semibold text-white">Example CSS usage:</h6>
-                      <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto w-full mt-2">
-                        <pre><code>{`.header-background {
+                        <div className="bg-background/40 rounded-lg p-4">
+                          <h6 className="font-semibold text-white">Example CSS usage:</h6>
+                          <div className="bg-gray-900 p-3 rounded-lg overflow-x-auto mt-2">
+                            <pre className="text-sm"><code>{`.header-background {
   background-image: url('https://www.jeann.online/cdn-cgi/image/width=1200,height=400,fit=cover/https://kimera-media.s3.eu-north-1.amazonaws.com/ff34d313-dda8-4d84-bbb7-369c087f057f_event/ff34d313-dda8-4d84-bbb7-369c087f057f_result.jpg');
   background-size: cover;
   background-position: center;
 }`}</code></pre>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
