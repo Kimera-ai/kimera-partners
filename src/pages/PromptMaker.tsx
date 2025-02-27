@@ -30,12 +30,12 @@ const ImagePreview = ({
 }) => {
   if (!imagePreview) {
     return <label htmlFor="reference-image" className={`cursor-pointer block ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
-        <div className="h-8 w-8 rounded-md bg-white/10 backdrop-blur border border-white/20 p-1.5 hover:bg-white/20 flex items-center justify-center">
+        <div className="h-8 w-8 rounded-md bg-white/5 backdrop-blur border border-white/10 p-1.5 hover:bg-white/10 flex items-center justify-center">
           <Image className="h-full w-full text-white/70" />
         </div>
       </label>;
   }
-  return <button type="button" className={`h-8 w-8 rounded-md bg-white/10 backdrop-blur border border-white/20 p-0.5 hover:bg-white/20 group relative ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`} onClick={onRemove} disabled={isUploading || isProcessing || disabled}>
+  return <button type="button" className={`h-8 w-8 rounded-md bg-white/5 backdrop-blur border border-white/10 p-0.5 hover:bg-white/10 group relative ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`} onClick={onRemove} disabled={isUploading || isProcessing || disabled}>
       <img src={imagePreview} alt="Reference" className="w-full h-full object-cover rounded transition-opacity group-hover:opacity-50" />
       <X className="absolute inset-0 m-auto h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
     </button>;
@@ -436,13 +436,13 @@ const PromptMaker = () => {
             </h1>
             {session?.user && (
               <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2 backdrop-blur px-4 py-2 rounded-full bg-background/50">
+                <div className="flex items-center gap-2 backdrop-blur px-4 py-2 rounded-full bg-background/50 border border-white/5">
                   <Coins className="w-4 h-4 text-yellow-500" />
                   <span className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                     {isLoadingCredits ? <Loader2 className="w-4 h-4 animate-spin" /> : `${credits ?? 0} credits`}
                   </span>
                 </div>
-                <div className="text-sm text-muted-foreground backdrop-blur px-4 py-2 rounded-full bg-background/50">
+                <div className="text-sm text-muted-foreground backdrop-blur px-4 py-2 rounded-full bg-background/50 border border-white/5">
                   Cost per generation: {CREDITS_PER_GENERATION} credits
                 </div>
               </div>
@@ -451,16 +451,16 @@ const PromptMaker = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="space-y-6">
-              <Card className="p-6 bg-background/50 backdrop-blur">
+              <Card className="p-6 bg-card/60 backdrop-blur border border-white/5 shadow-lg">
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="workflow" className="text-sm font-medium block">Workflow</Label>
+                      <Label htmlFor="workflow" className="text-sm font-medium block text-white/80">Workflow</Label>
                       <Select value={workflow} onValueChange={setWorkflow}>
-                        <SelectTrigger id="workflow" className="w-full">
+                        <SelectTrigger id="workflow" className="w-full bg-background/50 border-white/10 text-white">
                           <SelectValue placeholder="Select workflow" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-background border-white/10 text-white">
                           <SelectItem value="no-reference">Basic image generation</SelectItem>
                           <SelectItem value="with-reference">Basic with image reference</SelectItem>
                           <SelectItem value="cartoon">Cartoon</SelectItem>
@@ -474,18 +474,18 @@ const PromptMaker = () => {
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Label htmlFor="ratio" className="text-sm font-medium block truncate">Aspect Ratio</Label>
+                            <Label htmlFor="ratio" className="text-sm font-medium block truncate text-white/80">Aspect Ratio</Label>
                           </TooltipTrigger>
-                          <TooltipContent>
+                          <TooltipContent className="bg-background/90 border-white/10">
                             <p>Aspect Ratio</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                       <Select value={ratio} onValueChange={setRatio}>
-                        <SelectTrigger id="ratio" className="w-full">
+                        <SelectTrigger id="ratio" className="w-full bg-background/50 border-white/10 text-white">
                           <SelectValue placeholder="Select ratio" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-background border-white/10 text-white">
                           <SelectItem value="1:1">1:1 (Square)</SelectItem>
                           <SelectItem value="2:3">2:3 (Portrait)</SelectItem>
                           <SelectItem value="3:4">3:4 (Portrait)</SelectItem>
@@ -496,18 +496,18 @@ const PromptMaker = () => {
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Label htmlFor="style" className="text-sm font-medium block truncate">Style</Label>
+                            <Label htmlFor="style" className="text-sm font-medium block truncate text-white/80">Style</Label>
                           </TooltipTrigger>
-                          <TooltipContent>
+                          <TooltipContent className="bg-background/90 border-white/10">
                             <p>Style</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                       <Select value={style} onValueChange={setStyle}>
-                        <SelectTrigger id="style" className="w-full">
+                        <SelectTrigger id="style" className="w-full bg-background/50 border-white/10 text-white">
                           <SelectValue placeholder="Select style" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-background border-white/10 text-white">
                           <SelectItem value="Cinematic">Cinematic</SelectItem>
                           <SelectItem value="Animated">Animated</SelectItem>
                           <SelectItem value="Digital Art">Digital Art</SelectItem>
@@ -525,18 +525,18 @@ const PromptMaker = () => {
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Label htmlFor="loraScale" className="text-sm font-medium block truncate">Character Ref. Strength</Label>
+                            <Label htmlFor="loraScale" className="text-sm font-medium block truncate text-white/80">Character Ref. Strength</Label>
                           </TooltipTrigger>
-                          <TooltipContent>
+                          <TooltipContent className="bg-background/90 border-white/10">
                             <p>Character Reference Strength</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                       <Select value={loraScale} onValueChange={setLoraScale} disabled={workflow === 'no-reference'}>
-                        <SelectTrigger id="loraScale" className={`w-full ${workflow === 'no-reference' ? 'opacity-50' : ''}`}>
+                        <SelectTrigger id="loraScale" className={`w-full bg-background/50 border-white/10 text-white ${workflow === 'no-reference' ? 'opacity-50' : ''}`}>
                           <SelectValue placeholder="Select strength" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-background border-white/10 text-white">
                           <SelectItem value="0.2">0.2</SelectItem>
                           <SelectItem value="0.3">0.3</SelectItem>
                           <SelectItem value="0.4">0.4</SelectItem>
@@ -553,18 +553,18 @@ const PromptMaker = () => {
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Label htmlFor="seed" className="text-sm font-medium block truncate">Seed</Label>
+                            <Label htmlFor="seed" className="text-sm font-medium block truncate text-white/80">Seed</Label>
                           </TooltipTrigger>
-                          <TooltipContent>
+                          <TooltipContent className="bg-background/90 border-white/10">
                             <p>Seed</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                       <Select value={seed} onValueChange={setSeed}>
-                        <SelectTrigger id="seed" className="w-full">
+                        <SelectTrigger id="seed" className="w-full bg-background/50 border-white/10 text-white">
                           <SelectValue placeholder="Select seed" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-background border-white/10 text-white">
                           <SelectItem value="random">Random</SelectItem>
                           <SelectItem value="steady">Steady</SelectItem>
                         </SelectContent>
@@ -573,7 +573,7 @@ const PromptMaker = () => {
                   </div>
 
                   <div>
-                    <Label htmlFor="prompt">Prompt</Label>
+                    <Label htmlFor="prompt" className="text-sm font-medium block text-white/80">Prompt</Label>
                     <div className="relative">
                       <Input id="reference-image" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={isUploading || isProcessing || workflow === 'no-reference'} />
                       <div className="relative">
@@ -584,7 +584,7 @@ const PromptMaker = () => {
                           <ImagePreview imagePreview={imagePreview} isUploading={isUploading} isProcessing={isProcessing} onRemove={removeImage} disabled={workflow === 'no-reference'} />
                         </div>
                         <div className="relative">
-                          <Textarea id="prompt" placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..." value={prompt} onChange={e => setPrompt(e.target.value)} className="h-32 resize-none bg-background/50 pl-14" />
+                          <Textarea id="prompt" placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..." value={prompt} onChange={e => setPrompt(e.target.value)} className="h-32 resize-none bg-background/50 border-white/10 text-white pl-14" />
                           <Button variant="ghost" size="icon" className="absolute bottom-3 left-3 text-primary/70 hover:text-primary hover:bg-primary/10 hover:scale-110 transition-all hover:shadow-[0_0_15px_rgba(155,135,245,0.3)] backdrop-blur-sm" onClick={handleImprovePrompt} disabled={isImprovingPrompt}>
                             {isImprovingPrompt ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                           </Button>
@@ -593,29 +593,29 @@ const PromptMaker = () => {
                     </div>
                   </div>
 
-                  <Button className="w-full" disabled={isProcessing || (workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl} onClick={handleGenerate}>
+                  <Button className="w-full bg-primary hover:bg-primary/90 text-white" disabled={isProcessing || (workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl} onClick={handleGenerate}>
                     <Sparkles className="w-4 h-4 mr-2" />
                     {isProcessing ? "Processing..." : (workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl ? "Upload an image" : "Generate"}
                   </Button>
                 </div>
               </Card>
 
-              <Card className="p-6 bg-background/50 backdrop-blur">
-                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Card className="p-6 bg-card/60 backdrop-blur border border-white/5 shadow-lg">
+                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-white">
                   <History className="w-5 h-5" />
                   Generation History
                 </h2>
-                <div className="max-h-[400px] overflow-y-auto pr-2">
+                <div className="max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {previousGenerations.map(gen => <div key={gen.id} className="space-y-3">
                         <div className="relative group">
                           <button className="w-full text-left" onClick={() => handleImageClick(gen)}>
-                            <img src={gen.image_url} alt={gen.prompt} className="w-full aspect-square object-cover rounded-lg hover:opacity-90 transition-opacity" />
+                            <img src={gen.image_url} alt={gen.prompt} className="w-full aspect-square object-cover rounded-lg hover:opacity-90 transition-opacity border border-white/10" />
                           </button>
                           <Button variant="outline" size="icon" onClick={e => {
                         e.stopPropagation();
                         handleDownload(gen.image_url);
-                      }} className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity bg-background/50 backdrop-blur hover:bg-background/80">
+                      }} className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity bg-background/50 backdrop-blur hover:bg-background/80 border-white/10">
                             <Download className="h-4 w-4" />
                           </Button>
                         </div>
@@ -639,16 +639,16 @@ const PromptMaker = () => {
               </Card>
             </div>
 
-            <Card className="p-6 bg-background/50 backdrop-blur relative aspect-[2/3] flex items-center justify-center">
+            <Card className="p-6 bg-card/60 backdrop-blur border border-white/5 shadow-lg relative aspect-[2/3] flex items-center justify-center">
               {isProcessing && <div className="absolute inset-0 flex items-center justify-center z-10">
-                  <div className="flex items-center gap-2 backdrop-blur px-6 py-3 rounded-full bg-violet-900">
+                  <div className="flex items-center gap-2 backdrop-blur px-6 py-3 rounded-full bg-violet-900/70 border border-white/10">
                     <Clock className="w-6 h-6 animate-pulse" />
                     <span className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                       {formatTime(elapsedTime)}
                     </span>
                   </div>
                 </div>}
-              {generatedImage ? <img src={generatedImage} alt="Generated" className="w-full h-full object-cover rounded-lg shadow-lg" /> : <div className="text-center text-muted-foreground">
+              {generatedImage ? <img src={generatedImage} alt="Generated" className="w-full h-full object-cover rounded-lg shadow-lg" /> : <div className="text-center text-white/60">
                   <Image className="w-12 h-12 mx-auto mb-4 opacity-50" />
                   <p>Your generated images will appear here</p>
                 </div>}
@@ -658,39 +658,39 @@ const PromptMaker = () => {
       </div>
 
       <Dialog open={showPromptDialog} onOpenChange={setShowPromptDialog}>
-        <DialogContent className="sm:max-w-[90vw] md:max-w-[800px] h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[90vw] md:max-w-[800px] h-[90vh] overflow-y-auto bg-card border border-white/10 text-white">
           <DialogHeader>
-            <DialogTitle className="flex items-center justify-between">
+            <DialogTitle className="flex items-center justify-between text-white">
               Generation Details
-              {selectedGeneration && <Button variant="outline" size="icon" onClick={() => handleDownload(selectedGeneration.image_url)} className="h-8 w-8">
+              {selectedGeneration && <Button variant="outline" size="icon" onClick={() => handleDownload(selectedGeneration.image_url)} className="h-8 w-8 border-white/10 bg-background/50 hover:bg-background/80">
                   <Download className="h-4 w-4" />
                 </Button>}
             </DialogTitle>
           </DialogHeader>
           {selectedGeneration && <div className="space-y-4 h-full">
-              <div className="relative h-[calc(90vh-12rem)] flex items-center justify-center rounded-lg bg-background/50">
+              <div className="relative h-[calc(90vh-12rem)] flex items-center justify-center rounded-lg bg-background/30 border border-white/5">
                 <img src={selectedGeneration.image_url} alt={selectedGeneration.prompt} className="max-w-full max-h-full object-contain" />
               </div>
               <div className="space-y-2">
-                <Label>Prompt</Label>
-                <p className="text-sm text-white/90 bg-background/50 p-4 rounded-lg max-h-[15vh] overflow-y-auto">
+                <Label className="text-white/80">Prompt</Label>
+                <p className="text-sm text-white/90 bg-background/30 p-4 rounded-lg max-h-[15vh] overflow-y-auto border border-white/5">
                   {selectedGeneration.prompt}
                 </p>
                 <div className="grid grid-cols-2 gap-4 text-sm text-white/70">
                   <div>
-                    <Label>Style</Label>
+                    <Label className="text-white/80">Style</Label>
                     <p>{selectedGeneration.style}</p>
                   </div>
                   <div>
-                    <Label>Ratio</Label>
+                    <Label className="text-white/80">Ratio</Label>
                     <p>{selectedGeneration.ratio}</p>
                   </div>
                   <div>
-                    <Label>Seed</Label>
+                    <Label className="text-white/80">Seed</Label>
                     <p>{selectedGeneration.seed || "random"}</p>
                   </div>
                   <div>
-                    <Label>Character Reference Strength</Label>
+                    <Label className="text-white/80">Character Reference Strength</Label>
                     <p>{selectedGeneration.lora_scale || "0.5"}</p>
                   </div>
                 </div>

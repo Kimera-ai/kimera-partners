@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -22,8 +23,8 @@ export default {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "#100919",
-        foreground: "#FFFFFF",
+        background: "#100919", // Darker background
+        foreground: "#FFFFFF", // White text
         primary: {
           DEFAULT: "#9b87f5", // Changed from red to Primary Purple
           hover: "#7E69AB", // Changed to Secondary Purple
@@ -50,8 +51,8 @@ export default {
           foreground: "hsl(var(--popover-foreground))",
         },
         card: {
-          DEFAULT: "#1A1F2C",
-          foreground: "#FFFFFF",
+          DEFAULT: "#1A1F2C", // Dark card background
+          foreground: "#FFFFFF", // White text for cards
         },
       },
       borderRadius: {
