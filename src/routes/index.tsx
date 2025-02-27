@@ -8,6 +8,7 @@ import Pricing from "@/pages/Pricing"
 import ThankYou from "@/pages/ThankYou"
 import EmbedThemes from "@/pages/EmbedThemes"
 import PromptMaker from "@/pages/PromptMaker"
+import API from "@/pages/API"
 import { useSession } from "@/hooks/useSession"
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -82,6 +83,14 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <PromptMaker />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/api",
+    element: (
+      <ProtectedRoute>
+        <API />
       </ProtectedRoute>
     ),
   },

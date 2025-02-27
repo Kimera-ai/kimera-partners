@@ -1,9 +1,10 @@
+
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Server } from "lucide-react";
 import { useState } from "react";
 
 const NavLink = ({ href, children, onClick }: { href: string; children: React.ReactNode; onClick?: () => void }) => {
@@ -81,6 +82,12 @@ export const Navigation = () => {
               <NavLink href="/partner-program">Partner Program</NavLink>
               <NavLink href="/marketing-kit">Marketing Kit</NavLink>
               <NavLink href="/pricing">Pricing</NavLink>
+              <NavLink href="/api">
+                <div className="flex items-center gap-1">
+                  <Server className="h-4 w-4" />
+                  <span>API</span>
+                </div>
+              </NavLink>
             </div>
             <div className="flex items-center gap-4">
               {session ? (
@@ -116,6 +123,12 @@ export const Navigation = () => {
               <NavLink href="/partner-program" onClick={closeMobileMenu}>Partner Program</NavLink>
               <NavLink href="/marketing-kit" onClick={closeMobileMenu}>Marketing Kit</NavLink>
               <NavLink href="/pricing" onClick={closeMobileMenu}>Pricing</NavLink>
+              <NavLink href="/api" onClick={closeMobileMenu}>
+                <div className="flex items-center gap-1">
+                  <Server className="h-4 w-4" />
+                  <span>API</span>
+                </div>
+              </NavLink>
               
               <div className="pt-4 border-t border-white/10 mt-4">
                 {session ? (
