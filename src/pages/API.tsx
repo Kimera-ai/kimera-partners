@@ -69,7 +69,7 @@ const API = () => {
                     <pre className="text-sm text-gray-300">
                       <code>{`POST /v1/pipeline/run HTTP/1.1
 Host: api.kimera.ai
-x-api-key: 1712edc40e3eb72c858332fe7500bf33e885324f8c1cd52b8cded2cdfd724cee
+x-api-key: YOUR_API_KEY
 Content-Type: application/json
 Content-Length: 145
 
@@ -104,7 +104,7 @@ Content-Length: 145
                     <pre className="text-sm text-gray-300">
                       <code>{`GET /v1/pipeline/run/replace with the response id from post response HTTP/1.1
 Host: api.kimera.ai
-x-api-key: 1712edc40e3eb72c858332fe7500bf33e885324f8c1cd52b8cded2cdfd724cee`}</code>
+x-api-key: YOUR_API_KEY`}</code>
                     </pre>
                   </div>
                 </div>
