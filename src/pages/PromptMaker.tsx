@@ -433,7 +433,7 @@ const PromptMaker = () => {
         method: 'GET',
         mode: 'cors',
         headers: {
-          'Accept': 'image/jpeg,image/png,image/*'
+          'Accept': 'image/jpeg,image/png,image/*'\
         }
       });
       
@@ -465,7 +465,8 @@ const PromptMaker = () => {
     }
   };
 
-  return <BaseLayout>
+  return (
+    <BaseLayout>
       <div className="relative min-h-screen">
         <div className="absolute inset-0 pointer-events-none">
           <DotPattern width={24} height={24} className="[mask-image:radial-gradient(900px_circle_at_center,white,transparent)]" cx={1} cy={1} cr={1} />
@@ -653,15 +654,16 @@ const PromptMaker = () => {
                 </h2>
                 <div className="max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    {previousGenerations.map(gen => <div key={gen.id} className="space-y-3">
+                    {previousGenerations.map(gen => (
+                      <div key={gen.id} className="space-y-3">
                         <div className="relative group">
                           <button className="w-full text-left" onClick={() => handleImageClick(gen)}>
                             <img src={gen.image_url} alt={gen.prompt} className="w-full aspect-square object-cover rounded-lg hover:opacity-90 transition-opacity border border-white/10" />
                           </button>
                           <Button variant="outline" size="icon" onClick={e => {
-                        e.stopPropagation();
-                        handleDownload(gen.image_url);
-                      }} className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity bg-background/50 backdrop-blur hover:bg-background/80 border-white/10">
+                            e.stopPropagation();
+                            handleDownload(gen.image_url);
+                          }} className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity bg-background/50 backdrop-blur hover:bg-background/80 border-white/10">
                             <Download className="h-4 w-4" />
                           </Button>
                         </div>
@@ -679,7 +681,8 @@ const PromptMaker = () => {
                             <span>{CREDITS_PER_GENERATION} credits</span>
                           </div>
                         </div>
-                      </div>)}
+                      </div>
+                    ))}
                   </div>
                 </div>
               </Card>
@@ -721,15 +724,18 @@ const PromptMaker = () => {
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between text-white">
               Generation Details
-              {selectedGeneration && <Button variant="outline" size="icon" onClick={() => handleDownload(selectedGeneration.image_url)} className="h-8 w-8 border-white/10 bg-background/50 hover:bg-background/80">
+              {selectedGeneration && (
+                <Button variant="outline" size="icon" onClick={() => handleDownload(selectedGeneration.image_url)} className="h-8 w-8 border-white/10 bg-background/50 hover:bg-background/80">
                   <Download className="h-4 w-4" />
-                </Button>}
+                </Button>
+              )}
             </DialogTitle>
           </DialogHeader>
-          {selectedGeneration && <div className="space-y-4 h-full">
+          {selectedGeneration && (
+            <div className="space-y-4 h-full">
               <div className="relative h-[calc(90vh-12rem)] flex items-center justify-center rounded-lg bg-background/30 border border-white/5">
                 <img src={selectedGeneration.image_url} alt={selectedGeneration.prompt} className="max-w-full max-h-full object-contain" />
               </div>
               <div className="space-y-2">
                 <Label className="text-white/80">Prompt</Label>
-                <p className="text-sm text-white/90 bg-background/30 p-4 rounded-
+                <p className="text-
