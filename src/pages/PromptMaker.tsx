@@ -61,6 +61,7 @@ const PromptMaker = () => {
   const [credits, setCredits] = useState<number | null>(null);
   const [isLoadingCredits, setIsLoadingCredits] = useState(true);
   const [workflow, setWorkflow] = useState("no-reference");
+  const [pipelineStatus, setPipelineStatus] = useState("");
 
   const {
     session
@@ -239,6 +240,8 @@ const PromptMaker = () => {
     try {
       setIsProcessing(true);
       setElapsedTime(0);
+      setPipelineStatus("Starting pipeline...");
+      
       const defaultImageUrl = "https://cdn.discordapp.com/attachments/1276822658083979275/1344299399907381258/Untitled-1.jpg?ex=67c067e0&is=67bf1660&hm=f4c5e15bae4887d9fd5efb6deb7c15065341f8a035ee7b6424e5fcf95d403ee2&";
       const getPipelineId = () => {
         switch (workflow) {
@@ -250,6 +253,8 @@ const PromptMaker = () => {
             return "803a4MBY";
         }
       };
+      
+      setPipelineStatus("Preparing request data...");
       const requestBody = {
         pipeline_id: getPipelineId(),
         imageUrl: uploadedImageUrl || defaultImageUrl,
@@ -261,6 +266,8 @@ const PromptMaker = () => {
           seed: seed === "random" ? -1 : 1234
         }
       };
+      
+      setPipelineStatus("Sending request to Kimera API...");
       const pipelineResponse = await fetch('https://api.kimera.ai/v1/pipeline/run', {
         method: 'POST',
         headers: {
@@ -269,30 +276,47 @@ const PromptMaker = () => {
         },
         body: JSON.stringify(requestBody)
       });
+      
       if (!pipelineResponse.ok) {
         const errorData = await pipelineResponse.json();
         console.error("Pipeline error response:", errorData);
+        setPipelineStatus("Error: Failed to process image");
         throw new Error('Failed to process image');
       }
+      
       const responseData = await pipelineResponse.json();
       const jobId = responseData.id;
       console.log("Job started with ID:", jobId);
+      setPipelineStatus("Processing started (Job ID: " + jobId.substring(0, 8) + "...)");
+      
       const pollInterval = setInterval(async () => {
+        setPipelineStatus("Checking pipeline status...");
         const statusResponse = await fetch(`https://api.kimera.ai/v1/pipeline/run/${jobId}`, {
           headers: {
             'x-api-key': "1712edc40e3eb72c858332fe7500bf33e885324f8c1cd52b8cded2cdfd724cee"
           }
         });
+        
         if (!statusResponse.ok) {
           clearInterval(pollInterval);
+          setPipelineStatus("Error: Failed to check status");
           throw new Error('Failed to check status');
         }
+        
         const status = await statusResponse.json();
         console.log("Current status:", status);
-        if (status.status === 'completed') {
+        
+        // Update status message based on pipeline status
+        if (status.status === 'pending') {
+          setPipelineStatus("Waiting in queue...");
+        } else if (status.status === 'processing') {
+          setPipelineStatus("Processing your image...");
+        } else if (status.status === 'completed') {
+          setPipelineStatus("Generation complete!");
           clearInterval(pollInterval);
           setGeneratedImage(status.result);
           setIsProcessing(false);
+          
           const creditUpdateSuccess = await updateUserCredits(CREDITS_PER_GENERATION);
           if (!creditUpdateSuccess) {
             toast({
@@ -302,6 +326,7 @@ const PromptMaker = () => {
             });
             return;
           }
+          
           const {
             error: dbError
           } = await supabase.from('generated_images').insert({
@@ -312,17 +337,20 @@ const PromptMaker = () => {
             ratio: ratio,
             lora_scale: loraScale
           });
+          
           if (dbError) {
             console.error('Error storing generation:', dbError);
           } else {
             await fetchPreviousGenerations();
           }
+          
           toast({
             title: "Success",
             description: "Image has been generated successfully!",
             duration: 5000
           });
         } else if (status.status === 'failed' || status.status === 'Error') {
+          setPipelineStatus("Error: Pipeline processing failed");
           clearInterval(pollInterval);
           setIsProcessing(false);
           throw new Error('Processing failed');
@@ -330,6 +358,7 @@ const PromptMaker = () => {
       }, 2000);
     } catch (error) {
       setIsProcessing(false);
+      setPipelineStatus("Error: " + (error instanceof Error ? error.message : "Unknown error"));
       console.error('Generation error:', error);
       toast({
         variant: "destructive",
@@ -657,18 +686,31 @@ const PromptMaker = () => {
             </div>
 
             <Card className="p-6 bg-card/60 backdrop-blur border border-white/5 shadow-lg relative aspect-[2/3] flex items-center justify-center">
-              {isProcessing && <div className="absolute inset-0 flex items-center justify-center z-10">
-                  <div className="flex items-center gap-2 backdrop-blur px-6 py-3 rounded-full bg-violet-900/70 border border-white/10">
+              {isProcessing && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+                  <div className="flex items-center gap-2 backdrop-blur px-6 py-3 rounded-full bg-violet-900/70 border border-white/10 mb-4">
                     <Clock className="w-6 h-6 animate-pulse" />
                     <span className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                       {formatTime(elapsedTime)}
                     </span>
                   </div>
-                </div>}
-              {generatedImage ? <img src={generatedImage} alt="Generated" className="w-full h-full object-cover rounded-lg shadow-lg" /> : <div className="text-center text-white/60">
+                  
+                  <div className="backdrop-blur px-6 py-3 rounded-full bg-background/50 border border-white/10 flex items-center gap-2 max-w-[80%]">
+                    <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                    <span className="text-sm whitespace-nowrap text-ellipsis overflow-hidden">
+                      {pipelineStatus}
+                    </span>
+                  </div>
+                </div>
+              )}
+              {generatedImage ? (
+                <img src={generatedImage} alt="Generated" className="w-full h-full object-cover rounded-lg shadow-lg" />
+              ) : (
+                <div className="text-center text-white/60">
                   <Image className="w-12 h-12 mx-auto mb-4 opacity-50" />
                   <p>Your generated images will appear here</p>
-                </div>}
+                </div>
+              )}
             </Card>
           </div>
         </div>
@@ -690,32 +732,4 @@ const PromptMaker = () => {
               </div>
               <div className="space-y-2">
                 <Label className="text-white/80">Prompt</Label>
-                <p className="text-sm text-white/90 bg-background/30 p-4 rounded-lg max-h-[15vh] overflow-y-auto border border-white/5">
-                  {selectedGeneration.prompt}
-                </p>
-                <div className="grid grid-cols-2 gap-4 text-sm text-white/70">
-                  <div>
-                    <Label className="text-white/80">Style</Label>
-                    <p>{selectedGeneration.style}</p>
-                  </div>
-                  <div>
-                    <Label className="text-white/80">Ratio</Label>
-                    <p>{selectedGeneration.ratio}</p>
-                  </div>
-                  <div>
-                    <Label className="text-white/80">Seed</Label>
-                    <p>{selectedGeneration.seed || "random"}</p>
-                  </div>
-                  <div>
-                    <Label className="text-white/80">Character Reference Strength</Label>
-                    <p>{selectedGeneration.lora_scale || "0.5"}</p>
-                  </div>
-                </div>
-              </div>
-            </div>}
-        </DialogContent>
-      </Dialog>
-    </BaseLayout>;
-};
-
-export default PromptMaker;
+                <p className="text-sm text-white/90 bg-background/30 p-4 rounded-
