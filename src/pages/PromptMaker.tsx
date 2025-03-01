@@ -433,7 +433,7 @@ const PromptMaker = () => {
         method: 'GET',
         mode: 'cors',
         headers: {
-          'Accept': 'image/jpeg,image/png,image/*'\
+          'Accept': 'image/jpeg,image/png,image/*'
         }
       });
       
@@ -738,4 +738,16 @@ const PromptMaker = () => {
               </div>
               <div className="space-y-2">
                 <Label className="text-white/80">Prompt</Label>
-                <p className="text-
+                <p className="text-sm text-white/90 bg-background/30 p-4 rounded-lg">
+                  {selectedGeneration.prompt || "No prompt available"}
+                </p>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </BaseLayout>
+  );
+};
+
+export default PromptMaker;
