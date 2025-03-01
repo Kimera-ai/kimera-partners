@@ -225,6 +225,7 @@ const PromptMaker = () => {
       });
       return;
     }
+
     if ((workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl) {
       toast({
         title: "Image Required",
@@ -234,6 +235,7 @@ const PromptMaker = () => {
       });
       return;
     }
+
     try {
       setIsProcessing(true);
       setElapsedTime(0);
@@ -485,9 +487,13 @@ const PromptMaker = () => {
                     </div>
                   </div>
 
-                  <Button className="w-full bg-primary hover:bg-primary/90 text-white" disabled={isProcessing || (workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl} onClick={handleGenerate}>
+                  <Button 
+                    className="w-full bg-primary hover:bg-primary/90 text-white" 
+                    disabled={isProcessing || ((workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl)}
+                    onClick={handleGenerate}
+                  >
                     <Sparkles className="w-4 h-4 mr-2" />
-                    {isProcessing ? "Processing..." : (workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl ? "Upload an image" : "Generate"}
+                    {isProcessing ? "Processing..." : ((workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl) ? "Upload an image" : "Generate"}
                   </Button>
 
                   <div className="grid grid-cols-1 gap-4 pt-3 border-t border-white/5">
