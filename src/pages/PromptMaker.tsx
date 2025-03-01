@@ -92,7 +92,8 @@ const PromptMaker = () => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to fetch credits"
+        description: "Failed to fetch credits",
+        duration: 5000
       });
     } finally {
       setIsLoadingCredits(false);
@@ -187,14 +188,16 @@ const PromptMaker = () => {
       setUploadedImageUrl(publicUrl);
       toast({
         title: "Success",
-        description: "Image uploaded successfully"
+        description: "Image uploaded successfully",
+        duration: 5000
       });
     } catch (error) {
       console.error("Upload error:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to upload image"
+        description: error instanceof Error ? error.message : "Failed to upload image",
+        duration: 5000
       });
       setImagePreview(null);
       setUploadedImageUrl(null);
@@ -208,16 +211,17 @@ const PromptMaker = () => {
       toast({
         title: "Authentication Required",
         description: "Please sign in to generate images.",
-        variant: "destructive"
+        variant: "destructive",
+        duration: 5000
       });
       return;
     }
     if (credits !== null && credits < CREDITS_PER_GENERATION) {
       toast({
         title: "Insufficient Credits",
-        description: "You've run out of credits. Please contact support at support@lovable.ai to purchase more credits.",
+        description: "You've run out of credits. Please contact support@kimera.ai to purchase more credits.",
         variant: "destructive",
-        duration: 6000
+        duration: 8000
       });
       return;
     }
@@ -225,7 +229,8 @@ const PromptMaker = () => {
       toast({
         title: "Image Required",
         description: `Please upload an image when using the ${workflow === 'with-reference' ? 'Basic with image reference' : 'Cartoon'} workflow.`,
-        variant: "destructive"
+        variant: "destructive",
+        duration: 5000
       });
       return;
     }
@@ -312,7 +317,8 @@ const PromptMaker = () => {
           }
           toast({
             title: "Success",
-            description: "Image has been generated successfully!"
+            description: "Image has been generated successfully!",
+            duration: 5000
           });
         } else if (status.status === 'failed' || status.status === 'Error') {
           clearInterval(pollInterval);
@@ -326,7 +332,8 @@ const PromptMaker = () => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to process image"
+        description: error instanceof Error ? error.message : "Failed to process image",
+        duration: 5000
       });
     }
   };
@@ -344,7 +351,8 @@ const PromptMaker = () => {
       toast({
         title: "Empty Prompt",
         description: "Please enter a prompt to improve",
-        variant: "destructive"
+        variant: "destructive",
+        duration: 5000
       });
       return;
     }
@@ -363,7 +371,8 @@ const PromptMaker = () => {
         setPrompt(data.improvedPrompt);
         toast({
           title: "Prompt Improved",
-          description: "Your prompt has been enhanced with more details."
+          description: "Your prompt has been enhanced with more details.",
+          duration: 5000
         });
       }
     } catch (error) {
@@ -371,7 +380,8 @@ const PromptMaker = () => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to improve the prompt. Please try again."
+        description: "Failed to improve the prompt. Please try again.",
+        duration: 5000
       });
     } finally {
       setIsImprovingPrompt(false);
@@ -410,14 +420,16 @@ const PromptMaker = () => {
       
       toast({
         title: "Success",
-        description: "Image downloaded successfully"
+        description: "Image downloaded successfully",
+        duration: 5000
       });
     } catch (error) {
       console.error('Error downloading image:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to download image. Please try again or right-click and 'Save Image As'"
+        description: "Failed to download image. Please try again or right-click and 'Save Image As'",
+        duration: 5000
       });
     }
   };
@@ -452,7 +464,6 @@ const PromptMaker = () => {
             <div className="space-y-6">
               <Card className="p-6 bg-card/60 backdrop-blur border border-white/5 shadow-lg">
                 <div className="space-y-4">
-                  {/* Moved prompt section to the top */}
                   <div>
                     <Label htmlFor="prompt" className="text-sm font-medium block text-white/80">Prompt</Label>
                     <div className="relative">
@@ -474,13 +485,11 @@ const PromptMaker = () => {
                     </div>
                   </div>
 
-                  {/* Generate button remains after the prompt */}
                   <Button className="w-full bg-primary hover:bg-primary/90 text-white" disabled={isProcessing || (workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl} onClick={handleGenerate}>
                     <Sparkles className="w-4 h-4 mr-2" />
                     {isProcessing ? "Processing..." : (workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl ? "Upload an image" : "Generate"}
                   </Button>
 
-                  {/* Moved workflow selector below the prompt and generate button */}
                   <div className="grid grid-cols-1 gap-4 pt-3 border-t border-white/5">
                     <div className="space-y-2">
                       <Label htmlFor="workflow" className="text-sm font-medium block text-white/80">Workflow</Label>
@@ -497,7 +506,6 @@ const PromptMaker = () => {
                     </div>
                   </div>
 
-                  {/* Settings grid moved to the bottom */}
                   <div className="grid grid-cols-4 gap-4">
                     <div className="space-y-2">
                       <TooltipProvider>
