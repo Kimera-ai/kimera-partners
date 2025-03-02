@@ -47,6 +47,7 @@ const PromptMaker = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
+  const [tempGeneratedImages, setTempGeneratedImages] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
@@ -249,6 +250,7 @@ const PromptMaker = () => {
       setElapsedTime(0);
       setPipelineStatus("Starting pipeline...");
       setGeneratedImages([]);
+      setTempGeneratedImages([]);
       setCompletedImages(0);
       setActiveJobIds([]);
       
@@ -311,6 +313,8 @@ const PromptMaker = () => {
       console.log("Jobs started with IDs:", jobIds);
       setPipelineStatus(`Processing ${numImagesToGenerate} images...`);
       
+      setTempGeneratedImages(new Array(numImagesToGenerate).fill(null));
+      
       jobIds.forEach((jobId, index) => {
         pollJobStatus(jobId, index);
       });
@@ -364,7 +368,7 @@ const PromptMaker = () => {
         } else if (status.status === 'completed') {
           clearInterval(pollInterval);
           
-          setGeneratedImages(prev => {
+          setTempGeneratedImages(prev => {
             const newImages = [...prev];
             newImages[imageIndex] = status.result;
             return newImages;
@@ -374,6 +378,12 @@ const PromptMaker = () => {
             const newCount = prev + 1;
             
             if (newCount === parseInt(numberOfImages)) {
+              setTempGeneratedImages(prevTemp => {
+                const completedImages = prevTemp.filter(img => img !== null);
+                setGeneratedImages(completedImages);
+                return prevTemp;
+              });
+              
               setIsProcessing(false);
               setPipelineStatus("All images generated successfully!");
               
@@ -385,6 +395,12 @@ const PromptMaker = () => {
                   description: "Failed to update credits"
                 });
               }
+              
+              toast({
+                title: "Success",
+                description: `All ${numberOfImages} images have been generated successfully!`,
+                duration: 3000
+              });
             }
             
             return newCount;
@@ -404,12 +420,6 @@ const PromptMaker = () => {
           } else {
             await fetchPreviousGenerations();
           }
-          
-          toast({
-            title: "Success",
-            description: `Image ${imageIndex + 1} has been generated successfully!`,
-            duration: 3000
-          });
         } else if (status.status === 'failed' || status.status === 'Error') {
           setPipelineStatus(`Error: Image ${imageIndex + 1} processing failed`);
           clearInterval(pollInterval);
@@ -789,20 +799,23 @@ const PromptMaker = () => {
                     {completedImages > 0 && (
                       <div className="mt-4 text-sm text-white">
                         Completed: {completedImages} of {numberOfImages} images
+                        <div className="mt-2">
+                          Waiting for all images to complete before displaying...
+                        </div>
                       </div>
                     )}
                   </div>
                 )}
                 
                 {generatedImages.length > 0 ? (
-                  <div className={`grid ${generatedImages.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} gap-4 w-full`}>
+                  <div className={`grid grid-cols-${Math.min(generatedImages.length, 2)} gap-4 w-full`}>
                     {generatedImages.map((imgUrl, index) => (
                       <div key={index} className="relative group">
                         <img 
                           src={imgUrl} 
                           alt={`Generated ${index + 1}`} 
                           className="w-full aspect-[2/3] object-cover rounded-lg shadow-lg" 
-                          loading="lazy"
+                          loading="lazy" 
                         />
                         <Button 
                           variant="outline" 
