@@ -1,3 +1,4 @@
+
 import { useState, useRef, useCallback, useEffect } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { Input } from "@/components/ui/input";
@@ -838,3 +839,24 @@ const PromptMaker = () => {
                       <Label htmlFor="workflow" className="text-sm font-medium block text-white/80">Workflow</Label>
                       <Select value={workflow} onValueChange={setWorkflow}>
                         <SelectTrigger id="workflow" className="w-full bg-background/50 border-white/10 text-white">
+                          <SelectValue placeholder="Select a workflow" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="no-reference">Basic (Text to Image)</SelectItem>
+                          <SelectItem value="with-reference">Basic with image reference</SelectItem>
+                          <SelectItem value="cartoon">Cartoon</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </div>
+    </BaseLayout>
+  );
+};
+
+export default PromptMaker;
