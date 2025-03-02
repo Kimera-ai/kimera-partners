@@ -738,7 +738,7 @@ const PromptMaker = () => {
                       <div key={gen.id} className="space-y-3">
                         <div className="relative group">
                           <button className="w-full text-left" onClick={() => handleImageClick(gen)}>
-                            <img src={gen.image_url} alt={gen.prompt} className="w-full aspect-square object-cover rounded-lg hover:opacity-90 transition-opacity border border-white/10" />
+                            <img src={gen.image_url} alt={gen.prompt} className="w-full aspect-square object-cover rounded-lg hover:opacity-90 transition-opacity border border-white/10" loading="lazy" />
                           </button>
                           <Button variant="outline" size="icon" onClick={e => {
                             e.stopPropagation();
@@ -769,7 +769,7 @@ const PromptMaker = () => {
             </div>
 
             <div className="space-y-6">
-              <Card className="p-6 bg-card/60 backdrop-blur border border-white/5 shadow-lg relative flex flex-col items-center justify-center min-h-[400px]">
+              <Card className="p-6 bg-card/60 backdrop-blur border border-white/5 shadow-lg relative min-h-[400px]">
                 {isProcessing && (
                   <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
                     <div className="flex items-center gap-2 backdrop-blur px-6 py-3 rounded-full bg-violet-900/70 border border-white/10 mb-4">
@@ -795,8 +795,8 @@ const PromptMaker = () => {
                 )}
                 
                 {generatedImages.length > 0 ? (
-                  <div className={`grid grid-cols-${Math.min(generatedImages.length, 2)} gap-4 w-full`}>
-                    {generatedImages.slice(0, 2).map((imgUrl, index) => (
+                  <div className={`grid ${generatedImages.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} gap-4 w-full`}>
+                    {generatedImages.map((imgUrl, index) => (
                       <div key={index} className="relative group">
                         <img 
                           src={imgUrl} 
@@ -822,31 +822,6 @@ const PromptMaker = () => {
                   </div>
                 )}
               </Card>
-              
-              {generatedImages.length > 2 && (
-                <Card className="p-6 bg-card/60 backdrop-blur border border-white/5 shadow-lg">
-                  <div className={`grid grid-cols-${Math.min(Math.max(generatedImages.length - 2, 0), 2)} gap-4 w-full`}>
-                    {generatedImages.slice(2).map((imgUrl, index) => (
-                      <div key={index + 2} className="relative group">
-                        <img 
-                          src={imgUrl} 
-                          alt={`Generated ${index + 3}`} 
-                          className="w-full aspect-[2/3] object-cover rounded-lg shadow-lg" 
-                          loading="lazy"
-                        />
-                        <Button 
-                          variant="outline" 
-                          size="icon" 
-                          onClick={() => handleDownload(imgUrl)} 
-                          className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity bg-background/50 backdrop-blur hover:bg-background/80 border-white/10"
-                        >
-                          <Download className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </Card>
-              )}
             </div>
           </div>
         </div>
