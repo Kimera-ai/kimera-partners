@@ -1,10 +1,9 @@
-
 import React, { useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Loader2, Sparkles, Upload } from "lucide-react";
+import { Loader2, Sparkles } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { ImagePreview } from "./ImagePreview";
@@ -78,7 +77,6 @@ export const ControlPanel = ({
   return (
     <Card className="p-6 bg-card/60 backdrop-blur border border-white/5 shadow-lg">
       <div className="space-y-4">
-        {/* Workflow on its own line */}
         <div className="space-y-2">
           <Label htmlFor="workflow" className="text-sm font-medium block text-white/80">Workflow</Label>
           <Select value={workflow} onValueChange={setWorkflow}>
@@ -93,7 +91,6 @@ export const ControlPanel = ({
           </Select>
         </div>
 
-        {/* Style on its own line */}
         <div className="space-y-2">
           <Label htmlFor="style" className="text-sm font-medium block text-white/80">Style</Label>
           <Select value={style} onValueChange={setStyle}>
@@ -116,7 +113,6 @@ export const ControlPanel = ({
           </Select>
         </div>
 
-        {/* Ratio and Number of Images in one line */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="ratio" className="text-sm font-medium block text-white/80">Aspect Ratio</Label>
@@ -165,7 +161,6 @@ export const ControlPanel = ({
           </div>
         </div>
 
-        {/* Lora Scale and Seed in one line */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="loraScale" className="text-sm font-medium block text-white/80">Lora Scale</Label>
@@ -202,7 +197,6 @@ export const ControlPanel = ({
           </div>
         </div>
 
-        {/* Prompt textarea after all dropdown rows */}
         <div>
           <Label htmlFor="prompt" className="text-sm font-medium block text-white/80">Prompt</Label>
           <div className="relative">
@@ -228,40 +222,13 @@ export const ControlPanel = ({
                   disabled={workflow === 'no-reference'} 
                 />
               </div>
-              <div className="relative">
-                <Textarea 
-                  id="prompt" 
-                  placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..." 
-                  value={prompt} 
-                  onChange={e => setPrompt(e.target.value)} 
-                  className="h-32 resize-none bg-background/50 border-white/10 text-white pl-14" 
-                />
-                <div className="absolute bottom-3 left-3 flex space-x-2">
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="text-primary/70 hover:text-primary hover:bg-primary/10 hover:scale-110 transition-all hover:shadow-[0_0_15px_rgba(155,135,245,0.3)] backdrop-blur-sm" 
-                    onClick={handleImprovePrompt} 
-                    disabled={isImprovingPrompt || !prompt.trim()}
-                    type="button"
-                  >
-                    {isImprovingPrompt ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-                  </Button>
-                  
-                  {(workflow === 'with-reference' || workflow === 'cartoon') && (
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="text-primary/70 hover:text-primary hover:bg-primary/10 hover:scale-110 transition-all hover:shadow-[0_0_15px_rgba(155,135,245,0.3)] backdrop-blur-sm" 
-                      onClick={triggerFileInput} 
-                      disabled={isUploading}
-                      type="button"
-                    >
-                      <Upload className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              </div>
+              <Textarea 
+                id="prompt" 
+                placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..." 
+                value={prompt} 
+                onChange={e => setPrompt(e.target.value)} 
+                className="h-32 resize-none bg-background/50 border-white/10 text-white pl-14" 
+              />
             </div>
           </div>
         </div>
