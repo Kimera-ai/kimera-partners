@@ -15,12 +15,16 @@ export const StylePanel = ({ style, setStyle }: StylePanelProps) => {
           <SelectValue placeholder="Select style" />
         </SelectTrigger>
         <SelectContent className="bg-background border-white/10 text-white">
-          <SelectItem value="Photographic">Photographic</SelectItem>
           <SelectItem value="Cinematic">Cinematic</SelectItem>
-          <SelectItem value="Anime">Anime</SelectItem>
+          <SelectItem value="Animated">Animated</SelectItem>
           <SelectItem value="Digital Art">Digital Art</SelectItem>
+          <SelectItem value="Photographic">Photographic</SelectItem>
+          <SelectItem value="Fantasy art">Fantasy art</SelectItem>
+          <SelectItem value="Neonpunk">Neonpunk</SelectItem>
+          <SelectItem value="Enhance">Enhance</SelectItem>
           <SelectItem value="Comic Book">Comic Book</SelectItem>
-          <SelectItem value="Low Poly">Low Poly</SelectItem>
+          <SelectItem value="Lowpoly">Lowpoly</SelectItem>
+          <SelectItem value="Line art">Line art</SelectItem>
         </SelectContent>
       </Select>
     </div>
