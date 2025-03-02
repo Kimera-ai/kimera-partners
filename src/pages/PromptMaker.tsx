@@ -46,7 +46,7 @@ const PromptMaker = () => {
   const [prompt, setPrompt] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
@@ -62,6 +62,9 @@ const PromptMaker = () => {
   const [isLoadingCredits, setIsLoadingCredits] = useState(true);
   const [workflow, setWorkflow] = useState("no-reference");
   const [pipelineStatus, setPipelineStatus] = useState("");
+  const [numberOfImages, setNumberOfImages] = useState("1");
+  const [completedImages, setCompletedImages] = useState(0);
+  const [activeJobIds, setActiveJobIds] = useState<string[]>([]);
 
   const {
     session
@@ -217,10 +220,14 @@ const PromptMaker = () => {
       });
       return;
     }
-    if (credits !== null && credits < CREDITS_PER_GENERATION) {
+    
+    const numImages = parseInt(numberOfImages);
+    const totalCost = CREDITS_PER_GENERATION * numImages;
+    
+    if (credits !== null && credits < totalCost) {
       toast({
         title: "Insufficient Credits",
-        description: "You've run out of credits. Please contact support@kimera.ai to purchase more credits.",
+        description: `You need ${totalCost} credits to generate ${numImages} images. Please contact support@kimera.ai to purchase more credits.`,
         variant: "destructive",
         duration: 8000
       });
@@ -241,6 +248,9 @@ const PromptMaker = () => {
       setIsProcessing(true);
       setElapsedTime(0);
       setPipelineStatus("Starting pipeline...");
+      setGeneratedImages([]);
+      setCompletedImages(0);
+      setActiveJobIds([]);
       
       const defaultImageUrl = "https://www.jeann.online/cdn-cgi/image/format=jpeg/https://kimera-media.s3.eu-north-1.amazonaws.com/623b36fe-ac7f-4c56-a124-cddb942a38e5_event/623b36fe-ac7f-4c56-a124-cddb942a38e5_source.jpeg";
       const getPipelineId = () => {
@@ -254,43 +264,74 @@ const PromptMaker = () => {
         }
       };
       
-      setPipelineStatus("Preparing request data...");
-      const requestBody = {
-        pipeline_id: getPipelineId(),
-        imageUrl: uploadedImageUrl || defaultImageUrl,
-        ratio: ratio,
-        prompt: `${style} style: ${prompt}` || `${style} this image`,
-        data: {
-          lora_scale: parseFloat(loraScale),
-          style: style,
-          seed: seed === "random" ? -1 : 1234
-        }
-      };
+      const numImagesToGenerate = parseInt(numberOfImages);
+      setPipelineStatus(`Preparing to generate ${numImagesToGenerate} images...`);
       
-      setPipelineStatus("Sending request to Kimera API...");
-      const pipelineResponse = await fetch('https://api.kimera.ai/v1/pipeline/run', {
-        method: 'POST',
-        headers: {
-          'x-api-key': "1712edc40e3eb72c858332fe7500bf33e885324f8c1cd52b8cded2cdfd724cee",
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(requestBody)
-      });
-      
-      if (!pipelineResponse.ok) {
-        const errorData = await pipelineResponse.json();
-        console.error("Pipeline error response:", errorData);
-        setPipelineStatus("Error: Failed to process image");
-        throw new Error('Failed to process image');
+      const generateRequests = [];
+      for (let i = 0; i < numImagesToGenerate; i++) {
+        const requestBody = {
+          pipeline_id: getPipelineId(),
+          imageUrl: uploadedImageUrl || defaultImageUrl,
+          ratio: ratio,
+          prompt: `${style} style: ${prompt}` || `${style} this image`,
+          data: {
+            lora_scale: parseFloat(loraScale),
+            style: style,
+            seed: seed === "random" ? -1 : 1234
+          }
+        };
+        
+        generateRequests.push(fetch('https://api.kimera.ai/v1/pipeline/run', {
+          method: 'POST',
+          headers: {
+            'x-api-key': "1712edc40e3eb72c858332fe7500bf33e885324f8c1cd52b8cded2cdfd724cee",
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(requestBody)
+        }));
       }
       
-      const responseData = await pipelineResponse.json();
-      const jobId = responseData.id;
-      console.log("Job started with ID:", jobId);
-      setPipelineStatus("Processing started (Job ID: " + jobId.substring(0, 8) + "...)");
+      setPipelineStatus(`Sending ${numImagesToGenerate} requests to Kimera API...`);
       
-      const pollInterval = setInterval(async () => {
-        setPipelineStatus("Checking pipeline status...");
+      const responses = await Promise.all(generateRequests);
+      
+      for (let i = 0; i < responses.length; i++) {
+        if (!responses[i].ok) {
+          const errorData = await responses[i].json();
+          console.error(`Pipeline error response for request ${i+1}:`, errorData);
+          setPipelineStatus(`Error: Failed to process image ${i+1}`);
+          throw new Error(`Failed to process image ${i+1}`);
+        }
+      }
+      
+      const responseDataArray = await Promise.all(responses.map(r => r.json()));
+      const jobIds = responseDataArray.map(data => data.id);
+      setActiveJobIds(jobIds);
+      
+      console.log("Jobs started with IDs:", jobIds);
+      setPipelineStatus(`Processing ${numImagesToGenerate} images...`);
+      
+      jobIds.forEach((jobId, index) => {
+        pollJobStatus(jobId, index);
+      });
+      
+    } catch (error) {
+      setIsProcessing(false);
+      setPipelineStatus("Error: " + (error instanceof Error ? error.message : "Unknown error"));
+      console.error('Generation error:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to process image",
+        duration: 5000
+      });
+    }
+  };
+
+  const pollJobStatus = async (jobId: string, imageIndex: number) => {
+    const pollInterval = setInterval(async () => {
+      try {
+        setPipelineStatus(`Checking status for image ${imageIndex + 1}...`);
         const statusResponse = await fetch(`https://api.kimera.ai/v1/pipeline/run/${jobId}`, {
           headers: {
             'x-api-key': "1712edc40e3eb72c858332fe7500bf33e885324f8c1cd52b8cded2cdfd724cee"
@@ -299,47 +340,58 @@ const PromptMaker = () => {
         
         if (!statusResponse.ok) {
           clearInterval(pollInterval);
-          setPipelineStatus("Error: Failed to check status");
-          throw new Error('Failed to check status');
+          setPipelineStatus(`Error: Failed to check status for image ${imageIndex + 1}`);
+          throw new Error(`Failed to check status for image ${imageIndex + 1}`);
         }
         
         const status = await statusResponse.json();
-        console.log("Current status:", status);
+        console.log(`Current status for image ${imageIndex + 1}:`, status);
         
         if (status.status === 'pending') {
-          setPipelineStatus("Waiting in queue...");
+          setPipelineStatus(`Image ${imageIndex + 1}: Waiting in queue...`);
         } else if (status.status === 'processing') {
-          setPipelineStatus("Processing your image...");
+          setPipelineStatus(`Image ${imageIndex + 1}: Processing...`);
         } else if (status.status === 'AI Dream') {
-          setPipelineStatus("AI Dream: Creating your image...");
+          setPipelineStatus(`Image ${imageIndex + 1}: Creating image...`);
           if (status.progress && status.progress.step && status.progress.total) {
-            setPipelineStatus(`AI Dream: Creating your image (${status.progress.step}/${status.progress.total})...`);
+            setPipelineStatus(`Image ${imageIndex + 1}: Creating (${status.progress.step}/${status.progress.total})...`);
           }
         } else if (status.status === 'Face Swap') {
-          setPipelineStatus("Face Swap: Applying reference to image...");
+          setPipelineStatus(`Image ${imageIndex + 1}: Applying reference...`);
           if (status.progress && status.progress.step && status.progress.total) {
-            setPipelineStatus(`Face Swap: Applying reference (${status.progress.step}/${status.progress.total})...`);
+            setPipelineStatus(`Image ${imageIndex + 1}: Applying reference (${status.progress.step}/${status.progress.total})...`);
           }
         } else if (status.status === 'completed') {
-          setPipelineStatus("Generation complete!");
           clearInterval(pollInterval);
-          setGeneratedImage(status.result);
-          setIsProcessing(false);
           
-          const creditUpdateSuccess = await updateUserCredits(CREDITS_PER_GENERATION);
-          if (!creditUpdateSuccess) {
-            toast({
-              variant: "destructive",
-              title: "Error",
-              description: "Failed to update credits"
-            });
-            return;
-          }
+          setGeneratedImages(prev => {
+            const newImages = [...prev];
+            newImages[imageIndex] = status.result;
+            return newImages;
+          });
           
-          const {
-            error: dbError
-          } = await supabase.from('generated_images').insert({
-            user_id: session.user.id,
+          setCompletedImages(prev => {
+            const newCount = prev + 1;
+            
+            if (newCount === parseInt(numberOfImages)) {
+              setIsProcessing(false);
+              setPipelineStatus("All images generated successfully!");
+              
+              const creditUpdateSuccess = updateUserCredits(CREDITS_PER_GENERATION * parseInt(numberOfImages));
+              if (!creditUpdateSuccess) {
+                toast({
+                  variant: "destructive",
+                  title: "Error",
+                  description: "Failed to update credits"
+                });
+              }
+            }
+            
+            return newCount;
+          });
+          
+          const { error: dbError } = await supabase.from('generated_images').insert({
+            user_id: session?.user?.id,
             image_url: status.result,
             prompt: prompt,
             style: style,
@@ -355,29 +407,22 @@ const PromptMaker = () => {
           
           toast({
             title: "Success",
-            description: "Image has been generated successfully!",
-            duration: 5000
+            description: `Image ${imageIndex + 1} has been generated successfully!`,
+            duration: 3000
           });
         } else if (status.status === 'failed' || status.status === 'Error') {
-          setPipelineStatus("Error: Pipeline processing failed");
+          setPipelineStatus(`Error: Image ${imageIndex + 1} processing failed`);
           clearInterval(pollInterval);
           setIsProcessing(false);
-          throw new Error('Processing failed');
+          throw new Error(`Image ${imageIndex + 1} processing failed`);
         } else {
-          setPipelineStatus(`${status.status || "Processing"}: ${status.progress?.step || ""}/${status.progress?.total || ""}`);
+          setPipelineStatus(`Image ${imageIndex + 1}: ${status.status || "Processing"}: ${status.progress?.step || ""}/${status.progress?.total || ""}`);
         }
-      }, 2000);
-    } catch (error) {
-      setIsProcessing(false);
-      setPipelineStatus("Error: " + (error instanceof Error ? error.message : "Unknown error"));
-      console.error('Generation error:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to process image",
-        duration: 5000
-      });
-    }
+      } catch (error) {
+        clearInterval(pollInterval);
+        console.error(`Error polling status for image ${imageIndex + 1}:`, error);
+      }
+    }, 2000);
   };
 
   const removeImage = useCallback((e: React.MouseEvent) => {
@@ -385,7 +430,7 @@ const PromptMaker = () => {
     e.stopPropagation();
     setImagePreview(null);
     setUploadedImageUrl(null);
-    setGeneratedImage(null);
+    setGeneratedImages([]);
   }, []);
 
   const handleImprovePrompt = async () => {
@@ -553,7 +598,31 @@ const PromptMaker = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-4 gap-4">
+                  <div className="grid grid-cols-5 gap-4">
+                    <div className="space-y-2">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Label htmlFor="numberOfImages" className="text-sm font-medium block truncate text-white/80">Number of Images</Label>
+                          </TooltipTrigger>
+                          <TooltipContent className="bg-background/90 border-white/10">
+                            <p>Number of images to generate</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <Select value={numberOfImages} onValueChange={setNumberOfImages}>
+                        <SelectTrigger id="numberOfImages" className="w-full bg-background/50 border-white/10 text-white">
+                          <SelectValue placeholder="Select number" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background border-white/10 text-white">
+                          <SelectItem value="1">1 image</SelectItem>
+                          <SelectItem value="2">2 images</SelectItem>
+                          <SelectItem value="3">3 images</SelectItem>
+                          <SelectItem value="4">4 images</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
                     <div className="space-y-2">
                       <TooltipProvider>
                         <Tooltip>
@@ -699,33 +768,84 @@ const PromptMaker = () => {
               </Card>
             </div>
 
-            <Card className="p-6 bg-card/60 backdrop-blur border border-white/5 shadow-lg relative aspect-[2/3] flex items-center justify-center">
-              {isProcessing && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
-                  <div className="flex items-center gap-2 backdrop-blur px-6 py-3 rounded-full bg-violet-900/70 border border-white/10 mb-4">
-                    <Clock className="w-6 h-6 animate-pulse" />
-                    <span className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                      {formatTime(elapsedTime)}
-                    </span>
+            <div className="space-y-6">
+              <Card className="p-6 bg-card/60 backdrop-blur border border-white/5 shadow-lg relative flex flex-col items-center justify-center min-h-[400px]">
+                {isProcessing && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+                    <div className="flex items-center gap-2 backdrop-blur px-6 py-3 rounded-full bg-violet-900/70 border border-white/10 mb-4">
+                      <Clock className="w-6 h-6 animate-pulse" />
+                      <span className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                        {formatTime(elapsedTime)}
+                      </span>
+                    </div>
+                    
+                    <div className="backdrop-blur px-6 py-3 rounded-full bg-background/50 border border-white/10 flex items-center gap-2 max-w-[80%]">
+                      <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                      <span className="text-sm whitespace-nowrap text-ellipsis overflow-hidden">
+                        {pipelineStatus}
+                      </span>
+                    </div>
+                    
+                    {completedImages > 0 && (
+                      <div className="mt-4 text-sm text-white">
+                        Completed: {completedImages} of {numberOfImages} images
+                      </div>
+                    )}
                   </div>
-                  
-                  <div className="backdrop-blur px-6 py-3 rounded-full bg-background/50 border border-white/10 flex items-center gap-2 max-w-[80%]">
-                    <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                    <span className="text-sm whitespace-nowrap text-ellipsis overflow-hidden">
-                      {pipelineStatus}
-                    </span>
+                )}
+                
+                {generatedImages.length > 0 ? (
+                  <div className={`grid grid-cols-${Math.min(generatedImages.length, 2)} gap-4 w-full`}>
+                    {generatedImages.map((imgUrl, index) => (
+                      <div key={index} className="relative group">
+                        <img 
+                          src={imgUrl} 
+                          alt={`Generated ${index + 1}`} 
+                          className="w-full aspect-[2/3] object-cover rounded-lg shadow-lg" 
+                        />
+                        <Button 
+                          variant="outline" 
+                          size="icon" 
+                          onClick={() => handleDownload(imgUrl)} 
+                          className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity bg-background/50 backdrop-blur hover:bg-background/80 border-white/10"
+                        >
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
                   </div>
-                </div>
+                ) : (
+                  <div className="text-center text-white/60">
+                    <Image className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>Your generated images will appear here</p>
+                  </div>
+                )}
+              </Card>
+              
+              {generatedImages.length > 2 && (
+                <Card className="p-6 bg-card/60 backdrop-blur border border-white/5 shadow-lg">
+                  <div className={`grid grid-cols-${Math.min(Math.max(generatedImages.length - 2, 0), 2)} gap-4 w-full`}>
+                    {generatedImages.slice(2).map((imgUrl, index) => (
+                      <div key={index + 2} className="relative group">
+                        <img 
+                          src={imgUrl} 
+                          alt={`Generated ${index + 3}`} 
+                          className="w-full aspect-[2/3] object-cover rounded-lg shadow-lg" 
+                        />
+                        <Button 
+                          variant="outline" 
+                          size="icon" 
+                          onClick={() => handleDownload(imgUrl)} 
+                          className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity bg-background/50 backdrop-blur hover:bg-background/80 border-white/10"
+                        >
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
               )}
-              {generatedImage ? (
-                <img src={generatedImage} alt="Generated" className="w-full h-full object-cover rounded-lg shadow-lg" />
-              ) : (
-                <div className="text-center text-white/60">
-                  <Image className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>Your generated images will appear here</p>
-                </div>
-              )}
-            </Card>
+            </div>
           </div>
         </div>
       </div>
