@@ -31,17 +31,23 @@ export const PreviousGenerations = ({
     if (imageCount <= 4) return "grid-cols-2";
     return "grid-cols-2 md:grid-cols-3";
   };
+
+  // Helper function to ensure pointer events are restored
+  const resetPointerEvents = () => {
+    // Use both immediate and delayed reset to ensure it works in all cases
+    document.body.style.pointerEvents = '';
+    setTimeout(() => {
+      document.body.style.pointerEvents = '';
+    }, 300);
+  };
   
   return (
     <Drawer 
       open={isHistoryOpen} 
       onOpenChange={(open) => {
         setIsHistoryOpen(open);
-        // Add a small delay to ensure DOM is updated
         if (!open) {
-          setTimeout(() => {
-            document.body.style.pointerEvents = '';
-          }, 300);
+          resetPointerEvents();
         }
       }}
       direction="right"
@@ -68,10 +74,7 @@ export const PreviousGenerations = ({
                 variant="ghost" 
                 size="sm" 
                 className="rounded-full h-8 w-8 p-0"
-                onClick={() => {
-                  // Ensure pointer events are restored when drawer is closed
-                  document.body.style.pointerEvents = '';
-                }}
+                onClick={resetPointerEvents}
               >
                 <span className="sr-only">Close</span>
                 <svg
@@ -99,7 +102,8 @@ export const PreviousGenerations = ({
                 className="relative aspect-[3/4] rounded-md overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all"
                 onClick={() => {
                   handleImageClick(generation);
-                  setIsHistoryOpen(false); // Close drawer after selection
+                  setIsHistoryOpen(false);
+                  resetPointerEvents();
                 }}
               >
                 <img 

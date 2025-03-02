@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
@@ -19,8 +19,30 @@ export const PromptDialog = ({
 }: PromptDialogProps) => {
   if (!selectedGeneration) return null;
   
+  // Reset pointer events when dialog opens/closes
+  useEffect(() => {
+    if (!showPromptDialog) {
+      // Ensure pointer events are restored when dialog is closed
+      document.body.style.pointerEvents = '';
+    }
+    
+    return () => {
+      // Clean up on unmount
+      document.body.style.pointerEvents = '';
+    };
+  }, [showPromptDialog]);
+  
   return (
-    <Dialog open={showPromptDialog} onOpenChange={setShowPromptDialog}>
+    <Dialog 
+      open={showPromptDialog} 
+      onOpenChange={(open) => {
+        setShowPromptDialog(open);
+        if (!open) {
+          // Reset pointer events when dialog closes
+          document.body.style.pointerEvents = '';
+        }
+      }}
+    >
       <DialogContent className="sm:max-w-lg bg-card/95 backdrop-blur border-white/10">
         <DialogHeader>
           <DialogTitle>Image Details</DialogTitle>
