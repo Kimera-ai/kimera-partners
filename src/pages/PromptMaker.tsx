@@ -1,3 +1,4 @@
+
 import { useState, useRef, useCallback, useEffect } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { Input } from "@/components/ui/input";
@@ -799,4 +800,19 @@ const PromptMaker = () => {
                           <SelectItem value="Fantasy art">Fantasy art</SelectItem>
                           <SelectItem value="Neonpunk">Neonpunk</SelectItem>
                           <SelectItem value="Enhance">Enhance</SelectItem>
-                          <SelectItem value="Comic book">Comic book</
+                          <SelectItem value="Comic book">Comic book</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </div>
+    </BaseLayout>
+  );
+};
+
+export default PromptMaker;
