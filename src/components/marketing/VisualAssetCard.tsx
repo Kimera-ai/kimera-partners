@@ -1,13 +1,11 @@
-
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import { VisualAsset } from "@/types/marketing";
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 export const VisualAssetCard = ({ asset }: { asset: VisualAsset }) => {
   const [isDownloading, setIsDownloading] = useState(false);
-  const { toast } = useToast();
 
   const handleDownload = async () => {
     if (isDownloading) return;
