@@ -312,10 +312,20 @@ const PromptMaker = () => {
     const numImages = parseInt(numberOfImages);
     const totalCost = CREDITS_PER_GENERATION * numImages;
     
-    if (credits !== null && credits < totalCost) {
+    // Improved credit check logic
+    if (credits === null || isLoadingCredits) {
+      toast({
+        title: "Loading Credits",
+        description: "Please wait while we check your available credits.",
+        duration: 3000
+      });
+      return;
+    }
+    
+    if (credits < totalCost) {
       toast({
         title: "Insufficient Credits",
-        description: `You need ${totalCost} credits to generate ${numImages} images. Please contact support@kimera.ai to purchase more credits.`,
+        description: `You need ${totalCost} credits to generate ${numImages} ${numImages === 1 ? 'image' : 'images'}, but you only have ${credits}. Please contact support@kimera.ai to purchase more credits.`,
         variant: "destructive",
         duration: 8000
       });
@@ -454,14 +464,17 @@ const PromptMaker = () => {
         pollJobStatus(apiJobId, index, jobId, currentPrompt, currentStyle, currentRatio, currentLoraScale);
       });
       
-      // Update credits after generation is started
+      // Update credits after generation is started - with improved error handling
       const creditUpdateSuccess = await updateUserCredits(CREDITS_PER_GENERATION * numImagesToGenerate);
       if (!creditUpdateSuccess) {
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Failed to update credits"
+          description: "Failed to update credits, but your generation request was submitted."
         });
+      } else {
+        // Update local credits state immediately to reflect the change
+        setCredits(prevCredits => (prevCredits !== null ? prevCredits - (CREDITS_PER_GENERATION * numImagesToGenerate) : null));
       }
       
     } catch (error) {
@@ -739,7 +752,7 @@ const PromptMaker = () => {
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2 backdrop-blur px-4 py-2 rounded-full bg-background/50 border border-white/5">
                   <Coins className="w-4 h-4 text-yellow-500" />
-                  <span className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                  <span className={`text-2xl font-bold ${credits !== null && credits < CREDITS_PER_GENERATION ? 'text-red-500' : 'bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent'}`}>
                     {isLoadingCredits ? <Loader2 className="w-4 h-4 animate-spin" /> : `${credits ?? 0} credits`}
                   </span>
                 </div>
@@ -778,12 +791,22 @@ const PromptMaker = () => {
 
                   <Button 
                     className="w-full bg-primary hover:bg-primary/90 text-white" 
-                    disabled={isUploading || ((workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl)}
+                    disabled={isUploading || ((workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl) || (credits !== null && credits < CREDITS_PER_GENERATION) || isLoadingCredits}
                     onClick={handleGenerate}
                   >
                     <Sparkles className="w-4 h-4 mr-2" />
-                    {isUploading ? "Uploading..." : ((workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl) ? "Upload an image" : "Generate"}
+                    {isUploading ? "Uploading..." : 
+                     ((workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl) ? "Upload an image" : 
+                     (credits !== null && credits < CREDITS_PER_GENERATION) ? "Insufficient Credits" : 
+                     isLoadingCredits ? "Loading Credits..." : 
+                     "Generate"}
                   </Button>
+
+                  {credits !== null && credits < CREDITS_PER_GENERATION && (
+                    <div className="text-sm text-red-400 bg-red-950/20 border border-red-500/20 p-3 rounded-md">
+                      You don't have enough credits to generate images. Please contact support@kimera.ai to purchase more credits.
+                    </div>
+                  )}
 
                   <div className="grid grid-cols-1 gap-4 pt-3 border-t border-white/5">
                     <div className="space-y-2">
