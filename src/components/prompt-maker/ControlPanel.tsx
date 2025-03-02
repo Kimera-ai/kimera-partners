@@ -78,7 +78,7 @@ export const ControlPanel = ({
   return (
     <Card className="p-6 bg-card/60 backdrop-blur border border-white/5 shadow-lg">
       <div className="space-y-4">
-        {/* Workflow and Ratio on the same line above prompt */}
+        {/* First row of dropdowns */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="workflow" className="text-sm font-medium block text-white/80">Workflow</Label>
@@ -112,6 +112,98 @@ export const ControlPanel = ({
           </div>
         </div>
 
+        {/* Second row of dropdowns */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="style" className="text-sm font-medium block text-white/80">Style</Label>
+            <Select value={style} onValueChange={setStyle}>
+              <SelectTrigger id="style" className="w-full bg-background/50 border-white/10 text-white">
+                <SelectValue placeholder="Select style" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border-white/10 text-white">
+                <SelectItem value="Photographic">Photographic</SelectItem>
+                <SelectItem value="Cinematic">Cinematic</SelectItem>
+                <SelectItem value="Anime">Anime</SelectItem>
+                <SelectItem value="Digital Art">Digital Art</SelectItem>
+                <SelectItem value="Realistic">Realistic</SelectItem>
+                <SelectItem value="Oil Painting">Oil Painting</SelectItem>
+                <SelectItem value="Watercolor">Watercolor</SelectItem>
+                <SelectItem value="Pixel Art">Pixel Art</SelectItem>
+                <SelectItem value="Comic Book">Comic Book</SelectItem>
+                <SelectItem value="Isometric">Isometric</SelectItem>
+                <SelectItem value="Low Poly">Low Poly</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="numberOfImages" className="text-sm font-medium block text-white/80">
+              Number of Images
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="ml-1 text-xs text-muted-foreground underline cursor-help">
+                      (costs {CREDITS_PER_GENERATION} credits per image)
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Each image costs {CREDITS_PER_GENERATION} credits to generate.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </Label>
+            <Select value={numberOfImages} onValueChange={setNumberOfImages}>
+              <SelectTrigger id="numberOfImages" className="w-full bg-background/50 border-white/10 text-white">
+                <SelectValue placeholder="Select number of images" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border-white/10 text-white">
+                <SelectItem value="1">1 image</SelectItem>
+                <SelectItem value="2">2 images</SelectItem>
+                <SelectItem value="3">3 images</SelectItem>
+                <SelectItem value="4">4 images</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Third row of dropdowns */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="loraScale" className="text-sm font-medium block text-white/80">Lora Scale</Label>
+            <Select value={loraScale} onValueChange={setLoraScale}>
+              <SelectTrigger id="loraScale" className="w-full bg-background/50 border-white/10 text-white">
+                <SelectValue placeholder="Select lora scale" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border-white/10 text-white">
+                <SelectItem value="0.1">0.1</SelectItem>
+                <SelectItem value="0.2">0.2</SelectItem>
+                <SelectItem value="0.3">0.3</SelectItem>
+                <SelectItem value="0.4">0.4</SelectItem>
+                <SelectItem value="0.5">0.5</SelectItem>
+                <SelectItem value="0.6">0.6</SelectItem>
+                <SelectItem value="0.7">0.7</SelectItem>
+                <SelectItem value="0.8">0.8</SelectItem>
+                <SelectItem value="0.9">0.9</SelectItem>
+                <SelectItem value="1.0">1.0</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="seed" className="text-sm font-medium block text-white/80">Seed</Label>
+            <Select value={seed} onValueChange={setSeed}>
+              <SelectTrigger id="seed" className="w-full bg-background/50 border-white/10 text-white">
+                <SelectValue placeholder="Select seed" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border-white/10 text-white">
+                <SelectItem value="random">Random</SelectItem>
+                <SelectItem value="fixed">Fixed</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Prompt textarea after all dropdown rows */}
         <div>
           <Label htmlFor="prompt" className="text-sm font-medium block text-white/80">Prompt</Label>
           <div className="relative">
@@ -194,93 +286,6 @@ export const ControlPanel = ({
             You don't have enough credits to generate images. Please contact support@kimera.ai to purchase more credits.
           </div>
         )}
-
-        <div className="grid grid-cols-1 gap-4 pt-3 border-t border-white/5">
-          <div className="space-y-2">
-            <Label htmlFor="style" className="text-sm font-medium block text-white/80">Style</Label>
-            <Select value={style} onValueChange={setStyle}>
-              <SelectTrigger id="style" className="w-full bg-background/50 border-white/10 text-white">
-                <SelectValue placeholder="Select style" />
-              </SelectTrigger>
-              <SelectContent className="bg-background border-white/10 text-white">
-                <SelectItem value="Photographic">Photographic</SelectItem>
-                <SelectItem value="Cinematic">Cinematic</SelectItem>
-                <SelectItem value="Anime">Anime</SelectItem>
-                <SelectItem value="Digital Art">Digital Art</SelectItem>
-                <SelectItem value="Realistic">Realistic</SelectItem>
-                <SelectItem value="Oil Painting">Oil Painting</SelectItem>
-                <SelectItem value="Watercolor">Watercolor</SelectItem>
-                <SelectItem value="Pixel Art">Pixel Art</SelectItem>
-                <SelectItem value="Comic Book">Comic Book</SelectItem>
-                <SelectItem value="Isometric">Isometric</SelectItem>
-                <SelectItem value="Low Poly">Low Poly</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="numberOfImages" className="text-sm font-medium block text-white/80">
-              Number of Images
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span className="ml-1 text-xs text-muted-foreground underline cursor-help">
-                      (costs {CREDITS_PER_GENERATION} credits per image)
-                    </span>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Each image costs {CREDITS_PER_GENERATION} credits to generate.</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </Label>
-            <Select value={numberOfImages} onValueChange={setNumberOfImages}>
-              <SelectTrigger id="numberOfImages" className="w-full bg-background/50 border-white/10 text-white">
-                <SelectValue placeholder="Select number of images" />
-              </SelectTrigger>
-              <SelectContent className="bg-background border-white/10 text-white">
-                <SelectItem value="1">1 image</SelectItem>
-                <SelectItem value="2">2 images</SelectItem>
-                <SelectItem value="3">3 images</SelectItem>
-                <SelectItem value="4">4 images</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="loraScale" className="text-sm font-medium block text-white/80">Lora Scale</Label>
-            <Select value={loraScale} onValueChange={setLoraScale}>
-              <SelectTrigger id="loraScale" className="w-full bg-background/50 border-white/10 text-white">
-                <SelectValue placeholder="Select lora scale" />
-              </SelectTrigger>
-              <SelectContent className="bg-background border-white/10 text-white">
-                <SelectItem value="0.1">0.1</SelectItem>
-                <SelectItem value="0.2">0.2</SelectItem>
-                <SelectItem value="0.3">0.3</SelectItem>
-                <SelectItem value="0.4">0.4</SelectItem>
-                <SelectItem value="0.5">0.5</SelectItem>
-                <SelectItem value="0.6">0.6</SelectItem>
-                <SelectItem value="0.7">0.7</SelectItem>
-                <SelectItem value="0.8">0.8</SelectItem>
-                <SelectItem value="0.9">0.9</SelectItem>
-                <SelectItem value="1.0">1.0</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="seed" className="text-sm font-medium block text-white/80">Seed</Label>
-            <Select value={seed} onValueChange={setSeed}>
-              <SelectTrigger id="seed" className="w-full bg-background/50 border-white/10 text-white">
-                <SelectValue placeholder="Select seed" />
-              </SelectTrigger>
-              <SelectContent className="bg-background border-white/10 text-white">
-                <SelectItem value="random">Random</SelectItem>
-                <SelectItem value="fixed">Fixed</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
       </div>
     </Card>
   );
