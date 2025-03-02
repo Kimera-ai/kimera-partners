@@ -242,7 +242,7 @@ const PromptMaker = () => {
       setElapsedTime(0);
       setPipelineStatus("Starting pipeline...");
       
-      const defaultImageUrl = "https://cdn.discordapp.com/attachments/1276822658083979275/1344299399907381258/Untitled-1.jpg?ex=67c067e0&is=67bf1660&hm=f4c5e15bae4887d9fd5efb6deb7c15065341f8a035ee7b6424e5fcf95d403ee2&";
+      const defaultImageUrl = "https://www.jeann.online/cdn-cgi/image/format=jpeg/https://kimera-media.s3.eu-north-1.amazonaws.com/623b36fe-ac7f-4c56-a124-cddb942a38e5_event/623b36fe-ac7f-4c56-a124-cddb942a38e5_source.jpeg";
       const getPipelineId = () => {
         switch (workflow) {
           case "with-reference":
