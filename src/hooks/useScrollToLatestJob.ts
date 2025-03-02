@@ -6,96 +6,47 @@ export const useScrollToLatestJob = (
   jobRefs: React.MutableRefObject<{ [key: string]: HTMLDivElement | null }>,
   generationJobs: any[]
 ) => {
-  // Completely rewritten scroll handling to fix scroll lock issues
+  // Improved scroll handling for new jobs
   useEffect(() => {
     if (latestJobRef.current && jobRefs.current[latestJobRef.current]) {
       const jobElement = jobRefs.current[latestJobRef.current];
       if (jobElement) {
-        // First, make sure to reset any scroll locks that might be applied
-        const resetScrolling = () => {
-          // Reset all possible scroll lock methods
+        // Use a single smooth scroll with better behavior
+        setTimeout(() => {
+          // Instead of directly scrolling the element, use window.scrollTo
+          // for better control and less side effects
+          const rect = jobElement.getBoundingClientRect();
+          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+          
+          window.scrollTo({
+            top: rect.top + scrollTop - window.innerHeight / 2 + rect.height / 2,
+            behavior: 'smooth'
+          });
+          
+          // Immediately ensure scrolling is fully enabled
           document.body.style.overflow = 'auto';
           document.documentElement.style.overflow = 'auto';
           document.body.style.position = 'static';
           document.documentElement.style.position = 'static';
+          document.body.style.height = 'auto';
+          document.documentElement.style.height = 'auto';
+          document.body.style.overflowY = 'auto';
+          document.documentElement.style.overflowY = 'auto';
           
-          // Remove any classes that might lock scrolling
-          document.body.classList.remove('overflow-hidden', 'fixed');
-          document.documentElement.classList.remove('overflow-hidden', 'fixed');
-          
-          // Remove any inline styles that might affect scrolling
-          const bodyStyle = document.body.style;
-          bodyStyle.removeProperty('height');
-          bodyStyle.removeProperty('top');
-          bodyStyle.removeProperty('left');
-          bodyStyle.removeProperty('right');
-          bodyStyle.removeProperty('bottom');
-          bodyStyle.removeProperty('position');
-          
-          const htmlStyle = document.documentElement.style;
-          htmlStyle.removeProperty('height');
-          htmlStyle.removeProperty('top');
-          htmlStyle.removeProperty('left');
-          htmlStyle.removeProperty('right');
-          htmlStyle.removeProperty('bottom');
-          htmlStyle.removeProperty('position');
-        };
-        
-        // Reset scrolling immediately first
-        resetScrolling();
-        
-        // Wait a tiny bit for the UI to update
-        setTimeout(() => {
-          // Calculate position for the element
-          const rect = jobElement.getBoundingClientRect();
-          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-          const targetY = rect.top + scrollTop - 120; // 120px offset from the top
-          
-          // Scroll to the element - using plain JS
-          window.scrollTo(0, targetY);
-          
-          // Ensure scrolling is enabled again after scrolling
-          resetScrolling();
-          
-          // Add a listener to detect any potential scroll locks that might be applied later
-          const preventScrollLocks = () => {
-            requestAnimationFrame(resetScrolling);
-          };
-          
-          window.addEventListener('scroll', preventScrollLocks, { passive: true });
-          
-          // Continue to reset scroll locks for a few seconds to ensure they don't get re-applied
-          const intervalId = setInterval(resetScrolling, 100);
+          // Additional cleanup after scrolling completes
           setTimeout(() => {
-            clearInterval(intervalId);
-            window.removeEventListener('scroll', preventScrollLocks);
-          }, 5000);
-        }, 50);
+            // Remove any remaining scroll locks
+            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
+            document.body.style.position = '';
+            document.documentElement.style.position = '';
+            document.body.style.height = '';
+            document.documentElement.style.height = '';
+            document.body.style.overflowY = '';
+            document.documentElement.style.overflowY = '';
+          }, 1000);
+        }, 100);
       }
     }
   }, [generationJobs, latestJobRef, jobRefs]);
-  
-  // Add an additional effect to always ensure scrolling is possible
-  useEffect(() => {
-    // Create a global MutationObserver to watch for any added styles that might lock scrolling
-    const observer = new MutationObserver((mutations) => {
-      for (const mutation of mutations) {
-        if (
-          document.body.style.overflow === 'hidden' || 
-          document.documentElement.style.overflow === 'hidden'
-        ) {
-          document.body.style.overflow = 'auto';
-          document.documentElement.style.overflow = 'auto';
-        }
-      }
-    });
-    
-    // Start observing body and html for attribute changes
-    observer.observe(document.body, { attributes: true, attributeFilter: ['style', 'class'] });
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['style', 'class'] });
-    
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
 };

@@ -1,7 +1,9 @@
 
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 export const useImageDownloader = () => {
+  const { toast } = useToast();
+
   const handleDownload = async (imageUrl: string) => {
     try {
       const s3Url = imageUrl.split('format=jpeg/')[1];
