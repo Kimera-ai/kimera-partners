@@ -306,11 +306,21 @@ const PromptMaker = () => {
         const status = await statusResponse.json();
         console.log("Current status:", status);
         
-        // Update status message based on pipeline status
+        // Improved status message handling based on pipeline status
         if (status.status === 'pending') {
           setPipelineStatus("Waiting in queue...");
         } else if (status.status === 'processing') {
           setPipelineStatus("Processing your image...");
+        } else if (status.status === 'AI Dream') {
+          setPipelineStatus("AI Dream: Creating your image...");
+          if (status.progress && status.progress.step && status.progress.total) {
+            setPipelineStatus(`AI Dream: Creating your image (${status.progress.step}/${status.progress.total})...`);
+          }
+        } else if (status.status === 'Face Swap') {
+          setPipelineStatus("Face Swap: Applying reference to image...");
+          if (status.progress && status.progress.step && status.progress.total) {
+            setPipelineStatus(`Face Swap: Applying reference (${status.progress.step}/${status.progress.total})...`);
+          }
         } else if (status.status === 'completed') {
           setPipelineStatus("Generation complete!");
           clearInterval(pollInterval);
@@ -354,6 +364,9 @@ const PromptMaker = () => {
           clearInterval(pollInterval);
           setIsProcessing(false);
           throw new Error('Processing failed');
+        } else {
+          // Handle any other status
+          setPipelineStatus(`${status.status || "Processing"}: ${status.progress?.step || ""}/${status.progress?.total || ""}`);
         }
       }, 2000);
     } catch (error) {
@@ -725,29 +738,4 @@ const PromptMaker = () => {
             <DialogTitle className="flex items-center justify-between text-white">
               Generation Details
               {selectedGeneration && (
-                <Button variant="outline" size="icon" onClick={() => handleDownload(selectedGeneration.image_url)} className="h-8 w-8 border-white/10 bg-background/50 hover:bg-background/80">
-                  <Download className="h-4 w-4" />
-                </Button>
-              )}
-            </DialogTitle>
-          </DialogHeader>
-          {selectedGeneration && (
-            <div className="space-y-4 h-full">
-              <div className="relative h-[calc(90vh-12rem)] flex items-center justify-center rounded-lg bg-background/30 border border-white/5">
-                <img src={selectedGeneration.image_url} alt={selectedGeneration.prompt} className="max-w-full max-h-full object-contain" />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-white/80">Prompt</Label>
-                <p className="text-sm text-white/90 bg-background/30 p-4 rounded-lg">
-                  {selectedGeneration.prompt || "No prompt available"}
-                </p>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-    </BaseLayout>
-  );
-};
-
-export default PromptMaker;
+                <Button variant="outline" size="icon" onClick={() => handleDownload(selectedGeneration.image_url)} className="h
