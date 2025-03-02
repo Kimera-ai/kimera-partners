@@ -1,3 +1,4 @@
+<lov-code>
 import { useState, useRef, useCallback, useEffect } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { Input } from "@/components/ui/input";
@@ -42,15 +43,25 @@ const ImagePreview = ({
 
 const CREDITS_PER_GENERATION = 14;
 
+// Define a new interface for tracking generation jobs
+interface GenerationJob {
+  id: string;
+  status: string;
+  completedImages: number;
+  totalImages: number;
+  generatedImages: (string | null)[];
+  isCompleted: boolean;
+  startTime: number;
+  elapsedTime: number;
+}
+
 const PromptMaker = () => {
   const [prompt, setPrompt] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
-  const [tempGeneratedImages, setTempGeneratedImages] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
-  const [elapsedTime, setElapsedTime] = useState(0);
   const [ratio, setRatio] = useState("2:3");
   const [style, setStyle] = useState("Photographic");
   const [loraScale, setLoraScale] = useState("0.5");
@@ -62,10 +73,11 @@ const PromptMaker = () => {
   const [credits, setCredits] = useState<number | null>(null);
   const [isLoadingCredits, setIsLoadingCredits] = useState(true);
   const [workflow, setWorkflow] = useState("no-reference");
-  const [pipelineStatus, setPipelineStatus] = useState("");
   const [numberOfImages, setNumberOfImages] = useState("1");
-  const [completedImages, setCompletedImages] = useState(0);
-  const [activeJobIds, setActiveJobIds] = useState<string[]>([]);
+  
+  // New state for tracking multiple generation jobs
+  const [generationJobs, setGenerationJobs] = useState<GenerationJob[]>([]);
+  const [jobIdCounter, setJobIdCounter] = useState(0);
 
   const {
     session
@@ -74,7 +86,6 @@ const PromptMaker = () => {
     toast
   } = useToast();
   const previewRef = useRef<HTMLDivElement>(null);
-  const timerRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     if (session?.user) {
@@ -139,23 +150,24 @@ const PromptMaker = () => {
     }
   };
 
+  // Add timer effect to update elapsed time for all jobs
   useEffect(() => {
-    if (isProcessing) {
-      setElapsedTime(0);
-      timerRef.current = setInterval(() => {
-        setElapsedTime(prev => prev + 10);
-      }, 10);
-    } else {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    }
+    // Timer for updating elapsed time for all active jobs
+    const timer = setInterval(() => {
+      setGenerationJobs(prevJobs => {
+        return prevJobs.map(job => {
+          if (!job.isCompleted) {
+            return { ...job, elapsedTime: Date.now() - job.startTime };
+          }
+          return job;
+        });
+      });
+    }, 10);
+    
     return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
+      clearInterval(timer);
     };
-  }, [isProcessing]);
+  }, []);
 
   const formatTime = (milliseconds: number) => {
     const seconds = Math.floor(milliseconds / 1000);
@@ -211,6 +223,7 @@ const PromptMaker = () => {
     }
   };
 
+  // Updated handleGenerate function to support simultaneous generation
   const handleGenerate = async () => {
     if (!session?.user) {
       toast({
@@ -246,13 +259,24 @@ const PromptMaker = () => {
     }
 
     try {
-      setIsProcessing(true);
-      setElapsedTime(0);
-      setPipelineStatus("Starting pipeline...");
-      setGeneratedImages([]);
-      setTempGeneratedImages([]);
-      setCompletedImages(0);
-      setActiveJobIds([]);
+      // Create a new job ID for this generation
+      const jobId = `job-${jobIdCounter}`;
+      setJobIdCounter(prev => prev + 1);
+      
+      // Create a new generation job
+      const newJob: GenerationJob = {
+        id: jobId,
+        status: "Starting pipeline...",
+        completedImages: 0,
+        totalImages: numImages,
+        generatedImages: new Array(numImages).fill(null),
+        isCompleted: false,
+        startTime: Date.now(),
+        elapsedTime: 0
+      };
+      
+      // Add the new job to the list
+      setGenerationJobs(prev => [...prev, newJob]);
       
       const defaultImageUrl = "https://www.jeann.online/cdn-cgi/image/format=jpeg/https://kimera-media.s3.eu-north-1.amazonaws.com/623b36fe-ac7f-4c56-a124-cddb942a38e5_event/623b36fe-ac7f-4c56-a124-cddb942a38e5_source.jpeg";
       const getPipelineId = () => {
@@ -267,19 +291,35 @@ const PromptMaker = () => {
       };
       
       const numImagesToGenerate = parseInt(numberOfImages);
-      setPipelineStatus(`Preparing to generate ${numImagesToGenerate} images...`);
+      
+      // Update job status
+      setGenerationJobs(prev => 
+        prev.map(job => 
+          job.id === jobId 
+            ? { ...job, status: `Preparing to generate ${numImagesToGenerate} images...` } 
+            : job
+        )
+      );
       
       const generateRequests = [];
+      const currentPrompt = prompt;
+      const currentWorkflow = workflow;
+      const currentRatio = ratio;
+      const currentStyle = style;
+      const currentLoraScale = loraScale;
+      const currentSeed = seed;
+      const currentUploadedImageUrl = uploadedImageUrl;
+      
       for (let i = 0; i < numImagesToGenerate; i++) {
         const requestBody = {
           pipeline_id: getPipelineId(),
-          imageUrl: uploadedImageUrl || defaultImageUrl,
-          ratio: ratio,
-          prompt: `${style} style: ${prompt}` || `${style} this image`,
+          imageUrl: currentUploadedImageUrl || defaultImageUrl,
+          ratio: currentRatio,
+          prompt: `${currentStyle} style: ${currentPrompt}` || `${currentStyle} this image`,
           data: {
-            lora_scale: parseFloat(loraScale),
-            style: style,
-            seed: seed === "random" ? -1 : 1234
+            lora_scale: parseFloat(currentLoraScale),
+            style: currentStyle,
+            seed: currentSeed === "random" ? -1 : 1234
           }
         };
         
@@ -293,7 +333,14 @@ const PromptMaker = () => {
         }));
       }
       
-      setPipelineStatus(`Sending ${numImagesToGenerate} requests to Kimera API...`);
+      // Update job status
+      setGenerationJobs(prev => 
+        prev.map(job => 
+          job.id === jobId 
+            ? { ...job, status: `Sending ${numImagesToGenerate} requests to Kimera API...` } 
+            : job
+        )
+      );
       
       const responses = await Promise.all(generateRequests);
       
@@ -301,27 +348,49 @@ const PromptMaker = () => {
         if (!responses[i].ok) {
           const errorData = await responses[i].json();
           console.error(`Pipeline error response for request ${i+1}:`, errorData);
-          setPipelineStatus(`Error: Failed to process image ${i+1}`);
+          
+          // Update job status to error
+          setGenerationJobs(prev => 
+            prev.map(job => 
+              job.id === jobId 
+                ? { ...job, status: `Error: Failed to process image ${i+1}`, isCompleted: true } 
+                : job
+            )
+          );
+          
           throw new Error(`Failed to process image ${i+1}`);
         }
       }
       
       const responseDataArray = await Promise.all(responses.map(r => r.json()));
-      const jobIds = responseDataArray.map(data => data.id);
-      setActiveJobIds(jobIds);
+      const apiJobIds = responseDataArray.map(data => data.id);
       
-      console.log("Jobs started with IDs:", jobIds);
-      setPipelineStatus(`Processing ${numImagesToGenerate} images...`);
+      console.log(`Jobs started with IDs for job ${jobId}:`, apiJobIds);
       
-      setTempGeneratedImages(new Array(numImagesToGenerate).fill(null));
+      // Update job status
+      setGenerationJobs(prev => 
+        prev.map(job => 
+          job.id === jobId 
+            ? { ...job, status: `Processing ${numImagesToGenerate} images...` } 
+            : job
+        )
+      );
       
-      jobIds.forEach((jobId, index) => {
-        pollJobStatus(jobId, index);
+      apiJobIds.forEach((apiJobId, index) => {
+        pollJobStatus(apiJobId, index, jobId, currentPrompt, currentStyle, currentRatio, currentLoraScale);
       });
       
+      // Update credits after generation is started
+      const creditUpdateSuccess = await updateUserCredits(CREDITS_PER_GENERATION * numImagesToGenerate);
+      if (!creditUpdateSuccess) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to update credits"
+        });
+      }
+      
     } catch (error) {
-      setIsProcessing(false);
-      setPipelineStatus("Error: " + (error instanceof Error ? error.message : "Unknown error"));
       console.error('Generation error:', error);
       toast({
         variant: "destructive",
@@ -332,11 +401,20 @@ const PromptMaker = () => {
     }
   };
 
-  const pollJobStatus = async (jobId: string, imageIndex: number) => {
+  // Updated pollJobStatus function to handle concurrent jobs
+  const pollJobStatus = async (apiJobId: string, imageIndex: number, jobId: string, jobPrompt: string, jobStyle: string, jobRatio: string, jobLoraScale: string) => {
     const pollInterval = setInterval(async () => {
       try {
-        setPipelineStatus(`Checking status for image ${imageIndex + 1}...`);
-        const statusResponse = await fetch(`https://api.kimera.ai/v1/pipeline/run/${jobId}`, {
+        // Update job status
+        setGenerationJobs(prev => 
+          prev.map(job => 
+            job.id === jobId 
+              ? { ...job, status: `Checking status for image ${imageIndex + 1}...` } 
+              : job
+          )
+        );
+        
+        const statusResponse = await fetch(`https://api.kimera.ai/v1/pipeline/run/${apiJobId}`, {
           headers: {
             'x-api-key': "1712edc40e3eb72c858332fe7500bf33e885324f8c1cd52b8cded2cdfd724cee"
           }
@@ -344,75 +422,93 @@ const PromptMaker = () => {
         
         if (!statusResponse.ok) {
           clearInterval(pollInterval);
-          setPipelineStatus(`Error: Failed to check status for image ${imageIndex + 1}`);
+          
+          // Update job status to error
+          setGenerationJobs(prev => 
+            prev.map(job => 
+              job.id === jobId 
+                ? { ...job, status: `Error: Failed to check status for image ${imageIndex + 1}`, isCompleted: true } 
+                : job
+            )
+          );
+          
           throw new Error(`Failed to check status for image ${imageIndex + 1}`);
         }
         
         const status = await statusResponse.json();
-        console.log(`Current status for image ${imageIndex + 1}:`, status);
+        console.log(`Current status for job ${jobId}, image ${imageIndex + 1}:`, status);
+        
+        let statusMessage = "";
         
         if (status.status === 'pending') {
-          setPipelineStatus(`Image ${imageIndex + 1}: Waiting in queue...`);
+          statusMessage = `Image ${imageIndex + 1}: Waiting in queue...`;
         } else if (status.status === 'processing') {
-          setPipelineStatus(`Image ${imageIndex + 1}: Processing...`);
+          statusMessage = `Image ${imageIndex + 1}: Processing...`;
         } else if (status.status === 'AI Dream') {
-          setPipelineStatus(`Image ${imageIndex + 1}: Creating image...`);
+          statusMessage = `Image ${imageIndex + 1}: Creating image...`;
           if (status.progress && status.progress.step && status.progress.total) {
-            setPipelineStatus(`Image ${imageIndex + 1}: Creating (${status.progress.step}/${status.progress.total})...`);
+            statusMessage = `Image ${imageIndex + 1}: Creating (${status.progress.step}/${status.progress.total})...`;
           }
         } else if (status.status === 'Face Swap') {
-          setPipelineStatus(`Image ${imageIndex + 1}: Applying reference...`);
+          statusMessage = `Image ${imageIndex + 1}: Applying reference...`;
           if (status.progress && status.progress.step && status.progress.total) {
-            setPipelineStatus(`Image ${imageIndex + 1}: Applying reference (${status.progress.step}/${status.progress.total})...`);
+            statusMessage = `Image ${imageIndex + 1}: Applying reference (${status.progress.step}/${status.progress.total})...`;
           }
         } else if (status.status === 'completed') {
           clearInterval(pollInterval);
           
-          setTempGeneratedImages(prev => {
-            const newImages = [...prev];
-            newImages[imageIndex] = status.result;
-            return newImages;
-          });
-          
-          setCompletedImages(prev => {
-            const newCount = prev + 1;
-            
-            if (newCount === parseInt(numberOfImages)) {
-              setTempGeneratedImages(prevTemp => {
-                const completedImages = prevTemp.filter(img => img !== null);
-                setGeneratedImages(completedImages);
-                return prevTemp;
-              });
-              
-              setIsProcessing(false);
-              setPipelineStatus("All images generated successfully!");
-              
-              const creditUpdateSuccess = updateUserCredits(CREDITS_PER_GENERATION * parseInt(numberOfImages));
-              if (!creditUpdateSuccess) {
-                toast({
-                  variant: "destructive",
-                  title: "Error",
-                  description: "Failed to update credits"
-                });
+          // Update job images and completion status
+          setGenerationJobs(prev => {
+            const updatedJobs = prev.map(job => {
+              if (job.id === jobId) {
+                const newGeneratedImages = [...job.generatedImages];
+                newGeneratedImages[imageIndex] = status.result;
+                
+                const newCompletedImages = job.completedImages + 1;
+                const isAllCompleted = newCompletedImages === job.totalImages;
+                
+                const jobStatus = isAllCompleted 
+                  ? "All images generated successfully!" 
+                  : `Completed ${newCompletedImages} of ${job.totalImages} images...`;
+                
+                return {
+                  ...job,
+                  generatedImages: newGeneratedImages,
+                  completedImages: newCompletedImages,
+                  isCompleted: isAllCompleted,
+                  status: jobStatus
+                };
               }
+              return job;
+            });
+            
+            // Check if all images for this job are completed
+            const currentJob = updatedJobs.find(j => j.id === jobId);
+            if (currentJob && currentJob.completedImages === currentJob.totalImages) {
+              // Update the final set of generated images
+              const completedImages = currentJob.generatedImages.filter(img => img !== null) as string[];
+              
+              // Add all completed images to generatedImages state for display in history
+              setGeneratedImages(prev => [...prev, ...completedImages]);
               
               toast({
                 title: "Success",
-                description: `All ${numberOfImages} images have been generated successfully!`,
+                description: `Job completed! All ${currentJob.totalImages} images have been generated successfully!`,
                 duration: 3000
               });
             }
             
-            return newCount;
+            return updatedJobs;
           });
           
+          // Store the generated image in the database
           const { error: dbError } = await supabase.from('generated_images').insert({
             user_id: session?.user?.id,
             image_url: status.result,
-            prompt: prompt,
-            style: style,
-            ratio: ratio,
-            lora_scale: loraScale
+            prompt: jobPrompt,
+            style: jobStyle,
+            ratio: jobRatio,
+            lora_scale: jobLoraScale
           });
           
           if (dbError) {
@@ -421,16 +517,38 @@ const PromptMaker = () => {
             await fetchPreviousGenerations();
           }
         } else if (status.status === 'failed' || status.status === 'Error') {
-          setPipelineStatus(`Error: Image ${imageIndex + 1} processing failed`);
           clearInterval(pollInterval);
-          setIsProcessing(false);
+          
+          // Update job status to error
+          setGenerationJobs(prev => 
+            prev.map(job => 
+              job.id === jobId 
+                ? { 
+                    ...job, 
+                    status: `Error: Image ${imageIndex + 1} processing failed`, 
+                    isCompleted: true 
+                  } 
+                : job
+            )
+          );
+          
           throw new Error(`Image ${imageIndex + 1} processing failed`);
         } else {
-          setPipelineStatus(`Image ${imageIndex + 1}: ${status.status || "Processing"}: ${status.progress?.step || ""}/${status.progress?.total || ""}`);
+          statusMessage = `Image ${imageIndex + 1}: ${status.status || "Processing"}: ${status.progress?.step || ""}/${status.progress?.total || ""}`;
         }
+        
+        // Update job status
+        if (statusMessage) {
+          setGenerationJobs(prev => 
+            prev.map(job => 
+              job.id === jobId ? { ...job, status: statusMessage } : job
+            )
+          );
+        }
+        
       } catch (error) {
         clearInterval(pollInterval);
-        console.error(`Error polling status for image ${imageIndex + 1}:`, error);
+        console.error(`Error polling status for job ${jobId}, image ${imageIndex + 1}:`, error);
       }
     }, 2000);
   };
@@ -560,18 +678,19 @@ const PromptMaker = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="space-y-6">
+              {/* Control Panel Card */}
               <Card className="p-6 bg-card/60 backdrop-blur border border-white/5 shadow-lg">
                 <div className="space-y-4">
                   <div>
                     <Label htmlFor="prompt" className="text-sm font-medium block text-white/80">Prompt</Label>
                     <div className="relative">
-                      <Input id="reference-image" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={isUploading || isProcessing || workflow === 'no-reference'} />
+                      <Input id="reference-image" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={isUploading || workflow === 'no-reference'} />
                       <div className="relative">
                         <div ref={previewRef} className="absolute left-3 top-3 z-[9999] pointer-events-auto" style={{
                         position: 'absolute',
                         isolation: 'isolate'
                       }}>
-                          <ImagePreview imagePreview={imagePreview} isUploading={isUploading} isProcessing={isProcessing} onRemove={removeImage} disabled={workflow === 'no-reference'} />
+                          <ImagePreview imagePreview={imagePreview} isUploading={isUploading} isProcessing={false} onRemove={removeImage} disabled={workflow === 'no-reference'} />
                         </div>
                         <div className="relative">
                           <Textarea id="prompt" placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..." value={prompt} onChange={e => setPrompt(e.target.value)} className="h-32 resize-none bg-background/50 border-white/10 text-white pl-14" />
@@ -585,11 +704,11 @@ const PromptMaker = () => {
 
                   <Button 
                     className="w-full bg-primary hover:bg-primary/90 text-white" 
-                    disabled={isProcessing || ((workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl)}
+                    disabled={isUploading || ((workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl)}
                     onClick={handleGenerate}
                   >
                     <Sparkles className="w-4 h-4 mr-2" />
-                    {isProcessing ? "Processing..." : ((workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl) ? "Upload an image" : "Generate"}
+                    {isUploading ? "Uploading..." : ((workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl) ? "Upload an image" : "Generate"}
                   </Button>
 
                   <div className="grid grid-cols-1 gap-4 pt-3 border-t border-white/5">
@@ -655,6 +774,7 @@ const PromptMaker = () => {
                         </SelectContent>
                       </Select>
                     </div>
+                    
                     <div className="space-y-2">
                       <TooltipProvider>
                         <Tooltip>
@@ -684,191 +804,5 @@ const PromptMaker = () => {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="space-y-2">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Label htmlFor="loraScale" className="text-sm font-medium block truncate text-white/80">Character Ref. Strength</Label>
-                          </TooltipTrigger>
-                          <TooltipContent className="bg-background/90 border-white/10">
-                            <p>Character Reference Strength</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                      <Select value={loraScale} onValueChange={setLoraScale} disabled={workflow === 'no-reference'}>
-                        <SelectTrigger id="loraScale" className={`w-full bg-background/50 border-white/10 text-white ${workflow === 'no-reference' ? 'opacity-50' : ''}`}>
-                          <SelectValue placeholder="Select strength" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-background border-white/10 text-white">
-                          <SelectItem value="0.2">0.2</SelectItem>
-                          <SelectItem value="0.3">0.3</SelectItem>
-                          <SelectItem value="0.4">0.4</SelectItem>
-                          <SelectItem value="0.5">0.5</SelectItem>
-                          <SelectItem value="0.6">0.6</SelectItem>
-                          <SelectItem value="0.7">0.7</SelectItem>
-                          <SelectItem value="0.8">0.8</SelectItem>
-                          <SelectItem value="0.9">0.9</SelectItem>
-                          <SelectItem value="1.0">1.0</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Label htmlFor="seed" className="text-sm font-medium block truncate text-white/80">Seed</Label>
-                          </TooltipTrigger>
-                          <TooltipContent className="bg-background/90 border-white/10">
-                            <p>Seed</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                      <Select value={seed} onValueChange={setSeed}>
-                        <SelectTrigger id="seed" className="w-full bg-background/50 border-white/10 text-white">
-                          <SelectValue placeholder="Select seed" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-background border-white/10 text-white">
-                          <SelectItem value="random">Random</SelectItem>
-                          <SelectItem value="steady">Steady</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-
-              <Card className="p-6 bg-card/60 backdrop-blur border border-white/5 shadow-lg">
-                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-white">
-                  <History className="w-5 h-5" />
-                  Generation History
-                </h2>
-                <div className="max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    {previousGenerations.map(gen => (
-                      <div key={gen.id} className="space-y-3">
-                        <div className="relative group">
-                          <button className="w-full text-left" onClick={() => handleImageClick(gen)}>
-                            <img src={gen.image_url} alt={gen.prompt} className="w-full aspect-square object-cover rounded-lg hover:opacity-90 transition-opacity border border-white/10" loading="lazy" />
-                          </button>
-                          <Button variant="outline" size="icon" onClick={e => {
-                            e.stopPropagation();
-                            handleDownload(gen.image_url);
-                          }} className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity bg-background/50 backdrop-blur hover:bg-background/80 border-white/10">
-                            <Download className="h-4 w-4" />
-                          </Button>
-                        </div>
-                        <div className="space-y-1 text-xs text-white/70">
-                          <div className="flex flex-wrap gap-2">
-                            <span>Style: {gen.style}</span>
-                            <span>Ratio: {gen.ratio}</span>
-                          </div>
-                          <div className="flex flex-wrap gap-2">
-                            <span>Seed: {gen.seed || "random"}</span>
-                            <span>Strength: {gen.lora_scale || "0.5"}</span>
-                          </div>
-                          <div className="flex items-center gap-1 text-yellow-500">
-                            <Coins className="h-3 w-3" />
-                            <span>{CREDITS_PER_GENERATION} credits</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </Card>
-            </div>
-
-            <div className="space-y-6">
-              <Card className="p-6 bg-card/60 backdrop-blur border border-white/5 shadow-lg relative min-h-[400px]">
-                {isProcessing && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
-                    <div className="flex items-center gap-2 backdrop-blur px-6 py-3 rounded-full bg-violet-900/70 border border-white/10 mb-4">
-                      <Clock className="w-6 h-6 animate-pulse" />
-                      <span className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                        {formatTime(elapsedTime)}
-                      </span>
-                    </div>
                     
-                    <div className="backdrop-blur px-6 py-3 rounded-full bg-background/50 border border-white/10 flex items-center gap-2 max-w-[80%]">
-                      <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                      <span className="text-sm whitespace-nowrap text-ellipsis overflow-hidden">
-                        {pipelineStatus}
-                      </span>
-                    </div>
-                    
-                    {completedImages > 0 && (
-                      <div className="mt-4 text-sm text-white">
-                        Completed: {completedImages} of {numberOfImages} images
-                        <div className="mt-2">
-                          Waiting for all images to complete before displaying...
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-                
-                {generatedImages.length > 0 ? (
-                  <div className={`grid grid-cols-${Math.min(generatedImages.length, 2)} gap-4 w-full`}>
-                    {generatedImages.map((imgUrl, index) => (
-                      <div key={index} className="relative group">
-                        <img 
-                          src={imgUrl} 
-                          alt={`Generated ${index + 1}`} 
-                          className="w-full aspect-[2/3] object-cover rounded-lg shadow-lg" 
-                          loading="lazy" 
-                        />
-                        <Button 
-                          variant="outline" 
-                          size="icon" 
-                          onClick={() => handleDownload(imgUrl)} 
-                          className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity bg-background/50 backdrop-blur hover:bg-background/80 border-white/10"
-                        >
-                          <Download className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center text-white/60">
-                    <Image className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <p>Your generated images will appear here</p>
-                  </div>
-                )}
-              </Card>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <Dialog open={showPromptDialog} onOpenChange={setShowPromptDialog}>
-        <DialogContent className="sm:max-w-[90vw] md:max-w-[800px] h-[90vh] overflow-y-auto bg-card border border-white/10 text-white">
-          <DialogHeader>
-            <DialogTitle className="flex items-center justify-between text-white">
-              Generation Details
-              {selectedGeneration && (
-                <Button variant="outline" size="icon" onClick={() => handleDownload(selectedGeneration.image_url)} className="h-8 w-8 border-white/10 bg-background/50 hover:bg-background/80">
-                  <Download className="h-4 w-4" />
-                </Button>
-              )}
-            </DialogTitle>
-          </DialogHeader>
-          {selectedGeneration && (
-            <div className="space-y-4 h-full">
-              <div className="relative h-[calc(90vh-12rem)] flex items-center justify-center rounded-lg bg-background/30 border border-white/5">
-                <img src={selectedGeneration.image_url} alt={selectedGeneration.prompt} className="max-w-full max-h-full object-contain" />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-white/80">Prompt</Label>
-                <p className="text-sm text-white/90 bg-background/30 p-4 rounded-lg">
-                  {selectedGeneration.prompt || "No prompt available"}
-                </p>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-    </BaseLayout>
-  );
-};
-
-export default PromptMaker;
+                    <div className
