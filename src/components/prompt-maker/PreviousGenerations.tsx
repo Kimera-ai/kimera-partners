@@ -33,7 +33,20 @@ export const PreviousGenerations = ({
   };
   
   return (
-    <Drawer open={isHistoryOpen} onOpenChange={setIsHistoryOpen} direction="right">
+    <Drawer 
+      open={isHistoryOpen} 
+      onOpenChange={(open) => {
+        setIsHistoryOpen(open);
+        // Add a small delay to ensure DOM is updated
+        if (!open) {
+          setTimeout(() => {
+            document.body.style.pointerEvents = '';
+          }, 300);
+        }
+      }}
+      direction="right"
+      shouldScaleBackground={false}
+    >
       <DrawerTrigger asChild>
         <Button 
           variant="outline" 
@@ -51,7 +64,15 @@ export const PreviousGenerations = ({
               <h3 className="text-lg font-medium">Previous Generations</h3>
             </div>
             <DrawerClose asChild>
-              <Button variant="ghost" size="sm" className="rounded-full h-8 w-8 p-0">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="rounded-full h-8 w-8 p-0"
+                onClick={() => {
+                  // Ensure pointer events are restored when drawer is closed
+                  document.body.style.pointerEvents = '';
+                }}
+              >
                 <span className="sr-only">Close</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -76,7 +97,10 @@ export const PreviousGenerations = ({
               <div 
                 key={index} 
                 className="relative aspect-[3/4] rounded-md overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all"
-                onClick={() => handleImageClick(generation)}
+                onClick={() => {
+                  handleImageClick(generation);
+                  setIsHistoryOpen(false); // Close drawer after selection
+                }}
               >
                 <img 
                   src={generation.image_url} 
