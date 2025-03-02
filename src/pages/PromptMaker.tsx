@@ -23,6 +23,7 @@ const PromptMaker = () => {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const { toast } = useToast();
   const jobRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  const containerRef = useRef<HTMLDivElement | null>(null);
   
   const {
     imagePreview, 
@@ -82,13 +83,31 @@ const PromptMaker = () => {
     uploadedImageUrl
   );
 
-  // Scroll to the most recent job when a new one is created
+  // Improved scroll handling for new jobs
   useEffect(() => {
     if (latestJobRef.current && jobRefs.current[latestJobRef.current]) {
-      jobRefs.current[latestJobRef.current]?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
+      const jobElement = jobRefs.current[latestJobRef.current];
+      if (jobElement) {
+        // Use a smoother scroll with better behavior
+        setTimeout(() => {
+          jobElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+          
+          // Ensure the page can be scrolled in both directions after automatic scrolling
+          document.body.style.overflow = '';
+          document.documentElement.style.overflow = '';
+          
+          // Allow manual scrolling again after the automated scroll is complete
+          setTimeout(() => {
+            window.scrollTo({
+              top: window.scrollY,
+              behavior: 'auto'
+            });
+          }, 500);
+        }, 100);
+      }
     }
   }, [generationJobs]);
 
@@ -140,7 +159,7 @@ const PromptMaker = () => {
 
   return (
     <BaseLayout>
-      <div className="relative min-h-screen">
+      <div className="relative min-h-screen" ref={containerRef}>
         <div className="absolute inset-0 pointer-events-none">
           <DotPattern width={24} height={24} className="[mask-image:radial-gradient(900px_circle_at_center,white,transparent)]" cx={1} cy={1} cr={1} />
         </div>
