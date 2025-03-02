@@ -1,4 +1,3 @@
-
 import { useState, useRef, useCallback, useEffect } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { Input } from "@/components/ui/input";
@@ -298,7 +297,7 @@ const PromptMaker = () => {
     }
   };
 
-  // Updated handleGenerate function to fix the image count issue
+  // Updated handleGenerate function to support simultaneous generation
   const handleGenerate = async () => {
     if (!session?.user) {
       toast({
@@ -365,7 +364,6 @@ const PromptMaker = () => {
         }
       };
       
-      // Use the correct number of images to generate
       const numImagesToGenerate = parseInt(numberOfImages);
       
       // Update job status
@@ -835,7 +833,7 @@ const PromptMaker = () => {
                             <Label htmlFor="ratio" className="text-sm font-medium block truncate text-white/80">Aspect Ratio</Label>
                           </TooltipTrigger>
                           <TooltipContent className="bg-background/90 border-white/10">
-                            <p>Aspect ratio of the generated image</p>
+                            <p>Aspect Ratio</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -844,11 +842,9 @@ const PromptMaker = () => {
                           <SelectValue placeholder="Select ratio" />
                         </SelectTrigger>
                         <SelectContent className="bg-background border-white/10 text-white">
-                          <SelectItem value="1:1">Square (1:1)</SelectItem>
-                          <SelectItem value="2:3">Portrait (2:3)</SelectItem>
-                          <SelectItem value="3:2">Landscape (3:2)</SelectItem>
-                          <SelectItem value="9:16">Vertical (9:16)</SelectItem>
-                          <SelectItem value="16:9">Horizontal (16:9)</SelectItem>
+                          <SelectItem value="1:1">1:1 (Square)</SelectItem>
+                          <SelectItem value="2:3">2:3 (Portrait)</SelectItem>
+                          <SelectItem value="3:4">3:4 (Portrait)</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -860,7 +856,7 @@ const PromptMaker = () => {
                             <Label htmlFor="style" className="text-sm font-medium block truncate text-white/80">Style</Label>
                           </TooltipTrigger>
                           <TooltipContent className="bg-background/90 border-white/10">
-                            <p>Visual style of the generated image</p>
+                            <p>Style</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -869,14 +865,16 @@ const PromptMaker = () => {
                           <SelectValue placeholder="Select style" />
                         </SelectTrigger>
                         <SelectContent className="bg-background border-white/10 text-white">
-                          <SelectItem value="Photographic">Photographic</SelectItem>
                           <SelectItem value="Cinematic">Cinematic</SelectItem>
-                          <SelectItem value="Anime">Anime</SelectItem>
+                          <SelectItem value="Animated">Animated</SelectItem>
                           <SelectItem value="Digital Art">Digital Art</SelectItem>
-                          <SelectItem value="3D Render">3D Render</SelectItem>
-                          <SelectItem value="Painting">Painting</SelectItem>
-                          <SelectItem value="Sketch">Sketch</SelectItem>
-                          <SelectItem value="Pixel Art">Pixel Art</SelectItem>
+                          <SelectItem value="Photographic">Photographic</SelectItem>
+                          <SelectItem value="Fantasy art">Fantasy art</SelectItem>
+                          <SelectItem value="Neonpunk">Neonpunk</SelectItem>
+                          <SelectItem value="Enhance">Enhance</SelectItem>
+                          <SelectItem value="Comic book">Comic book</SelectItem>
+                          <SelectItem value="Lowpoly">Lowpoly</SelectItem>
+                          <SelectItem value="Line art">Line art</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -888,20 +886,19 @@ const PromptMaker = () => {
                             <Label htmlFor="loraScale" className="text-sm font-medium block truncate text-white/80">Lora Scale</Label>
                           </TooltipTrigger>
                           <TooltipContent className="bg-background/90 border-white/10">
-                            <p>Strength of the style adaptation (0.1-1.0)</p>
+                            <p>Controls the strength of the style</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                       <Select value={loraScale} onValueChange={setLoraScale}>
                         <SelectTrigger id="loraScale" className="w-full bg-background/50 border-white/10 text-white">
-                          <SelectValue placeholder="Select scale" />
+                          <SelectValue placeholder="Select lora scale" />
                         </SelectTrigger>
                         <SelectContent className="bg-background border-white/10 text-white">
-                          <SelectItem value="0.1">0.1 (Subtle)</SelectItem>
-                          <SelectItem value="0.3">0.3 (Light)</SelectItem>
+                          <SelectItem value="0.2">0.2 (Subtle)</SelectItem>
                           <SelectItem value="0.5">0.5 (Medium)</SelectItem>
-                          <SelectItem value="0.7">0.7 (Strong)</SelectItem>
-                          <SelectItem value="1.0">1.0 (Full)</SelectItem>
+                          <SelectItem value="0.8">0.8 (Strong)</SelectItem>
+                          <SelectItem value="1.0">1.0 (Very Strong)</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -913,7 +910,7 @@ const PromptMaker = () => {
                             <Label htmlFor="seed" className="text-sm font-medium block truncate text-white/80">Seed</Label>
                           </TooltipTrigger>
                           <TooltipContent className="bg-background/90 border-white/10">
-                            <p>Random seed for image generation</p>
+                            <p>Random seed gives different results each time</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -923,194 +920,216 @@ const PromptMaker = () => {
                         </SelectTrigger>
                         <SelectContent className="bg-background border-white/10 text-white">
                           <SelectItem value="random">Random</SelectItem>
-                          <SelectItem value="fixed">Fixed</SelectItem>
+                          <SelectItem value="fixed">Fixed (1234)</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                   </div>
-                </div>
-              </Card>
 
-              {/* Generated Jobs Status */}
-              {generationJobs.length > 0 && (
-                <Card className="p-6 bg-card/60 backdrop-blur border border-white/5 shadow-lg overflow-auto max-h-[500px]">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Generation Jobs</h2>
-                      <div className="text-sm text-muted-foreground">{generationJobs.filter(j => !j.isCompleted).length} active, {generationJobs.filter(j => j.isCompleted).length} completed</div>
-                    </div>
-                    <div className="space-y-4">
-                      {generationJobs.map((job) => (
-                        <div key={job.id} className={`rounded-lg p-4 ${job.isCompleted ? (job.status.includes('Error') ? 'bg-red-950/20' : 'bg-green-950/20') : 'bg-blue-950/20'} border ${job.isCompleted ? (job.status.includes('Error') ? 'border-red-800/30' : 'border-green-800/30') : 'border-blue-800/30'}`}>
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center gap-2">
-                              {!job.isCompleted ? (
-                                <Loader2 className="h-4 w-4 text-primary animate-spin" />
-                              ) : job.status.includes('Error') ? (
-                                <X className="h-4 w-4 text-red-500" />
-                              ) : (
-                                <span className="text-green-500">✓</span>
-                              )}
-                              <span className="font-medium">{job.id}</span>
-                            </div>
-                            <div className="text-sm text-muted-foreground flex items-center gap-2">
-                              <Clock className="h-3 w-3" />
-                              {formatTime(job.elapsedTime)}
-                            </div>
-                          </div>
-                          <div className="text-sm mb-2">{job.status}</div>
-                          {job.completedImages > 0 && (
-                            <div className="text-xs text-muted-foreground mb-2">Completed: {job.completedImages}/{job.totalImages}</div>
-                          )}
-                          {job.isCompleted && !job.status.includes('Error') && (
-                            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2 mt-3">
-                              {job.generatedImages.filter(Boolean).map((img, idx) => (
-                                <div key={`${job.id}-img-${idx}`} className="relative group">
-                                  <img 
-                                    src={img as string} 
-                                    alt={`Generated ${idx + 1}`} 
-                                    className="w-full h-24 object-cover rounded-md border border-white/10" 
-                                  />
-                                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-md flex items-center justify-center gap-2">
-                                    <Button 
-                                      variant="ghost" 
-                                      size="icon" 
-                                      className="h-7 w-7 bg-black/40 hover:bg-black/60" 
-                                      onClick={() => handleDownload(img as string)}
-                                    >
-                                      <Download className="h-3 w-3 text-white" />
-                                    </Button>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </Card>
-              )}
-            </div>
-
-            <div className="space-y-6">
-              {/* Previous Generations */}
-              <Card className="p-6 bg-card/60 backdrop-blur border border-white/5 shadow-lg">
-                <div className="space-y-4">
-                  <div className="flex items-center">
-                    <History className="w-5 h-5 mr-2 text-primary/70" />
-                    <h2 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Previous Generations</h2>
-                  </div>
-                  
-                  {previousGenerations.length > 0 ? (
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      {previousGenerations.map((generation, index) => (
-                        <div 
-                          key={`${generation.id}-${index}`} 
-                          className="relative group cursor-pointer rounded-lg overflow-hidden border border-white/10 transition-all hover:shadow-xl hover:border-primary/30"
-                          onClick={() => handleImageClick(generation)}
-                        >
-                          <img 
-                            src={generation.image_url} 
-                            alt={`Generation ${index + 1}`} 
-                            className="w-full h-48 object-cover transition-transform group-hover:scale-105" 
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-3 flex flex-col justify-end">
-                            <p className="text-xs text-white line-clamp-2">{generation.prompt}</p>
-                            <div className="flex items-center justify-between mt-2">
-                              <div className="flex space-x-1">
-                                <span className="text-[10px] bg-white/20 backdrop-blur-sm rounded-full px-2 py-0.5">{generation.style}</span>
-                                <span className="text-[10px] bg-white/20 backdrop-blur-sm rounded-full px-2 py-0.5">{generation.ratio}</span>
+                  {/* Active Generation Jobs List */}
+                  {generationJobs.length > 0 && (
+                    <div className="mt-6 space-y-4">
+                      <h3 className="text-lg font-medium text-white/90">Active Generation Jobs</h3>
+                      <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
+                        {generationJobs.map((job) => (
+                          <div key={job.id} className={`p-3 rounded-md border ${job.isCompleted ? 'border-green-500/30 bg-green-950/20' : 'border-orange-500/30 bg-orange-950/20'}`}>
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                {job.isCompleted ? 
+                                  <Sparkles className="w-4 h-4 text-green-400" /> :
+                                  <Loader2 className="w-4 h-4 text-orange-400 animate-spin" />
+                                }
+                                <span className="font-medium text-sm">
+                                  Job {job.id.replace('job-', '')}
+                                </span>
                               </div>
+                              <span className="text-xs font-mono bg-black/30 rounded px-2 py-0.5 text-white/70">
+                                {formatTime(job.elapsedTime)}
+                              </span>
+                            </div>
+                            <div className="text-sm text-white/70 mb-2">{job.status}</div>
+                            
+                            {/* Progress bar */}
+                            <div className="h-1.5 w-full bg-black/30 rounded-full overflow-hidden">
+                              <div 
+                                className={`h-full ${job.isCompleted ? 'bg-green-500' : 'bg-orange-500'}`} 
+                                style={{width: `${(job.completedImages / job.totalImages) * 100}%`}}
+                              ></div>
+                            </div>
+                            
+                            {/* Generated images */}
+                            {job.completedImages > 0 && (
+                              <div className="mt-3 grid grid-cols-4 gap-2">
+                                {job.generatedImages.map((img, i) => img && (
+                                  <div key={`${job.id}-img-${i}`} className="relative group aspect-[2/3] rounded-md overflow-hidden">
+                                    <img src={img} alt={`Generated ${i+1}`} className="w-full h-full object-cover" />
+                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                      <Button 
+                                        variant="ghost" 
+                                        size="icon" 
+                                        className="text-white h-8 w-8"
+                                        onClick={() => handleDownload(img)}
+                                      >
+                                        <Download className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Previous Generations */}
+                  {previousGenerations.length > 0 && (
+                    <div className="mt-6 space-y-4">
+                      <h3 className="text-lg font-medium text-white/90 flex items-center gap-2">
+                        <History className="w-4 h-4 text-white/70" />
+                        Generation History
+                      </h3>
+                      <div className="grid grid-cols-4 gap-2 max-h-96 overflow-y-auto pr-2">
+                        {previousGenerations.map((gen, index) => (
+                          <div 
+                            key={`prev-gen-${index}`} 
+                            className="relative group aspect-[2/3] rounded-md overflow-hidden cursor-pointer"
+                            onClick={() => handleImageClick(gen)}
+                          >
+                            <img src={gen.image_url} alt={`Previous ${index}`} className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                               <Button 
                                 variant="ghost" 
                                 size="icon" 
-                                className="h-6 w-6 bg-black/40 hover:bg-black/60" 
+                                className="text-white h-8 w-8"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleDownload(generation.image_url);
+                                  handleDownload(gen.image_url);
                                 }}
                               >
-                                <Download className="h-3 w-3 text-white" />
+                                <Download className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="text-white h-8 w-8"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setPrompt(gen.prompt || "");
+                                }}
+                              >
+                                <Lightbulb className="h-4 w-4" />
                               </Button>
                             </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8 text-muted-foreground bg-background/30 backdrop-blur rounded-lg border border-white/5">
-                      <Lightbulb className="h-8 w-8 mx-auto mb-3 text-primary/40" />
-                      <p>No previous generations found.</p>
-                      <p className="text-sm mt-2">Start creating with the form on the left!</p>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
+              </Card>
+            </div>
+            
+            {/* Preview Area */}
+            <div className="lg:sticky lg:top-24 space-y-6 h-fit">
+              <Card className="p-6 bg-card/60 backdrop-blur border border-white/5 shadow-lg">
+                <h3 className="text-lg font-medium text-white/90 mb-4 flex items-center gap-2">
+                  <Wand2 className="w-4 h-4 text-white/70" />
+                  Preview
+                </h3>
+                
+                {generatedImages.length > 0 ? (
+                  <div className="grid grid-cols-2 gap-4">
+                    {generatedImages.slice(0, 4).map((img, i) => (
+                      <div key={`main-preview-${i}`} className="relative group rounded-md overflow-hidden aspect-[2/3]">
+                        <img 
+                          src={img} 
+                          alt={`Generated ${i+1}`} 
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="text-white"
+                            onClick={() => handleDownload(img)}
+                          >
+                            <Download className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="aspect-[2/3] border border-dashed border-white/10 rounded-md flex flex-col items-center justify-center text-white/50 p-4">
+                    <Wand2 className="w-12 h-12 mb-4 opacity-20" />
+                    <p className="text-center">Fill in the prompt and hit generate to create an image</p>
+                    {workflow === 'with-reference' && !uploadedImageUrl && (
+                      <p className="text-center mt-2 text-sm text-orange-300">Don't forget to upload a reference image!</p>
+                    )}
+                  </div>
+                )}
               </Card>
             </div>
           </div>
         </div>
       </div>
       
-      {/* Prompt Details Dialog */}
+      {/* Prompt Dialog */}
       <Dialog open={showPromptDialog} onOpenChange={setShowPromptDialog}>
-        <DialogContent className="sm:max-w-xl bg-background/95 backdrop-blur border-white/10">
+        <DialogContent className="bg-background/95 backdrop-blur-lg border-white/10 text-white">
           <DialogHeader>
-            <DialogTitle className="text-xl">Generation Details</DialogTitle>
+            <DialogTitle>Generation Details</DialogTitle>
           </DialogHeader>
           {selectedGeneration && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <img 
-                  src={selectedGeneration?.image_url} 
-                  alt="Generated image" 
-                  className="w-full aspect-auto object-contain rounded-md border border-white/10" 
-                />
-                <Button 
-                  className="w-full mt-3" 
-                  onClick={() => handleDownload(selectedGeneration.image_url)}
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Download Image
-                </Button>
+            <div className="grid grid-cols-[2fr_3fr] gap-4">
+              <div className="aspect-[2/3] rounded-md overflow-hidden">
+                <img src={selectedGeneration.image_url} alt="Selected generation" className="w-full h-full object-cover" />
               </div>
-              <div className="space-y-4">
+              <div className="space-y-3 overflow-y-auto max-h-[50vh] pr-3">
                 <div>
-                  <Label className="text-sm text-muted-foreground">Prompt</Label>
-                  <p className="text-sm mt-1">{selectedGeneration?.prompt}</p>
+                  <h4 className="text-xs text-white/60 uppercase">Prompt</h4>
+                  <p className="text-sm">{selectedGeneration.prompt || "No prompt recorded"}</p>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label className="text-sm text-muted-foreground">Style</Label>
-                    <p className="text-sm mt-1">{selectedGeneration?.style}</p>
+                    <h4 className="text-xs text-white/60 uppercase">Style</h4>
+                    <p className="text-sm">{selectedGeneration.style || "Not specified"}</p>
                   </div>
                   <div>
-                    <Label className="text-sm text-muted-foreground">Aspect Ratio</Label>
-                    <p className="text-sm mt-1">{selectedGeneration?.ratio}</p>
+                    <h4 className="text-xs text-white/60 uppercase">Ratio</h4>
+                    <p className="text-sm">{selectedGeneration.ratio || "Not specified"}</p>
                   </div>
                   <div>
-                    <Label className="text-sm text-muted-foreground">Lora Scale</Label>
-                    <p className="text-sm mt-1">{selectedGeneration?.lora_scale}</p>
+                    <h4 className="text-xs text-white/60 uppercase">Lora Scale</h4>
+                    <p className="text-sm">{selectedGeneration.lora_scale || "Not specified"}</p>
                   </div>
                   <div>
-                    <Label className="text-sm text-muted-foreground">Created</Label>
-                    <p className="text-sm mt-1">{new Date(selectedGeneration?.created_at).toLocaleString()}</p>
+                    <h4 className="text-xs text-white/60 uppercase">Date</h4>
+                    <p className="text-sm">{selectedGeneration.created_at ? new Date(selectedGeneration.created_at).toLocaleString() : "Unknown"}</p>
                   </div>
                 </div>
-                <div>
+                <div className="pt-2 flex gap-2">
                   <Button 
-                    variant="outline" 
                     className="w-full"
                     onClick={() => {
-                      setPrompt(selectedGeneration?.prompt);
-                      setStyle(selectedGeneration?.style);
-                      setRatio(selectedGeneration?.ratio);
-                      setLoraScale(selectedGeneration?.lora_scale);
+                      setPrompt(selectedGeneration.prompt || "");
+                      setStyle(selectedGeneration.style || "Photographic");
+                      setRatio(selectedGeneration.ratio || "2:3");
+                      setLoraScale(selectedGeneration.lora_scale || "0.5");
                       setShowPromptDialog(false);
                     }}
                   >
-                    <Wand2 className="h-4 w-4 mr-2" />
-                    Use These Settings
+                    <Lightbulb className="w-4 h-4 mr-2" />
+                    Use these settings
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={() => handleDownload(selectedGeneration.image_url)}
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download
                   </Button>
                 </div>
               </div>
