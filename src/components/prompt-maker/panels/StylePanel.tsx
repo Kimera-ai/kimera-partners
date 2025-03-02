@@ -19,12 +19,7 @@ export const StylePanel = ({ style, setStyle }: StylePanelProps) => {
           <SelectItem value="Cinematic">Cinematic</SelectItem>
           <SelectItem value="Anime">Anime</SelectItem>
           <SelectItem value="Digital Art">Digital Art</SelectItem>
-          <SelectItem value="Realistic">Realistic</SelectItem>
-          <SelectItem value="Oil Painting">Oil Painting</SelectItem>
-          <SelectItem value="Watercolor">Watercolor</SelectItem>
-          <SelectItem value="Pixel Art">Pixel Art</SelectItem>
           <SelectItem value="Comic Book">Comic Book</SelectItem>
-          <SelectItem value="Isometric">Isometric</SelectItem>
           <SelectItem value="Low Poly">Low Poly</SelectItem>
         </SelectContent>
       </Select>
