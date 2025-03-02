@@ -11,18 +11,17 @@ export const useScrollToLatestJob = (
     if (latestJobRef.current && jobRefs.current[latestJobRef.current]) {
       const jobElement = jobRefs.current[latestJobRef.current];
       if (jobElement) {
-        // Use a single smooth scroll with better behavior and no additional scrolling
+        // Use a single smooth scroll with better behavior
         setTimeout(() => {
+          // Scroll to the job element smoothly
           jobElement.scrollIntoView({
             behavior: 'smooth',
             block: 'start'
           });
           
-          // Ensure the page scrolling behavior is normal
-          document.body.style.overflow = '';
-          document.documentElement.style.overflow = '';
-          
-          // Remove the additional scroll that was causing the continuous scrolling issue
+          // Make sure scrolling is enabled in all directions
+          document.body.style.overflowY = 'auto';
+          document.documentElement.style.overflowY = 'auto';
         }, 100);
       }
     }
