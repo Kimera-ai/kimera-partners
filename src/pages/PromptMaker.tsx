@@ -349,8 +349,8 @@ const PromptMaker = () => {
         elapsedTime: 0
       };
       
-      // Add the new job to the list
-      setGenerationJobs(prev => [...prev, newJob]);
+      // Add the new job to the beginning of the list
+      setGenerationJobs(prev => [newJob, ...prev]);
       
       const defaultImageUrl = "https://www.jeann.online/cdn-cgi/image/format=jpeg/https://kimera-media.s3.eu-north-1.amazonaws.com/623b36fe-ac7f-4c56-a124-cddb942a38e5_event/623b36fe-ac7f-4c56-a124-cddb942a38e5_source.jpeg";
       const getPipelineId = () => {
