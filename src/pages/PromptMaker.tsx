@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useRef, useEffect } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { Button } from "@/components/ui/button";
 import { DotPattern } from "@/components/ui/dot-pattern";
@@ -21,6 +22,7 @@ const PromptMaker = () => {
   const [showPromptDialog, setShowPromptDialog] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const { toast } = useToast();
+  const jobRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   
   const {
     imagePreview, 
@@ -45,7 +47,8 @@ const PromptMaker = () => {
     formatTime,
     pollJobStatus,
     startNewJob,
-    updateJobStatus
+    updateJobStatus,
+    latestJobRef
   } = useGenerationJobs(session);
   
   const {
@@ -78,6 +81,16 @@ const PromptMaker = () => {
     pollJobStatus,
     uploadedImageUrl
   );
+
+  // Scroll to the most recent job when a new one is created
+  useEffect(() => {
+    if (latestJobRef.current && jobRefs.current[latestJobRef.current]) {
+      jobRefs.current[latestJobRef.current]?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  }, [generationJobs]);
 
   const handleImageClick = (generation: any) => {
     setSelectedGeneration(generation);
@@ -184,6 +197,7 @@ const PromptMaker = () => {
                   job={job} 
                   formatTime={formatTime} 
                   handleDownload={handleDownload} 
+                  ref={(el) => { jobRefs.current[job.id] = el; }}
                 />
               ))}
             </div>

@@ -1,6 +1,6 @@
 
 import { Clock, Loader2 } from "lucide-react";
-import React from "react";
+import React, { forwardRef } from "react";
 import { Card } from "@/components/ui/card";
 
 export interface GenerationJobType {
@@ -20,7 +20,7 @@ interface GenerationJobProps {
   handleDownload: (imageUrl: string) => Promise<void>;
 }
 
-export const GenerationJobComponent = ({ job, formatTime, handleDownload }: GenerationJobProps) => {
+export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobProps>(({ job, formatTime, handleDownload }, ref) => {
   // Get non-null images
   const validImages = job.generatedImages.filter(img => img !== null) as string[];
   
@@ -35,7 +35,7 @@ export const GenerationJobComponent = ({ job, formatTime, handleDownload }: Gene
   };
 
   return (
-    <Card className="p-4 bg-card/40 backdrop-blur border border-white/5 shadow-md mb-4">
+    <Card ref={ref} className="p-4 bg-card/40 backdrop-blur border border-white/5 shadow-md mb-4">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           {!job.isCompleted ? (
@@ -85,4 +85,6 @@ export const GenerationJobComponent = ({ job, formatTime, handleDownload }: Gene
       )}
     </Card>
   );
-};
+});
+
+GenerationJobComponent.displayName = "GenerationJobComponent";

@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { GenerationJobType } from '@/components/prompt-maker/GenerationJob';
@@ -10,6 +10,7 @@ export const useGenerationJobs = (session: any) => {
   const [previousGenerations, setPreviousGenerations] = useState<any[]>([]);
   const [generationJobs, setGenerationJobs] = useState<GenerationJobType[]>([]);
   const [jobIdCounter, setJobIdCounter] = useState(0);
+  const latestJobRef = useRef<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -243,6 +244,9 @@ export const useGenerationJobs = (session: any) => {
     // Add the new job to the beginning of the list
     setGenerationJobs(prev => [newJob, ...prev]);
     
+    // Set this as the latest job
+    latestJobRef.current = jobId;
+    
     return jobId;
   };
 
@@ -268,6 +272,7 @@ export const useGenerationJobs = (session: any) => {
     formatTime,
     pollJobStatus,
     startNewJob,
-    updateJobStatus
+    updateJobStatus,
+    latestJobRef
   };
 };
