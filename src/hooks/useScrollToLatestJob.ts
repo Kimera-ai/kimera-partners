@@ -6,72 +6,96 @@ export const useScrollToLatestJob = (
   jobRefs: React.MutableRefObject<{ [key: string]: HTMLDivElement | null }>,
   generationJobs: any[]
 ) => {
-  // Completely rewritten scroll handling for new jobs
+  // Completely rewritten scroll handling to fix scroll lock issues
   useEffect(() => {
     if (latestJobRef.current && jobRefs.current[latestJobRef.current]) {
       const jobElement = jobRefs.current[latestJobRef.current];
       if (jobElement) {
-        // Allow a moment for the UI to update
+        // First, make sure to reset any scroll locks that might be applied
+        const resetScrolling = () => {
+          // Reset all possible scroll lock methods
+          document.body.style.overflow = 'auto';
+          document.documentElement.style.overflow = 'auto';
+          document.body.style.position = 'static';
+          document.documentElement.style.position = 'static';
+          
+          // Remove any classes that might lock scrolling
+          document.body.classList.remove('overflow-hidden', 'fixed');
+          document.documentElement.classList.remove('overflow-hidden', 'fixed');
+          
+          // Remove any inline styles that might affect scrolling
+          const bodyStyle = document.body.style;
+          bodyStyle.removeProperty('height');
+          bodyStyle.removeProperty('top');
+          bodyStyle.removeProperty('left');
+          bodyStyle.removeProperty('right');
+          bodyStyle.removeProperty('bottom');
+          bodyStyle.removeProperty('position');
+          
+          const htmlStyle = document.documentElement.style;
+          htmlStyle.removeProperty('height');
+          htmlStyle.removeProperty('top');
+          htmlStyle.removeProperty('left');
+          htmlStyle.removeProperty('right');
+          htmlStyle.removeProperty('bottom');
+          htmlStyle.removeProperty('position');
+        };
+        
+        // Reset scrolling immediately first
+        resetScrolling();
+        
+        // Wait a tiny bit for the UI to update
         setTimeout(() => {
-          // Unlock scrolling immediately first
-          document.body.style.overflow = '';
-          document.documentElement.style.overflow = '';
-          document.body.style.position = '';
-          document.documentElement.style.position = '';
-          document.body.style.height = '';
-          document.documentElement.style.height = '';
-          document.body.style.top = '';
-          document.documentElement.style.top = '';
+          // Calculate position for the element
+          const rect = jobElement.getBoundingClientRect();
+          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+          const targetY = rect.top + scrollTop - 120; // 120px offset from the top
           
-          // Then smoothly scroll to the element
-          const yOffset = -100; // Add some offset to show context above the element
-          const y = jobElement.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          // Scroll to the element - using plain JS
+          window.scrollTo(0, targetY);
           
-          window.scrollTo({
-            top: y,
-            behavior: 'smooth'
-          });
+          // Ensure scrolling is enabled again after scrolling
+          resetScrolling();
           
-          // Ensure all scroll locks are completely removed after scrolling
-          const removeAllScrollLocks = () => {
-            // Remove any lock on body and html
-            document.body.classList.remove('overflow-hidden');
-            document.documentElement.classList.remove('overflow-hidden');
-            
-            // Clear all these properties
-            document.body.style.overflow = '';
-            document.documentElement.style.overflow = '';
-            document.body.style.position = '';
-            document.documentElement.style.position = '';
-            document.body.style.height = '';
-            document.documentElement.style.height = '';
-            document.body.style.top = '';
-            document.documentElement.style.top = '';
-            document.body.style.left = '';
-            document.documentElement.style.left = '';
-            document.body.style.right = '';
-            document.documentElement.style.right = '';
-            document.body.style.bottom = '';
-            document.documentElement.style.bottom = '';
-            
-            // Force scrolling to be enabled with !important-like approach
-            document.body.setAttribute('style', 'overflow: auto !important');
-            document.documentElement.setAttribute('style', 'overflow: auto !important');
-            
-            // After a moment, clear the forced styles
-            setTimeout(() => {
-              document.body.removeAttribute('style');
-              document.documentElement.removeAttribute('style');
-            }, 500);
+          // Add a listener to detect any potential scroll locks that might be applied later
+          const preventScrollLocks = () => {
+            requestAnimationFrame(resetScrolling);
           };
           
-          // Remove locks immediately
-          removeAllScrollLocks();
+          window.addEventListener('scroll', preventScrollLocks, { passive: true });
           
-          // And also after scrolling is complete
-          setTimeout(removeAllScrollLocks, 1000);
-        }, 100);
+          // Continue to reset scroll locks for a few seconds to ensure they don't get re-applied
+          const intervalId = setInterval(resetScrolling, 100);
+          setTimeout(() => {
+            clearInterval(intervalId);
+            window.removeEventListener('scroll', preventScrollLocks);
+          }, 5000);
+        }, 50);
       }
     }
   }, [generationJobs, latestJobRef, jobRefs]);
+  
+  // Add an additional effect to always ensure scrolling is possible
+  useEffect(() => {
+    // Create a global MutationObserver to watch for any added styles that might lock scrolling
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (
+          document.body.style.overflow === 'hidden' || 
+          document.documentElement.style.overflow === 'hidden'
+        ) {
+          document.body.style.overflow = 'auto';
+          document.documentElement.style.overflow = 'auto';
+        }
+      }
+    });
+    
+    // Start observing body and html for attribute changes
+    observer.observe(document.body, { attributes: true, attributeFilter: ['style', 'class'] });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['style', 'class'] });
+    
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 };
