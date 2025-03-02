@@ -298,7 +298,7 @@ const PromptMaker = () => {
     }
   };
 
-  // Updated handleGenerate function to support simultaneous generation
+  // Updated handleGenerate function to fix the image count issue
   const handleGenerate = async () => {
     if (!session?.user) {
       toast({
@@ -365,16 +365,14 @@ const PromptMaker = () => {
         }
       };
       
+      // Use the correct number of images to generate
       const numImagesToGenerate = parseInt(numberOfImages);
       
-      // Update job status - Fixed message to correctly represent number of images
+      // Update job status
       setGenerationJobs(prev => 
         prev.map(job => 
           job.id === jobId 
-            ? { ...job, status: numImagesToGenerate === 1 
-                ? "Preparing to generate image..." 
-                : `Preparing to generate ${numImagesToGenerate} images...` 
-              } 
+            ? { ...job, status: `Preparing to generate ${numImagesToGenerate} images...` } 
             : job
         )
       );
@@ -411,14 +409,11 @@ const PromptMaker = () => {
         }));
       }
       
-      // Update job status - Fixed message for single image case
+      // Update job status
       setGenerationJobs(prev => 
         prev.map(job => 
           job.id === jobId 
-            ? { ...job, status: numImagesToGenerate === 1 
-                ? "Sending request to Kimera API..." 
-                : `Sending ${numImagesToGenerate} requests to Kimera API...` 
-              } 
+            ? { ...job, status: `Sending ${numImagesToGenerate} requests to Kimera API...` } 
             : job
         )
       );
@@ -430,22 +425,16 @@ const PromptMaker = () => {
           const errorData = await responses[i].json();
           console.error(`Pipeline error response for request ${i+1}:`, errorData);
           
-          // Update job status to error - Fixed message for single image
+          // Update job status to error
           setGenerationJobs(prev => 
             prev.map(job => 
               job.id === jobId 
-                ? { ...job, status: numImagesToGenerate === 1 
-                    ? "Error: Failed to process image" 
-                    : `Error: Failed to process image ${i+1}`, 
-                    isCompleted: true 
-                  } 
+                ? { ...job, status: `Error: Failed to process image ${i+1}`, isCompleted: true } 
                 : job
             )
           );
           
-          throw new Error(numImagesToGenerate === 1 
-            ? "Failed to process image" 
-            : `Failed to process image ${i+1}`);
+          throw new Error(`Failed to process image ${i+1}`);
         }
       }
       
@@ -454,20 +443,17 @@ const PromptMaker = () => {
       
       console.log(`Jobs started with IDs for job ${jobId}:`, apiJobIds);
       
-      // Update job status - Fixed message for single image
+      // Update job status
       setGenerationJobs(prev => 
         prev.map(job => 
           job.id === jobId 
-            ? { ...job, status: numImagesToGenerate === 1 
-                ? "Processing image..." 
-                : `Processing ${numImagesToGenerate} images...` 
-              } 
+            ? { ...job, status: `Processing ${numImagesToGenerate} images...` } 
             : job
         )
       );
       
       apiJobIds.forEach((apiJobId, index) => {
-        pollJobStatus(apiJobId, index, jobId, currentPrompt, currentStyle, currentRatio, currentLoraScale, numImagesToGenerate);
+        pollJobStatus(apiJobId, index, jobId, currentPrompt, currentStyle, currentRatio, currentLoraScale);
       });
       
       // Update credits after generation is started
@@ -491,19 +477,15 @@ const PromptMaker = () => {
     }
   };
 
-  // Updated pollJobStatus function to handle concurrent jobs with improved messaging for single images
-  const pollJobStatus = async (apiJobId: string, imageIndex: number, jobId: string, jobPrompt: string, jobStyle: string, jobRatio: string, jobLoraScale: string, totalImages: number) => {
+  // Updated pollJobStatus function to handle concurrent jobs
+  const pollJobStatus = async (apiJobId: string, imageIndex: number, jobId: string, jobPrompt: string, jobStyle: string, jobRatio: string, jobLoraScale: string) => {
     const pollInterval = setInterval(async () => {
       try {
-        // Update job status - Simplified for single image
-        const isSingleImage = totalImages === 1;
+        // Update job status
         setGenerationJobs(prev => 
           prev.map(job => 
             job.id === jobId 
-              ? { ...job, status: isSingleImage
-                  ? "Checking image status..."
-                  : `Checking status for image ${imageIndex + 1}...` 
-                } 
+              ? { ...job, status: `Checking status for image ${imageIndex + 1}...` } 
               : job
           )
         );
@@ -517,22 +499,16 @@ const PromptMaker = () => {
         if (!statusResponse.ok) {
           clearInterval(pollInterval);
           
-          // Update job status to error - Fixed for single image
+          // Update job status to error
           setGenerationJobs(prev => 
             prev.map(job => 
               job.id === jobId 
-                ? { ...job, status: isSingleImage
-                    ? "Error: Failed to check image status"
-                    : `Error: Failed to check status for image ${imageIndex + 1}`, 
-                    isCompleted: true 
-                  } 
+                ? { ...job, status: `Error: Failed to check status for image ${imageIndex + 1}`, isCompleted: true } 
                 : job
             )
           );
           
-          throw new Error(isSingleImage
-            ? "Failed to check image status"
-            : `Failed to check status for image ${imageIndex + 1}`);
+          throw new Error(`Failed to check status for image ${imageIndex + 1}`);
         }
         
         const status = await statusResponse.json();
@@ -541,32 +517,18 @@ const PromptMaker = () => {
         let statusMessage = "";
         
         if (status.status === 'pending') {
-          statusMessage = isSingleImage
-            ? "Waiting in queue..."
-            : `Image ${imageIndex + 1}: Waiting in queue...`;
+          statusMessage = `Image ${imageIndex + 1}: Waiting in queue...`;
         } else if (status.status === 'processing') {
-          statusMessage = isSingleImage
-            ? "Processing..."
-            : `Image ${imageIndex + 1}: Processing...`;
+          statusMessage = `Image ${imageIndex + 1}: Processing...`;
         } else if (status.status === 'AI Dream') {
+          statusMessage = `Image ${imageIndex + 1}: Creating image...`;
           if (status.progress && status.progress.step && status.progress.total) {
-            statusMessage = isSingleImage
-              ? `Creating image (${status.progress.step}/${status.progress.total})...`
-              : `Image ${imageIndex + 1}: Creating (${status.progress.step}/${status.progress.total})...`;
-          } else {
-            statusMessage = isSingleImage
-              ? "Creating image..."
-              : `Image ${imageIndex + 1}: Creating image...`;
+            statusMessage = `Image ${imageIndex + 1}: Creating (${status.progress.step}/${status.progress.total})...`;
           }
         } else if (status.status === 'Face Swap') {
+          statusMessage = `Image ${imageIndex + 1}: Applying reference...`;
           if (status.progress && status.progress.step && status.progress.total) {
-            statusMessage = isSingleImage
-              ? `Applying reference (${status.progress.step}/${status.progress.total})...`
-              : `Image ${imageIndex + 1}: Applying reference (${status.progress.step}/${status.progress.total})...`;
-          } else {
-            statusMessage = isSingleImage
-              ? "Applying reference..."
-              : `Image ${imageIndex + 1}: Applying reference...`;
+            statusMessage = `Image ${imageIndex + 1}: Applying reference (${status.progress.step}/${status.progress.total})...`;
           }
         } else if (status.status === 'completed') {
           clearInterval(pollInterval);
@@ -582,8 +544,8 @@ const PromptMaker = () => {
                 const isAllCompleted = newCompletedImages === job.totalImages;
                 
                 const jobStatus = isAllCompleted 
-                  ? (isSingleImage ? "Image generated successfully!" : "All images generated successfully!")
-                  : (isSingleImage ? "Image completed!" : `Completed ${newCompletedImages} of ${job.totalImages} images...`);
+                  ? "All images generated successfully!" 
+                  : `Completed ${newCompletedImages} of ${job.totalImages} images...`;
                 
                 return {
                   ...job,
@@ -607,9 +569,7 @@ const PromptMaker = () => {
               
               toast({
                 title: "Success",
-                description: isSingleImage
-                  ? "Image has been generated successfully!"
-                  : `All ${currentJob.totalImages} images have been generated successfully!`,
+                description: `Job completed! All ${currentJob.totalImages} images have been generated successfully!`,
                 duration: 3000
               });
             }
@@ -635,29 +595,22 @@ const PromptMaker = () => {
         } else if (status.status === 'failed' || status.status === 'Error') {
           clearInterval(pollInterval);
           
-          // Update job status to error - Fixed for single image
+          // Update job status to error
           setGenerationJobs(prev => 
             prev.map(job => 
               job.id === jobId 
                 ? { 
                     ...job, 
-                    status: isSingleImage 
-                      ? "Error: Image processing failed"
-                      : `Error: Image ${imageIndex + 1} processing failed`, 
+                    status: `Error: Image ${imageIndex + 1} processing failed`, 
                     isCompleted: true 
                   } 
                 : job
             )
           );
           
-          throw new Error(isSingleImage
-            ? "Image processing failed"
-            : `Image ${imageIndex + 1} processing failed`);
+          throw new Error(`Image ${imageIndex + 1} processing failed`);
         } else {
-          // For any other status
-          statusMessage = isSingleImage
-            ? `${status.status || "Processing"}: ${status.progress?.step || ""}/${status.progress?.total || ""}`
-            : `Image ${imageIndex + 1}: ${status.status || "Processing"}: ${status.progress?.step || ""}/${status.progress?.total || ""}`;
+          statusMessage = `Image ${imageIndex + 1}: ${status.status || "Processing"}: ${status.progress?.step || ""}/${status.progress?.total || ""}`;
         }
         
         // Update job status
@@ -839,22 +792,332 @@ const PromptMaker = () => {
                       <Label htmlFor="workflow" className="text-sm font-medium block text-white/80">Workflow</Label>
                       <Select value={workflow} onValueChange={setWorkflow}>
                         <SelectTrigger id="workflow" className="w-full bg-background/50 border-white/10 text-white">
-                          <SelectValue placeholder="Select a workflow" />
+                          <SelectValue placeholder="Select workflow" />
                         </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="no-reference">Basic (Text to Image)</SelectItem>
+                        <SelectContent className="bg-background border-white/10 text-white">
+                          <SelectItem value="no-reference">Basic image generation</SelectItem>
                           <SelectItem value="with-reference">Basic with image reference</SelectItem>
                           <SelectItem value="cartoon">Cartoon</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                   </div>
+
+                  <div className="grid grid-cols-5 gap-4">
+                    <div className="space-y-2">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Label htmlFor="numberOfImages" className="text-sm font-medium block truncate text-white/80">Number of Images</Label>
+                          </TooltipTrigger>
+                          <TooltipContent className="bg-background/90 border-white/10">
+                            <p>Number of images to generate</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <Select value={numberOfImages} onValueChange={setNumberOfImages}>
+                        <SelectTrigger id="numberOfImages" className="w-full bg-background/50 border-white/10 text-white">
+                          <SelectValue placeholder="Select number" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background border-white/10 text-white">
+                          <SelectItem value="1">1 image</SelectItem>
+                          <SelectItem value="2">2 images</SelectItem>
+                          <SelectItem value="3">3 images</SelectItem>
+                          <SelectItem value="4">4 images</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Label htmlFor="ratio" className="text-sm font-medium block truncate text-white/80">Aspect Ratio</Label>
+                          </TooltipTrigger>
+                          <TooltipContent className="bg-background/90 border-white/10">
+                            <p>Aspect ratio of the generated image</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <Select value={ratio} onValueChange={setRatio}>
+                        <SelectTrigger id="ratio" className="w-full bg-background/50 border-white/10 text-white">
+                          <SelectValue placeholder="Select ratio" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background border-white/10 text-white">
+                          <SelectItem value="1:1">Square (1:1)</SelectItem>
+                          <SelectItem value="2:3">Portrait (2:3)</SelectItem>
+                          <SelectItem value="3:2">Landscape (3:2)</SelectItem>
+                          <SelectItem value="9:16">Vertical (9:16)</SelectItem>
+                          <SelectItem value="16:9">Horizontal (16:9)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Label htmlFor="style" className="text-sm font-medium block truncate text-white/80">Style</Label>
+                          </TooltipTrigger>
+                          <TooltipContent className="bg-background/90 border-white/10">
+                            <p>Visual style of the generated image</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <Select value={style} onValueChange={setStyle}>
+                        <SelectTrigger id="style" className="w-full bg-background/50 border-white/10 text-white">
+                          <SelectValue placeholder="Select style" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background border-white/10 text-white">
+                          <SelectItem value="Photographic">Photographic</SelectItem>
+                          <SelectItem value="Cinematic">Cinematic</SelectItem>
+                          <SelectItem value="Anime">Anime</SelectItem>
+                          <SelectItem value="Digital Art">Digital Art</SelectItem>
+                          <SelectItem value="3D Render">3D Render</SelectItem>
+                          <SelectItem value="Painting">Painting</SelectItem>
+                          <SelectItem value="Sketch">Sketch</SelectItem>
+                          <SelectItem value="Pixel Art">Pixel Art</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Label htmlFor="loraScale" className="text-sm font-medium block truncate text-white/80">Lora Scale</Label>
+                          </TooltipTrigger>
+                          <TooltipContent className="bg-background/90 border-white/10">
+                            <p>Strength of the style adaptation (0.1-1.0)</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <Select value={loraScale} onValueChange={setLoraScale}>
+                        <SelectTrigger id="loraScale" className="w-full bg-background/50 border-white/10 text-white">
+                          <SelectValue placeholder="Select scale" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background border-white/10 text-white">
+                          <SelectItem value="0.1">0.1 (Subtle)</SelectItem>
+                          <SelectItem value="0.3">0.3 (Light)</SelectItem>
+                          <SelectItem value="0.5">0.5 (Medium)</SelectItem>
+                          <SelectItem value="0.7">0.7 (Strong)</SelectItem>
+                          <SelectItem value="1.0">1.0 (Full)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Label htmlFor="seed" className="text-sm font-medium block truncate text-white/80">Seed</Label>
+                          </TooltipTrigger>
+                          <TooltipContent className="bg-background/90 border-white/10">
+                            <p>Random seed for image generation</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <Select value={seed} onValueChange={setSeed}>
+                        <SelectTrigger id="seed" className="w-full bg-background/50 border-white/10 text-white">
+                          <SelectValue placeholder="Select seed" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background border-white/10 text-white">
+                          <SelectItem value="random">Random</SelectItem>
+                          <SelectItem value="fixed">Fixed</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+
+              {/* Generated Jobs Status */}
+              {generationJobs.length > 0 && (
+                <Card className="p-6 bg-card/60 backdrop-blur border border-white/5 shadow-lg overflow-auto max-h-[500px]">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Generation Jobs</h2>
+                      <div className="text-sm text-muted-foreground">{generationJobs.filter(j => !j.isCompleted).length} active, {generationJobs.filter(j => j.isCompleted).length} completed</div>
+                    </div>
+                    <div className="space-y-4">
+                      {generationJobs.map((job) => (
+                        <div key={job.id} className={`rounded-lg p-4 ${job.isCompleted ? (job.status.includes('Error') ? 'bg-red-950/20' : 'bg-green-950/20') : 'bg-blue-950/20'} border ${job.isCompleted ? (job.status.includes('Error') ? 'border-red-800/30' : 'border-green-800/30') : 'border-blue-800/30'}`}>
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              {!job.isCompleted ? (
+                                <Loader2 className="h-4 w-4 text-primary animate-spin" />
+                              ) : job.status.includes('Error') ? (
+                                <X className="h-4 w-4 text-red-500" />
+                              ) : (
+                                <span className="text-green-500">✓</span>
+                              )}
+                              <span className="font-medium">{job.id}</span>
+                            </div>
+                            <div className="text-sm text-muted-foreground flex items-center gap-2">
+                              <Clock className="h-3 w-3" />
+                              {formatTime(job.elapsedTime)}
+                            </div>
+                          </div>
+                          <div className="text-sm mb-2">{job.status}</div>
+                          {job.completedImages > 0 && (
+                            <div className="text-xs text-muted-foreground mb-2">Completed: {job.completedImages}/{job.totalImages}</div>
+                          )}
+                          {job.isCompleted && !job.status.includes('Error') && (
+                            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2 mt-3">
+                              {job.generatedImages.filter(Boolean).map((img, idx) => (
+                                <div key={`${job.id}-img-${idx}`} className="relative group">
+                                  <img 
+                                    src={img as string} 
+                                    alt={`Generated ${idx + 1}`} 
+                                    className="w-full h-24 object-cover rounded-md border border-white/10" 
+                                  />
+                                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-md flex items-center justify-center gap-2">
+                                    <Button 
+                                      variant="ghost" 
+                                      size="icon" 
+                                      className="h-7 w-7 bg-black/40 hover:bg-black/60" 
+                                      onClick={() => handleDownload(img as string)}
+                                    >
+                                      <Download className="h-3 w-3 text-white" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </Card>
+              )}
+            </div>
+
+            <div className="space-y-6">
+              {/* Previous Generations */}
+              <Card className="p-6 bg-card/60 backdrop-blur border border-white/5 shadow-lg">
+                <div className="space-y-4">
+                  <div className="flex items-center">
+                    <History className="w-5 h-5 mr-2 text-primary/70" />
+                    <h2 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Previous Generations</h2>
+                  </div>
+                  
+                  {previousGenerations.length > 0 ? (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {previousGenerations.map((generation, index) => (
+                        <div 
+                          key={`${generation.id}-${index}`} 
+                          className="relative group cursor-pointer rounded-lg overflow-hidden border border-white/10 transition-all hover:shadow-xl hover:border-primary/30"
+                          onClick={() => handleImageClick(generation)}
+                        >
+                          <img 
+                            src={generation.image_url} 
+                            alt={`Generation ${index + 1}`} 
+                            className="w-full h-48 object-cover transition-transform group-hover:scale-105" 
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-3 flex flex-col justify-end">
+                            <p className="text-xs text-white line-clamp-2">{generation.prompt}</p>
+                            <div className="flex items-center justify-between mt-2">
+                              <div className="flex space-x-1">
+                                <span className="text-[10px] bg-white/20 backdrop-blur-sm rounded-full px-2 py-0.5">{generation.style}</span>
+                                <span className="text-[10px] bg-white/20 backdrop-blur-sm rounded-full px-2 py-0.5">{generation.ratio}</span>
+                              </div>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-6 w-6 bg-black/40 hover:bg-black/60" 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDownload(generation.image_url);
+                                }}
+                              >
+                                <Download className="h-3 w-3 text-white" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground bg-background/30 backdrop-blur rounded-lg border border-white/5">
+                      <Lightbulb className="h-8 w-8 mx-auto mb-3 text-primary/40" />
+                      <p>No previous generations found.</p>
+                      <p className="text-sm mt-2">Start creating with the form on the left!</p>
+                    </div>
+                  )}
                 </div>
               </Card>
             </div>
           </div>
         </div>
       </div>
+      
+      {/* Prompt Details Dialog */}
+      <Dialog open={showPromptDialog} onOpenChange={setShowPromptDialog}>
+        <DialogContent className="sm:max-w-xl bg-background/95 backdrop-blur border-white/10">
+          <DialogHeader>
+            <DialogTitle className="text-xl">Generation Details</DialogTitle>
+          </DialogHeader>
+          {selectedGeneration && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <img 
+                  src={selectedGeneration?.image_url} 
+                  alt="Generated image" 
+                  className="w-full aspect-auto object-contain rounded-md border border-white/10" 
+                />
+                <Button 
+                  className="w-full mt-3" 
+                  onClick={() => handleDownload(selectedGeneration.image_url)}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Download Image
+                </Button>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-sm text-muted-foreground">Prompt</Label>
+                  <p className="text-sm mt-1">{selectedGeneration?.prompt}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm text-muted-foreground">Style</Label>
+                    <p className="text-sm mt-1">{selectedGeneration?.style}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm text-muted-foreground">Aspect Ratio</Label>
+                    <p className="text-sm mt-1">{selectedGeneration?.ratio}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm text-muted-foreground">Lora Scale</Label>
+                    <p className="text-sm mt-1">{selectedGeneration?.lora_scale}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm text-muted-foreground">Created</Label>
+                    <p className="text-sm mt-1">{new Date(selectedGeneration?.created_at).toLocaleString()}</p>
+                  </div>
+                </div>
+                <div>
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => {
+                      setPrompt(selectedGeneration?.prompt);
+                      setStyle(selectedGeneration?.style);
+                      setRatio(selectedGeneration?.ratio);
+                      setLoraScale(selectedGeneration?.lora_scale);
+                      setShowPromptDialog(false);
+                    }}
+                  >
+                    <Wand2 className="h-4 w-4 mr-2" />
+                    Use These Settings
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </BaseLayout>
   );
 };
