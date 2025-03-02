@@ -43,7 +43,14 @@ export const GenerationJobComponent = ({ job, formatTime, handleDownload }: Gene
           ) : (
             <div className="h-4 w-4 rounded-full bg-green-500"></div>
           )}
-          <div className="font-medium">{job.status}</div>
+          <div className="font-medium">
+            {job.status} 
+            {job.totalImages > 0 && (
+              <span className="text-muted-foreground ml-1 text-sm">
+                ({job.completedImages}/{job.totalImages} images)
+              </span>
+            )}
+          </div>
         </div>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <Clock className="h-3 w-3" />
