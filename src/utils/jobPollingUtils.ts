@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { JobPollingConfig, JobStatusResponse } from "@/types/generationJobs";
 import { GenerationJobType } from "@/components/prompt-maker/GenerationJob";
@@ -14,7 +13,6 @@ export const pollJobStatus = async (
   
   const pollInterval = setInterval(async () => {
     try {
-      // Update job status
       setGenerationJobs(prev => 
         prev.map(job => 
           job.id === jobId 
@@ -32,7 +30,6 @@ export const pollJobStatus = async (
       if (!statusResponse.ok) {
         clearInterval(pollInterval);
         
-        // Update job status to error
         setGenerationJobs(prev => 
           prev.map(job => 
             job.id === jobId 
@@ -52,7 +49,6 @@ export const pollJobStatus = async (
       if (status.status === 'completed') {
         clearInterval(pollInterval);
         
-        // Update job images and completion status - IMPORTANT: explicitly set displayImages to true
         setGenerationJobs(prev => {
           const updatedJobs = prev.map(job => {
             if (job.id === jobId) {
@@ -71,22 +67,19 @@ export const pollJobStatus = async (
                 generatedImages: newGeneratedImages,
                 completedImages: newCompletedImages,
                 isCompleted: isAllCompleted,
-                displayImages: true, // Always set to true when an image is completed
+                displayImages: true,
                 status: jobStatus
               };
             }
             return job;
           });
           
-          // Check if all images for this job are completed
           const currentJob = updatedJobs.find(j => j.id === jobId);
           if (currentJob && currentJob.completedImages === currentJob.totalImages) {
-            // All images are ready - add to generated images collection and update database
             const completedImages = currentJob.generatedImages
               .filter(img => img !== null)
               .slice(0, currentJob.totalImages) as string[];
             
-            // Call the callback to handle job completion
             onJobComplete(completedImages, { jobId, jobPrompt, jobStyle, jobRatio, jobLoraScale });
           }
           
@@ -95,7 +88,6 @@ export const pollJobStatus = async (
       } else if (status.status === 'failed' || status.status === 'Error') {
         clearInterval(pollInterval);
         
-        // Update job status to error
         setGenerationJobs(prev => 
           prev.map(job => 
             job.id === jobId 
@@ -110,7 +102,6 @@ export const pollJobStatus = async (
         
         throw new Error(`Image ${imageIndex + 1} processing failed`);
       } else {
-        // Update job status
         if (statusMessage) {
           setGenerationJobs(prev => 
             prev.map(job => 
@@ -124,7 +115,7 @@ export const pollJobStatus = async (
       clearInterval(pollInterval);
       console.error(`Error polling status for job ${jobId}, image ${imageIndex + 1}:`, error);
     }
-  }, 2000);
+  }, 5000);
 };
 
 export const getStatusMessage = (status: JobStatusResponse, imageIndex: number): string => {
