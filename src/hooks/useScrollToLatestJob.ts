@@ -16,12 +16,21 @@ export const useScrollToLatestJob = (
           // Scroll to the job element smoothly
           jobElement.scrollIntoView({
             behavior: 'smooth',
-            block: 'start'
+            block: 'center' // Changed from 'start' to 'center' for better UX
           });
           
           // Make sure scrolling is enabled in all directions
           document.body.style.overflowY = 'auto';
           document.documentElement.style.overflowY = 'auto';
+          
+          // Allow user to scroll freely after a short delay
+          setTimeout(() => {
+            // Remove any potential scroll locks that might be happening
+            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
+            document.body.style.position = '';
+            document.documentElement.style.position = '';
+          }, 500);
         }, 100);
       }
     }
