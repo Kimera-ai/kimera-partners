@@ -21,6 +21,19 @@ interface GenerationJobProps {
 }
 
 export const GenerationJobComponent = ({ job, formatTime, handleDownload }: GenerationJobProps) => {
+  // Get non-null images
+  const validImages = job.generatedImages.filter(img => img !== null) as string[];
+  
+  // Determine grid columns based on number of images
+  const getGridClass = (imageCount: number) => {
+    switch (imageCount) {
+      case 1: return "grid-cols-1";
+      case 2: return "grid-cols-1 sm:grid-cols-2";
+      case 3: return "grid-cols-1 sm:grid-cols-3";
+      default: return "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4";
+    }
+  };
+
   return (
     <Card className="p-4 bg-card/40 backdrop-blur border border-white/5 shadow-md mb-4">
       <div className="flex items-center justify-between mb-2">
@@ -39,32 +52,28 @@ export const GenerationJobComponent = ({ job, formatTime, handleDownload }: Gene
       </div>
       
       {job.completedImages > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mt-3">
-          {job.generatedImages
-            .filter(img => img !== null)
-            .map((imageUrl, index) => (
-              imageUrl && (
-                <div key={index} className="relative group rounded-md overflow-hidden bg-black aspect-[3/4]">
-                  <img 
-                    src={imageUrl} 
-                    alt={`Generated ${index}`} 
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <button 
-                      className="bg-white/10 hover:bg-white/20 text-white p-1 rounded-full transition-colors"
-                      onClick={() => handleDownload(imageUrl)}
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="7 10 12 15 17 10"></polyline>
-                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              )
-            ))}
+        <div className={`grid ${getGridClass(validImages.length)} gap-3 mt-3`}>
+          {validImages.map((imageUrl, index) => (
+            <div key={index} className="relative group rounded-md overflow-hidden bg-black aspect-[3/4]">
+              <img 
+                src={imageUrl} 
+                alt={`Generated ${index}`} 
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <button 
+                  className="bg-white/10 hover:bg-white/20 text-white p-1 rounded-full transition-colors"
+                  onClick={() => handleDownload(imageUrl)}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </Card>
