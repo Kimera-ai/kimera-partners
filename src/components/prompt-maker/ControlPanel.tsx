@@ -78,22 +78,46 @@ export const ControlPanel = ({
   return (
     <Card className="p-6 bg-card/60 backdrop-blur border border-white/5 shadow-lg">
       <div className="space-y-4">
-        {/* First row of dropdowns */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="workflow" className="text-sm font-medium block text-white/80">Workflow</Label>
-            <Select value={workflow} onValueChange={setWorkflow}>
-              <SelectTrigger id="workflow" className="w-full bg-background/50 border-white/10 text-white">
-                <SelectValue placeholder="Select workflow" />
-              </SelectTrigger>
-              <SelectContent className="bg-background border-white/10 text-white">
-                <SelectItem value="no-reference">Basic image generation</SelectItem>
-                <SelectItem value="with-reference">Basic with image reference</SelectItem>
-                <SelectItem value="cartoon">Cartoon</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        {/* Workflow on its own line */}
+        <div className="space-y-2">
+          <Label htmlFor="workflow" className="text-sm font-medium block text-white/80">Workflow</Label>
+          <Select value={workflow} onValueChange={setWorkflow}>
+            <SelectTrigger id="workflow" className="w-full bg-background/50 border-white/10 text-white">
+              <SelectValue placeholder="Select workflow" />
+            </SelectTrigger>
+            <SelectContent className="bg-background border-white/10 text-white">
+              <SelectItem value="no-reference">Basic image generation</SelectItem>
+              <SelectItem value="with-reference">Basic with image reference</SelectItem>
+              <SelectItem value="cartoon">Cartoon</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
+        {/* Style on its own line */}
+        <div className="space-y-2">
+          <Label htmlFor="style" className="text-sm font-medium block text-white/80">Style</Label>
+          <Select value={style} onValueChange={setStyle}>
+            <SelectTrigger id="style" className="w-full bg-background/50 border-white/10 text-white">
+              <SelectValue placeholder="Select style" />
+            </SelectTrigger>
+            <SelectContent className="bg-background border-white/10 text-white">
+              <SelectItem value="Photographic">Photographic</SelectItem>
+              <SelectItem value="Cinematic">Cinematic</SelectItem>
+              <SelectItem value="Anime">Anime</SelectItem>
+              <SelectItem value="Digital Art">Digital Art</SelectItem>
+              <SelectItem value="Realistic">Realistic</SelectItem>
+              <SelectItem value="Oil Painting">Oil Painting</SelectItem>
+              <SelectItem value="Watercolor">Watercolor</SelectItem>
+              <SelectItem value="Pixel Art">Pixel Art</SelectItem>
+              <SelectItem value="Comic Book">Comic Book</SelectItem>
+              <SelectItem value="Isometric">Isometric</SelectItem>
+              <SelectItem value="Low Poly">Low Poly</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Ratio and Number of Images in one line */}
+        <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="ratio" className="text-sm font-medium block text-white/80">Aspect Ratio</Label>
             <Select value={ratio} onValueChange={setRatio}>
@@ -107,31 +131,6 @@ export const ControlPanel = ({
                 <SelectItem value="16:9">Widescreen (16:9)</SelectItem>
                 <SelectItem value="2:3">Portrait (2:3)</SelectItem>
                 <SelectItem value="3:2">Landscape (3:2)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        {/* Second row of dropdowns */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="style" className="text-sm font-medium block text-white/80">Style</Label>
-            <Select value={style} onValueChange={setStyle}>
-              <SelectTrigger id="style" className="w-full bg-background/50 border-white/10 text-white">
-                <SelectValue placeholder="Select style" />
-              </SelectTrigger>
-              <SelectContent className="bg-background border-white/10 text-white">
-                <SelectItem value="Photographic">Photographic</SelectItem>
-                <SelectItem value="Cinematic">Cinematic</SelectItem>
-                <SelectItem value="Anime">Anime</SelectItem>
-                <SelectItem value="Digital Art">Digital Art</SelectItem>
-                <SelectItem value="Realistic">Realistic</SelectItem>
-                <SelectItem value="Oil Painting">Oil Painting</SelectItem>
-                <SelectItem value="Watercolor">Watercolor</SelectItem>
-                <SelectItem value="Pixel Art">Pixel Art</SelectItem>
-                <SelectItem value="Comic Book">Comic Book</SelectItem>
-                <SelectItem value="Isometric">Isometric</SelectItem>
-                <SelectItem value="Low Poly">Low Poly</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -166,7 +165,7 @@ export const ControlPanel = ({
           </div>
         </div>
 
-        {/* Third row of dropdowns */}
+        {/* Lora Scale and Seed in one line */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="loraScale" className="text-sm font-medium block text-white/80">Lora Scale</Label>
