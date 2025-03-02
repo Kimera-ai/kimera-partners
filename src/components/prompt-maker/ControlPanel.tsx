@@ -78,6 +78,40 @@ export const ControlPanel = ({
   return (
     <Card className="p-6 bg-card/60 backdrop-blur border border-white/5 shadow-lg">
       <div className="space-y-4">
+        {/* Workflow and Ratio on the same line above prompt */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="workflow" className="text-sm font-medium block text-white/80">Workflow</Label>
+            <Select value={workflow} onValueChange={setWorkflow}>
+              <SelectTrigger id="workflow" className="w-full bg-background/50 border-white/10 text-white">
+                <SelectValue placeholder="Select workflow" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border-white/10 text-white">
+                <SelectItem value="no-reference">Basic image generation</SelectItem>
+                <SelectItem value="with-reference">Basic with image reference</SelectItem>
+                <SelectItem value="cartoon">Cartoon</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="ratio" className="text-sm font-medium block text-white/80">Aspect Ratio</Label>
+            <Select value={ratio} onValueChange={setRatio}>
+              <SelectTrigger id="ratio" className="w-full bg-background/50 border-white/10 text-white">
+                <SelectValue placeholder="Select ratio" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border-white/10 text-white">
+                <SelectItem value="1:1">Square (1:1)</SelectItem>
+                <SelectItem value="4:3">Landscape (4:3)</SelectItem>
+                <SelectItem value="3:4">Portrait (3:4)</SelectItem>
+                <SelectItem value="16:9">Widescreen (16:9)</SelectItem>
+                <SelectItem value="2:3">Portrait (2:3)</SelectItem>
+                <SelectItem value="3:2">Landscape (3:2)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
         <div>
           <Label htmlFor="prompt" className="text-sm font-medium block text-white/80">Prompt</Label>
           <div className="relative">
@@ -162,37 +196,6 @@ export const ControlPanel = ({
         )}
 
         <div className="grid grid-cols-1 gap-4 pt-3 border-t border-white/5">
-          <div className="space-y-2">
-            <Label htmlFor="workflow" className="text-sm font-medium block text-white/80">Workflow</Label>
-            <Select value={workflow} onValueChange={setWorkflow}>
-              <SelectTrigger id="workflow" className="w-full bg-background/50 border-white/10 text-white">
-                <SelectValue placeholder="Select workflow" />
-              </SelectTrigger>
-              <SelectContent className="bg-background border-white/10 text-white">
-                <SelectItem value="no-reference">Basic image generation</SelectItem>
-                <SelectItem value="with-reference">Basic with image reference</SelectItem>
-                <SelectItem value="cartoon">Cartoon</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="ratio" className="text-sm font-medium block text-white/80">Aspect Ratio</Label>
-            <Select value={ratio} onValueChange={setRatio}>
-              <SelectTrigger id="ratio" className="w-full bg-background/50 border-white/10 text-white">
-                <SelectValue placeholder="Select ratio" />
-              </SelectTrigger>
-              <SelectContent className="bg-background border-white/10 text-white">
-                <SelectItem value="1:1">Square (1:1)</SelectItem>
-                <SelectItem value="4:3">Landscape (4:3)</SelectItem>
-                <SelectItem value="3:4">Portrait (3:4)</SelectItem>
-                <SelectItem value="16:9">Widescreen (16:9)</SelectItem>
-                <SelectItem value="2:3">Portrait (2:3)</SelectItem>
-                <SelectItem value="3:2">Landscape (3:2)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
           <div className="space-y-2">
             <Label htmlFor="style" className="text-sm font-medium block text-white/80">Style</Label>
             <Select value={style} onValueChange={setStyle}>
