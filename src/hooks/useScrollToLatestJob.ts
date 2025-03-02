@@ -6,45 +6,70 @@ export const useScrollToLatestJob = (
   jobRefs: React.MutableRefObject<{ [key: string]: HTMLDivElement | null }>,
   generationJobs: any[]
 ) => {
-  // Improved scroll handling for new jobs
+  // Completely rewritten scroll handling for new jobs
   useEffect(() => {
     if (latestJobRef.current && jobRefs.current[latestJobRef.current]) {
       const jobElement = jobRefs.current[latestJobRef.current];
       if (jobElement) {
-        // Use a single smooth scroll with better behavior
+        // Allow a moment for the UI to update
         setTimeout(() => {
-          // Instead of directly scrolling the element, use window.scrollTo
-          // for better control and less side effects
-          const rect = jobElement.getBoundingClientRect();
-          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+          // Unlock scrolling immediately first
+          document.body.style.overflow = '';
+          document.documentElement.style.overflow = '';
+          document.body.style.position = '';
+          document.documentElement.style.position = '';
+          document.body.style.height = '';
+          document.documentElement.style.height = '';
+          document.body.style.top = '';
+          document.documentElement.style.top = '';
+          
+          // Then smoothly scroll to the element
+          const yOffset = -100; // Add some offset to show context above the element
+          const y = jobElement.getBoundingClientRect().top + window.pageYOffset + yOffset;
           
           window.scrollTo({
-            top: rect.top + scrollTop - window.innerHeight / 2 + rect.height / 2,
+            top: y,
             behavior: 'smooth'
           });
           
-          // Immediately ensure scrolling is fully enabled
-          document.body.style.overflow = 'auto';
-          document.documentElement.style.overflow = 'auto';
-          document.body.style.position = 'static';
-          document.documentElement.style.position = 'static';
-          document.body.style.height = 'auto';
-          document.documentElement.style.height = 'auto';
-          document.body.style.overflowY = 'auto';
-          document.documentElement.style.overflowY = 'auto';
-          
-          // Additional cleanup after scrolling completes
-          setTimeout(() => {
-            // Remove any remaining scroll locks
+          // Ensure all scroll locks are completely removed after scrolling
+          const removeAllScrollLocks = () => {
+            // Remove any lock on body and html
+            document.body.classList.remove('overflow-hidden');
+            document.documentElement.classList.remove('overflow-hidden');
+            
+            // Clear all these properties
             document.body.style.overflow = '';
             document.documentElement.style.overflow = '';
             document.body.style.position = '';
             document.documentElement.style.position = '';
             document.body.style.height = '';
             document.documentElement.style.height = '';
-            document.body.style.overflowY = '';
-            document.documentElement.style.overflowY = '';
-          }, 1000);
+            document.body.style.top = '';
+            document.documentElement.style.top = '';
+            document.body.style.left = '';
+            document.documentElement.style.left = '';
+            document.body.style.right = '';
+            document.documentElement.style.right = '';
+            document.body.style.bottom = '';
+            document.documentElement.style.bottom = '';
+            
+            // Force scrolling to be enabled with !important-like approach
+            document.body.setAttribute('style', 'overflow: auto !important');
+            document.documentElement.setAttribute('style', 'overflow: auto !important');
+            
+            // After a moment, clear the forced styles
+            setTimeout(() => {
+              document.body.removeAttribute('style');
+              document.documentElement.removeAttribute('style');
+            }, 500);
+          };
+          
+          // Remove locks immediately
+          removeAllScrollLocks();
+          
+          // And also after scrolling is complete
+          setTimeout(removeAllScrollLocks, 1000);
         }, 100);
       }
     }
