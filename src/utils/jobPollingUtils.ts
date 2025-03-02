@@ -115,7 +115,7 @@ export const pollJobStatus = async (
       clearInterval(pollInterval);
       console.error(`Error polling status for job ${jobId}, image ${imageIndex + 1}:`, error);
     }
-  }, 5000);
+  }, 10000);
 };
 
 export const getStatusMessage = (status: JobStatusResponse, imageIndex: number): string => {
