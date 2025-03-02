@@ -13,24 +13,38 @@ export const useScrollToLatestJob = (
       if (jobElement) {
         // Use a single smooth scroll with better behavior
         setTimeout(() => {
-          // Scroll to the job element smoothly
-          jobElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center' // Changed from 'start' to 'center' for better UX
+          // Instead of directly scrolling the element, use window.scrollTo
+          // for better control and less side effects
+          const rect = jobElement.getBoundingClientRect();
+          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+          
+          window.scrollTo({
+            top: rect.top + scrollTop - window.innerHeight / 2 + rect.height / 2,
+            behavior: 'smooth'
           });
           
-          // Make sure scrolling is enabled in all directions
+          // Immediately ensure scrolling is fully enabled
+          document.body.style.overflow = 'auto';
+          document.documentElement.style.overflow = 'auto';
+          document.body.style.position = 'static';
+          document.documentElement.style.position = 'static';
+          document.body.style.height = 'auto';
+          document.documentElement.style.height = 'auto';
           document.body.style.overflowY = 'auto';
           document.documentElement.style.overflowY = 'auto';
           
-          // Allow user to scroll freely after a short delay
+          // Additional cleanup after scrolling completes
           setTimeout(() => {
-            // Remove any potential scroll locks that might be happening
+            // Remove any remaining scroll locks
             document.body.style.overflow = '';
             document.documentElement.style.overflow = '';
             document.body.style.position = '';
             document.documentElement.style.position = '';
-          }, 500);
+            document.body.style.height = '';
+            document.documentElement.style.height = '';
+            document.body.style.overflowY = '';
+            document.documentElement.style.overflowY = '';
+          }, 1000);
         }, 100);
       }
     }

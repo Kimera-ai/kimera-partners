@@ -10,7 +10,7 @@ interface MainContainerProps {
 export const MainContainer = forwardRef<HTMLDivElement, MainContainerProps>(
   ({ children, containerRef }, ref) => {
     return (
-      <div className="relative min-h-screen" ref={containerRef}>
+      <div className="relative min-h-screen overflow-visible" ref={containerRef}>
         <div className="absolute inset-0 pointer-events-none">
           <DotPattern 
             width={24} 
@@ -22,7 +22,7 @@ export const MainContainer = forwardRef<HTMLDivElement, MainContainerProps>(
           />
         </div>
         
-        <div className="relative z-10">
+        <div className="relative z-10 overflow-visible">
           {children}
         </div>
       </div>
