@@ -796,12 +796,13 @@ const PromptMaker = () => {
                 
                 {generatedImages.length > 0 ? (
                   <div className={`grid grid-cols-${Math.min(generatedImages.length, 2)} gap-4 w-full`}>
-                    {generatedImages.map((imgUrl, index) => (
+                    {generatedImages.slice(0, 2).map((imgUrl, index) => (
                       <div key={index} className="relative group">
                         <img 
                           src={imgUrl} 
                           alt={`Generated ${index + 1}`} 
                           className="w-full aspect-[2/3] object-cover rounded-lg shadow-lg" 
+                          loading="lazy"
                         />
                         <Button 
                           variant="outline" 
@@ -831,6 +832,7 @@ const PromptMaker = () => {
                           src={imgUrl} 
                           alt={`Generated ${index + 3}`} 
                           className="w-full aspect-[2/3] object-cover rounded-lg shadow-lg" 
+                          loading="lazy"
                         />
                         <Button 
                           variant="outline" 
