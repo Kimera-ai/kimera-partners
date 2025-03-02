@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2, Sparkles, Upload } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { ImagePreview } from "./ImagePreview";
@@ -66,7 +66,14 @@ export const ControlPanel = ({
   uploadedImageUrl
 }: ControlPanelProps) => {
   const previewRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const CREDITS_PER_GENERATION = 14;
+  
+  const triggerFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
   
   return (
     <Card className="p-6 bg-card/60 backdrop-blur border border-white/5 shadow-lg">
@@ -74,7 +81,15 @@ export const ControlPanel = ({
         <div>
           <Label htmlFor="prompt" className="text-sm font-medium block text-white/80">Prompt</Label>
           <div className="relative">
-            <Input id="reference-image" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={isUploading || workflow === 'no-reference'} />
+            <Input 
+              id="reference-image" 
+              type="file" 
+              accept="image/*" 
+              onChange={handleImageUpload} 
+              className="hidden" 
+              disabled={isUploading || workflow === 'no-reference'} 
+              ref={fileInputRef}
+            />
             <div className="relative">
               <div ref={previewRef} className="absolute left-3 top-3 z-[9999] pointer-events-auto" style={{
                 position: 'absolute',
@@ -96,15 +111,31 @@ export const ControlPanel = ({
                   onChange={e => setPrompt(e.target.value)} 
                   className="h-32 resize-none bg-background/50 border-white/10 text-white pl-14" 
                 />
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="absolute bottom-3 left-3 text-primary/70 hover:text-primary hover:bg-primary/10 hover:scale-110 transition-all hover:shadow-[0_0_15px_rgba(155,135,245,0.3)] backdrop-blur-sm" 
-                  onClick={handleImprovePrompt} 
-                  disabled={isImprovingPrompt}
-                >
-                  {isImprovingPrompt ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-                </Button>
+                <div className="absolute bottom-3 left-3 flex space-x-2">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="text-primary/70 hover:text-primary hover:bg-primary/10 hover:scale-110 transition-all hover:shadow-[0_0_15px_rgba(155,135,245,0.3)] backdrop-blur-sm" 
+                    onClick={handleImprovePrompt} 
+                    disabled={isImprovingPrompt || !prompt.trim()}
+                    type="button"
+                  >
+                    {isImprovingPrompt ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                  </Button>
+                  
+                  {(workflow === 'with-reference' || workflow === 'cartoon') && (
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="text-primary/70 hover:text-primary hover:bg-primary/10 hover:scale-110 transition-all hover:shadow-[0_0_15px_rgba(155,135,245,0.3)] backdrop-blur-sm" 
+                      onClick={triggerFileInput} 
+                      disabled={isUploading}
+                      type="button"
+                    >
+                      <Upload className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -114,6 +145,7 @@ export const ControlPanel = ({
           className="w-full bg-primary hover:bg-primary/90 text-white" 
           disabled={isUploading || ((workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl) || (credits !== null && credits < CREDITS_PER_GENERATION) || isLoadingCredits}
           onClick={handleGenerate}
+          type="button"
         >
           <Sparkles className="w-4 h-4 mr-2" />
           {isUploading ? "Uploading..." : 
