@@ -19,9 +19,9 @@ const PromptMaker = () => {
   const { session } = useSession();
   const [selectedGeneration, setSelectedGeneration] = useState<any | null>(null);
   const [showPromptDialog, setShowPromptDialog] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const { toast } = useToast();
   
-  // Use custom hooks to manage different parts of the component
   const {
     imagePreview, 
     isUploading, 
@@ -187,15 +187,17 @@ const PromptMaker = () => {
                 />
               ))}
             </div>
-            
-            {/* Previous Generations (History) */}
-            <PreviousGenerations 
-              previousGenerations={previousGenerations} 
-              handleImageClick={handleImageClick} 
-            />
           </div>
         </div>
       </div>
+
+      {/* Previous Generations (History) as side drawer */}
+      <PreviousGenerations 
+        previousGenerations={previousGenerations} 
+        handleImageClick={handleImageClick}
+        isHistoryOpen={isHistoryOpen}
+        setIsHistoryOpen={setIsHistoryOpen}
+      />
 
       {/* Prompt Dialog */}
       <PromptDialog 
