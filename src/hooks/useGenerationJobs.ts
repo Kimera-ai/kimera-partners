@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -128,7 +127,7 @@ export const useGenerationJobs = (session: any) => {
         } else if (status.status === 'completed') {
           clearInterval(pollInterval);
           
-          // Update job images and completion status (but don't show them yet)
+          // Update job images and completion status - IMPORTANT: explicitly set displayImages to true
           setGenerationJobs(prev => {
             const updatedJobs = prev.map(job => {
               if (job.id === jobId) {
@@ -140,15 +139,14 @@ export const useGenerationJobs = (session: any) => {
                 
                 const jobStatus = isAllCompleted 
                   ? "All images generated successfully!" 
-                  : `Completed ${newCompletedImages} of ${job.totalImages} images (preparing to display)...`;
+                  : `Completed ${newCompletedImages} of ${job.totalImages} images...`;
                 
                 return {
                   ...job,
                   generatedImages: newGeneratedImages,
                   completedImages: newCompletedImages,
-                  // Only set isCompleted to true when all images are done AND they've been displayed
                   isCompleted: isAllCompleted,
-                  displayImages: isAllCompleted, // New flag to control display
+                  displayImages: true, // Always set to true when an image is completed
                   status: jobStatus
                 };
               }
@@ -240,7 +238,7 @@ export const useGenerationJobs = (session: any) => {
       totalImages: numImagesToGenerate,
       generatedImages: new Array(numImagesToGenerate).fill(null),
       isCompleted: false,
-      displayImages: false, // Add new flag to control when to display images
+      displayImages: false, // Initial flag is false
       startTime: Date.now(),
       elapsedTime: 0
     };
