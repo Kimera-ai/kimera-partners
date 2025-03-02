@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const CREDITS_PER_GENERATION = 14;
 
@@ -38,7 +39,9 @@ export const useImageGeneration = (
     }
     try {
       setIsImprovingPrompt(true);
-      const { data, error } = await session.supabase.functions.invoke('improve-prompt', {
+      
+      // Use direct supabase client import instead of session.supabase
+      const { data, error } = await supabase.functions.invoke('improve-prompt', {
         body: { prompt }
       });
       
