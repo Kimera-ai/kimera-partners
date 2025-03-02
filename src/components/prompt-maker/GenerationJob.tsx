@@ -10,6 +10,7 @@ export interface GenerationJobType {
   totalImages: number;
   generatedImages: (string | null)[];
   isCompleted: boolean;
+  displayImages: boolean; // New flag to control when to display images
   startTime: number;
   elapsedTime: number;
 }
@@ -21,6 +22,9 @@ interface GenerationJobProps {
 }
 
 export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobProps>(({ job, formatTime, handleDownload }, ref) => {
+  // Only show images if all are complete
+  const shouldDisplayImages = job.isCompleted || job.displayImages;
+  
   // Get non-null images
   const validImages = job.generatedImages.filter(img => img !== null) as string[];
   
@@ -58,7 +62,8 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
         </div>
       </div>
       
-      {job.completedImages > 0 && (
+      {/* Only show images once all images in the batch are ready */}
+      {shouldDisplayImages && job.completedImages > 0 && (
         <div className={`grid ${getGridClass(validImages.length)} gap-3 mt-3`}>
           {validImages.map((imageUrl, index) => (
             <div key={index} className="relative group rounded-md overflow-hidden bg-black aspect-[3/4]">

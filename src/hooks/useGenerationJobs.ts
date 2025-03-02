@@ -128,7 +128,7 @@ export const useGenerationJobs = (session: any) => {
         } else if (status.status === 'completed') {
           clearInterval(pollInterval);
           
-          // Update job images and completion status
+          // Update job images and completion status (but don't show them yet)
           setGenerationJobs(prev => {
             const updatedJobs = prev.map(job => {
               if (job.id === jobId) {
@@ -140,13 +140,15 @@ export const useGenerationJobs = (session: any) => {
                 
                 const jobStatus = isAllCompleted 
                   ? "All images generated successfully!" 
-                  : `Completed ${newCompletedImages} of ${job.totalImages} images...`;
+                  : `Completed ${newCompletedImages} of ${job.totalImages} images (preparing to display)...`;
                 
                 return {
                   ...job,
                   generatedImages: newGeneratedImages,
                   completedImages: newCompletedImages,
+                  // Only set isCompleted to true when all images are done AND they've been displayed
                   isCompleted: isAllCompleted,
+                  displayImages: isAllCompleted, // New flag to control display
                   status: jobStatus
                 };
               }
@@ -156,11 +158,12 @@ export const useGenerationJobs = (session: any) => {
             // Check if all images for this job are completed
             const currentJob = updatedJobs.find(j => j.id === jobId);
             if (currentJob && currentJob.completedImages === currentJob.totalImages) {
-              // Only add the requested number of completed images to generatedImages state
+              // All images are ready - add to generated images collection and update database
               const completedImages = currentJob.generatedImages
                 .filter(img => img !== null)
                 .slice(0, currentJob.totalImages) as string[];
               
+              // Add all images to the generatedImages collection at once
               setGeneratedImages(prev => [...prev, ...completedImages]);
               
               toast({
@@ -168,26 +171,26 @@ export const useGenerationJobs = (session: any) => {
                 description: `Job completed! All ${currentJob.totalImages} images have been generated successfully!`,
                 duration: 3000
               });
+              
+              // Store all generated images in the database
+              Promise.all(completedImages.map(imageUrl => 
+                supabase.from('generated_images').insert({
+                  user_id: session?.user?.id,
+                  image_url: imageUrl,
+                  prompt: jobPrompt,
+                  style: jobStyle,
+                  ratio: jobRatio,
+                  lora_scale: jobLoraScale
+                })
+              )).then(() => {
+                fetchPreviousGenerations();
+              }).catch(error => {
+                console.error('Error storing generations:', error);
+              });
             }
             
             return updatedJobs;
           });
-          
-          // Store the generated image in the database
-          const { error: dbError } = await supabase.from('generated_images').insert({
-            user_id: session?.user?.id,
-            image_url: status.result,
-            prompt: jobPrompt,
-            style: jobStyle,
-            ratio: jobRatio,
-            lora_scale: jobLoraScale
-          });
-          
-          if (dbError) {
-            console.error('Error storing generation:', dbError);
-          } else {
-            await fetchPreviousGenerations();
-          }
         } else if (status.status === 'failed' || status.status === 'Error') {
           clearInterval(pollInterval);
           
@@ -237,6 +240,7 @@ export const useGenerationJobs = (session: any) => {
       totalImages: numImagesToGenerate,
       generatedImages: new Array(numImagesToGenerate).fill(null),
       isCompleted: false,
+      displayImages: false, // Add new flag to control when to display images
       startTime: Date.now(),
       elapsedTime: 0
     };
