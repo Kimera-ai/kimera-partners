@@ -1,3 +1,4 @@
+<lov-code>
 import { useState, useRef, useCallback, useEffect } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { Input } from "@/components/ui/input";
@@ -833,4 +834,4 @@ const PromptMaker = () => {
                           <TooltipTrigger asChild>
                             <Label htmlFor="ratio" className="text-sm font-medium block truncate text-white/80">Aspect Ratio</Label>
                           </TooltipTrigger>
-                          <TooltipContent className="bg-background/
+                          <TooltipContent className="bg
