@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { Button } from "@/components/ui/button";
@@ -14,11 +13,13 @@ import { useImageUpload } from "@/hooks/useImageUpload";
 import { useCredits } from "@/hooks/useCredits";
 import { useGenerationJobs } from "@/hooks/useGenerationJobs";
 import { useImageGeneration } from "@/hooks/useImageGeneration";
+import { useToast } from "@/hooks/use-toast";
 
 const PromptMaker = () => {
   const { session } = useSession();
   const [selectedGeneration, setSelectedGeneration] = useState<any | null>(null);
   const [showPromptDialog, setShowPromptDialog] = useState(false);
+  const { toast } = useToast();
   
   // Use custom hooks to manage different parts of the component
   const {
@@ -145,57 +146,53 @@ const PromptMaker = () => {
             )}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="space-y-6">
-              {/* Control Panel */}
-              <ControlPanel
-                prompt={prompt}
-                setPrompt={setPrompt}
-                imagePreview={imagePreview}
-                isUploading={isUploading}
-                isProcessing={isProcessing}
-                isImprovingPrompt={isImprovingPrompt}
-                handleImageUpload={handleImageUpload}
-                removeImage={removeImage}
-                handleImprovePrompt={handleImprovePrompt}
-                handleGenerate={handleGenerate}
-                workflow={workflow}
-                setWorkflow={setWorkflow}
-                ratio={ratio}
-                setRatio={setRatio}
-                style={style}
-                setStyle={setStyle}
-                loraScale={loraScale}
-                setLoraScale={setLoraScale}
-                seed={seed}
-                setSeed={setSeed}
-                numberOfImages={numberOfImages}
-                setNumberOfImages={setNumberOfImages}
-                credits={credits}
-                isLoadingCredits={isLoadingCredits}
-                uploadedImageUrl={uploadedImageUrl}
-              />
+          <div className="space-y-6">
+            {/* Control Panel */}
+            <ControlPanel
+              prompt={prompt}
+              setPrompt={setPrompt}
+              imagePreview={imagePreview}
+              isUploading={isUploading}
+              isProcessing={isProcessing}
+              isImprovingPrompt={isImprovingPrompt}
+              handleImageUpload={handleImageUpload}
+              removeImage={removeImage}
+              handleImprovePrompt={handleImprovePrompt}
+              handleGenerate={handleGenerate}
+              workflow={workflow}
+              setWorkflow={setWorkflow}
+              ratio={ratio}
+              setRatio={setRatio}
+              style={style}
+              setStyle={setStyle}
+              loraScale={loraScale}
+              setLoraScale={setLoraScale}
+              seed={seed}
+              setSeed={setSeed}
+              numberOfImages={numberOfImages}
+              setNumberOfImages={setNumberOfImages}
+              credits={credits}
+              isLoadingCredits={isLoadingCredits}
+              uploadedImageUrl={uploadedImageUrl}
+            />
 
-              {/* Generation Jobs */}
-              <div className="space-y-4">
-                {generationJobs.map((job) => (
-                  <GenerationJobComponent 
-                    key={job.id} 
-                    job={job} 
-                    formatTime={formatTime} 
-                    handleDownload={handleDownload} 
-                  />
-                ))}
-              </div>
+            {/* Generation Jobs */}
+            <div className="space-y-4">
+              {generationJobs.map((job) => (
+                <GenerationJobComponent 
+                  key={job.id} 
+                  job={job} 
+                  formatTime={formatTime} 
+                  handleDownload={handleDownload} 
+                />
+              ))}
             </div>
             
-            {/* Right column - Previous Generations */}
-            <div>
-              <PreviousGenerations 
-                previousGenerations={previousGenerations} 
-                handleImageClick={handleImageClick} 
-              />
-            </div>
+            {/* Previous Generations (History) */}
+            <PreviousGenerations 
+              previousGenerations={previousGenerations} 
+              handleImageClick={handleImageClick} 
+            />
           </div>
         </div>
       </div>
