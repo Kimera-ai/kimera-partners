@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { JobPollingConfig, JobStatusResponse } from "@/types/generationJobs";
 import { GenerationJobType } from "@/components/prompt-maker/GenerationJob";
@@ -116,7 +115,7 @@ export const pollJobStatus = async (
       clearInterval(pollInterval);
       console.error(`Error polling status for job ${jobId}, image ${imageIndex + 1}:`, error);
     }
-  }, 7000);
+  }, 5000);
 };
 
 export const getStatusMessage = (status: JobStatusResponse, imageIndex: number): string => {
