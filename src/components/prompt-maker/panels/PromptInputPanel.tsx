@@ -1,12 +1,12 @@
-
 import React, { useRef } from "react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2, Sparkles, Info } from "lucide-react";
 import { ImagePreview } from "../ImagePreview";
 import { PromptSettings, ImageSettings } from "../types";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 type PromptInputPanelProps = PromptSettings & 
   ImageSettings & {
@@ -38,7 +38,20 @@ export const PromptInputPanel = ({
   
   return (
     <div>
-      <Label htmlFor="prompt" className="text-sm font-medium block text-white/80 text-left">Prompt</Label>
+      <div className="flex items-center gap-1.5">
+        <Label htmlFor="prompt" className="text-sm font-medium block text-white/80 text-left">Prompt</Label>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Info className="h-4 w-4 text-white/60 hover:text-white/80 cursor-help transition-colors" />
+            </TooltipTrigger>
+            <TooltipContent className="bg-background/90 border-white/10 text-white">
+              <p>Describe the image you want to generate in detail</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+      
       <div className="relative">
         <Input 
           id="reference-image" 

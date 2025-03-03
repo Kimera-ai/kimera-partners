@@ -3,13 +3,27 @@ import React from "react";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { GenerationSettings } from "../types";
+import { Info } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 type WorkflowPanelProps = Pick<GenerationSettings, "workflow" | "setWorkflow">;
 
 export const WorkflowPanel = ({ workflow, setWorkflow }: WorkflowPanelProps) => {
   return (
     <div className="space-y-2">
-      <Label htmlFor="workflow" className="text-sm font-medium block text-white/80 text-left">Workflow</Label>
+      <div className="flex items-center gap-1.5">
+        <Label htmlFor="workflow" className="text-sm font-medium block text-white/80 text-left">Workflow</Label>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Info className="h-4 w-4 text-white/60 hover:text-white/80 cursor-help transition-colors" />
+            </TooltipTrigger>
+            <TooltipContent className="bg-background/90 border-white/10 text-white">
+              <p>Select the workflow mode that best suits your generation needs</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
       <Select value={workflow} onValueChange={setWorkflow}>
         <SelectTrigger id="workflow" className="w-full bg-background/50 border-white/10 text-white">
           <SelectValue placeholder="Select workflow" />
