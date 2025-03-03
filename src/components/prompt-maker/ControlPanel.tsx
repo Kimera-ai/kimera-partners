@@ -68,6 +68,20 @@ export const ControlPanel = ({
   return (
     <Card className="p-6 bg-card/60 backdrop-blur border border-white/5 shadow-lg">
       <div className="space-y-4">
+        <PromptInputPanel 
+          prompt={prompt}
+          setPrompt={setPrompt}
+          isImprovingPrompt={isImprovingPrompt}
+          handleImprovePrompt={handleImprovePrompt}
+          imagePreview={imagePreview}
+          isUploading={isUploading}
+          isProcessing={isProcessing}
+          handleImageUpload={handleImageUpload}
+          removeImage={removeImage}
+          workflow={workflow}
+          uploadedImageUrl={uploadedImageUrl}
+        />
+
         <WorkflowPanel 
           workflow={workflow} 
           setWorkflow={setWorkflow} 
@@ -91,20 +105,6 @@ export const ControlPanel = ({
           setLoraScale={setLoraScale}
           seed={seed}
           setSeed={setSeed}
-        />
-
-        <PromptInputPanel 
-          prompt={prompt}
-          setPrompt={setPrompt}
-          isImprovingPrompt={isImprovingPrompt}
-          handleImprovePrompt={handleImprovePrompt}
-          imagePreview={imagePreview}
-          isUploading={isUploading}
-          isProcessing={isProcessing}
-          handleImageUpload={handleImageUpload}
-          removeImage={removeImage}
-          workflow={workflow}
-          uploadedImageUrl={uploadedImageUrl}
         />
 
         <GenerateButtonPanel 
