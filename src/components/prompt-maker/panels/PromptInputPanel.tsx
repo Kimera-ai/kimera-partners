@@ -68,7 +68,7 @@ export const PromptInputPanel = ({
               placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..." 
               value={prompt} 
               onChange={e => setPrompt(e.target.value)} 
-              className="h-32 resize-none bg-background/50 border-white/10 text-white pl-14" 
+              className="h-32 resize-none bg-background/50 border-white/10 text-white pl-24" 
             />
             <div className="absolute bottom-3 left-3">
               <Button 
