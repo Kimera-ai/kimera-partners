@@ -15,9 +15,9 @@ export const WorkflowPanel = ({ workflow, setWorkflow }: WorkflowPanelProps) => 
           <SelectValue placeholder="Select workflow" />
         </SelectTrigger>
         <SelectContent className="bg-background border-white/10 text-white">
-          <SelectItem value="no-reference">Basic image generation</SelectItem>
-          <SelectItem value="with-reference">Basic with image reference</SelectItem>
-          <SelectItem value="cartoon">Cartoon</SelectItem>
+          <SelectItem value="no-reference">Image Generator (Basic Image Generation – No Character Reference)</SelectItem>
+          <SelectItem value="with-reference">Reference Mode (Basic with Image Reference)</SelectItem>
+          <SelectItem value="cartoon">Cartoonify (Cartoon & Exaggerated Styles)</SelectItem>
         </SelectContent>
       </Select>
     </div>
