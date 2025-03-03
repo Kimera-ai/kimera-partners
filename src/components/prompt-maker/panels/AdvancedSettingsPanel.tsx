@@ -15,7 +15,7 @@ export const AdvancedSettingsPanel = ({
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="space-y-2">
-        <Label htmlFor="loraScale" className="text-sm font-medium block text-white/80">Lora Scale</Label>
+        <Label htmlFor="loraScale" className="text-sm font-medium block text-white/80 text-left">Lora Scale</Label>
         <Select value={loraScale} onValueChange={setLoraScale}>
           <SelectTrigger id="loraScale" className="w-full bg-background/50 border-white/10 text-white">
             <SelectValue placeholder="Select lora scale" />
@@ -36,7 +36,7 @@ export const AdvancedSettingsPanel = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="seed" className="text-sm font-medium block text-white/80">Seed</Label>
+        <Label htmlFor="seed" className="text-sm font-medium block text-white/80 text-left">Seed</Label>
         <Select value={seed} onValueChange={setSeed}>
           <SelectTrigger id="seed" className="w-full bg-background/50 border-white/10 text-white">
             <SelectValue placeholder="Select seed" />

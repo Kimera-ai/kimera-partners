@@ -38,7 +38,7 @@ export const PromptInputPanel = ({
   
   return (
     <div>
-      <Label htmlFor="prompt" className="text-sm font-medium block text-white/80">Prompt</Label>
+      <Label htmlFor="prompt" className="text-sm font-medium block text-white/80 text-left">Prompt</Label>
       <div className="relative">
         <Input 
           id="reference-image" 

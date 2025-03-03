@@ -19,7 +19,7 @@ export const RatioAndImagesPanel = ({
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="space-y-2">
-        <Label htmlFor="ratio" className="text-sm font-medium block text-white/80">Aspect Ratio</Label>
+        <Label htmlFor="ratio" className="text-sm font-medium block text-white/80 text-left">Aspect Ratio</Label>
         <Select value={ratio} onValueChange={setRatio}>
           <SelectTrigger id="ratio" className="w-full bg-background/50 border-white/10 text-white">
             <SelectValue placeholder="Select ratio" />
@@ -36,7 +36,7 @@ export const RatioAndImagesPanel = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="numberOfImages" className="text-sm font-medium block text-white/80">
+        <Label htmlFor="numberOfImages" className="text-sm font-medium block text-white/80 text-left">
           Number of Images
           <TooltipProvider>
             <Tooltip>
