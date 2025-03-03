@@ -9,7 +9,7 @@ type StylePanelProps = Pick<GenerationSettings, "style" | "setStyle">;
 export const StylePanel = ({ style, setStyle }: StylePanelProps) => {
   return (
     <div className="space-y-2">
-      <Label htmlFor="style" className="text-sm font-medium block text-white/80">Style</Label>
+      <Label htmlFor="style" className="text-sm font-medium block text-white/80 tracking-wide">Style</Label>
       <Select value={style} onValueChange={setStyle}>
         <SelectTrigger id="style" className="w-full bg-background/50 border-white/10 text-white">
           <SelectValue placeholder="Select style" />
