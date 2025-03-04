@@ -83,12 +83,12 @@ export const PromptInputPanel = ({
               placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..." 
               value={prompt} 
               onChange={e => setPrompt(e.target.value)} 
-              className="h-32 resize-none bg-background/50 border-white/10 text-white pl-24" 
+              className="h-32 resize-none bg-background/50 border-white/10 text-white pl-28" 
             />
             {/* Vertical divider */}
             <Separator 
               orientation="vertical" 
-              className="absolute left-20 top-0 bottom-0 h-full bg-white/10 my-2 z-10" 
+              className="absolute left-24 top-0 bottom-0 h-full bg-white/10" 
             />
             <div className="absolute bottom-3 left-3">
               <div className="flex items-center gap-1">
