@@ -17,7 +17,7 @@ type PromptInputPanelProps = PromptSettings &
 
 // Custom Magic Wand SVG component
 const MagicWandIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 31 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="16" height="16" viewBox="0 0 31 35" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g clipPath="url(#clip0_1270_1546)">
       <path d="M7.90323 24.4028H6.80566V26.0262H7.90323V24.4028Z" fill="currentColor"/>
       <path d="M24.7761 9.44951L26.107 7.04129L28.5405 5.72433L26.107 4.40738L24.7761 1.99916L23.4453 4.40738L21.0118 5.72433L23.4453 7.04129L24.7761 9.44951ZM24.2539 5.20884L24.7761 4.26504L25.2984 5.20884L26.2521 5.72562L25.2984 6.2424L24.7761 7.18619L24.2539 6.2424L23.3002 5.72562L24.2539 5.20884Z" fill="currentColor"/>
@@ -85,7 +85,7 @@ export const PromptInputPanel = ({
           ref={fileInputRef}
         />
         <div className="relative flex">
-          <div className="absolute top-0 bottom-0 left-0 w-24 flex flex-col justify-center items-center gap-3 px-3 border-r border-white/10 z-10">
+          <div className="absolute top-0 bottom-0 left-0 w-24 flex flex-col justify-center items-center gap-4 px-3 border-r border-white/10 z-10">
             <ImagePreview 
               imagePreview={imagePreview} 
               isUploading={isUploading} 
