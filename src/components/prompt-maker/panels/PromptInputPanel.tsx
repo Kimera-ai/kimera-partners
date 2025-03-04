@@ -112,19 +112,17 @@ export const PromptInputPanel = ({
               className="absolute left-24 top-0 bottom-0 h-full bg-white/10" 
             />
             <div className="absolute bottom-2 left-3">
-              <div className="flex flex-col items-center">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="text-primary/70 hover:text-primary hover:bg-primary/10 hover:scale-110 transition-all hover:shadow-[0_0_15px_rgba(155,135,245,0.3)] backdrop-blur-sm" 
-                  onClick={handleImprovePrompt} 
-                  disabled={isImprovingPrompt || !prompt.trim()}
-                  type="button"
-                >
-                  {isImprovingPrompt ? <Loader2 className="h-4 w-4 animate-spin" /> : <MagicWandIcon />}
-                </Button>
-                <span className="text-[10px] text-primary/70 font-medium mt-1 w-full text-center">Magic Prompt</span>
-              </div>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-primary/70 hover:text-primary hover:bg-primary/10 hover:scale-110 transition-all hover:shadow-[0_0_15px_rgba(155,135,245,0.3)] backdrop-blur-sm flex flex-col items-center gap-1 px-2 py-1.5" 
+                onClick={handleImprovePrompt} 
+                disabled={isImprovingPrompt || !prompt.trim()}
+                type="button"
+              >
+                {isImprovingPrompt ? <Loader2 className="h-4 w-4 animate-spin" /> : <MagicWandIcon />}
+                <span className="text-[10px] font-medium">Magic Prompt</span>
+              </Button>
             </div>
           </div>
         </div>
@@ -132,3 +130,4 @@ export const PromptInputPanel = ({
     </div>
   );
 };
+
