@@ -4,10 +4,27 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { GenerationSettings, CreditInfo } from "../types";
-import { Info } from "lucide-react";
+import { Info, Square, RectangleHorizontal, RectangleVertical } from "lucide-react";
 
 type RatioAndImagesPanelProps = Pick<GenerationSettings, "ratio" | "setRatio" | "numberOfImages" | "setNumberOfImages"> & {
   CREDITS_PER_GENERATION: number;
+};
+
+// Helper component to render aspect ratio icon based on ratio value
+const AspectRatioIcon = ({ ratio }: { ratio: string }) => {
+  switch (ratio) {
+    case "1:1":
+      return <Square className="h-5 w-5 mr-2 text-white/80" />;
+    case "4:3":
+    case "16:9":
+    case "3:2":
+      return <RectangleHorizontal className="h-5 w-5 mr-2 text-white/80" />;
+    case "3:4":
+    case "2:3":
+      return <RectangleVertical className="h-5 w-5 mr-2 text-white/80" />;
+    default:
+      return <Square className="h-5 w-5 mr-2 text-white/80" />;
+  }
 };
 
 export const RatioAndImagesPanel = ({ 
@@ -35,15 +52,40 @@ export const RatioAndImagesPanel = ({
         </div>
         <Select value={ratio} onValueChange={setRatio}>
           <SelectTrigger id="ratio" className="w-full bg-background/50 border-white/10 text-white">
-            <SelectValue placeholder="Select ratio" />
+            <SelectValue placeholder="Select ratio">
+              {ratio && (
+                <div className="flex items-center">
+                  <AspectRatioIcon ratio={ratio} />
+                  <span>{getAspectRatioLabel(ratio)}</span>
+                </div>
+              )}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent className="bg-background border-white/10 text-white">
-            <SelectItem value="1:1">Square (1:1)</SelectItem>
-            <SelectItem value="4:3">Landscape (4:3)</SelectItem>
-            <SelectItem value="3:4">Portrait (3:4)</SelectItem>
-            <SelectItem value="16:9">Widescreen (16:9)</SelectItem>
-            <SelectItem value="2:3">Portrait (2:3)</SelectItem>
-            <SelectItem value="3:2">Landscape (3:2)</SelectItem>
+            <SelectItem value="1:1" className="flex items-center">
+              <Square className="h-5 w-5 mr-2 text-white/80" />
+              <span>Square (1:1)</span>
+            </SelectItem>
+            <SelectItem value="4:3" className="flex items-center">
+              <RectangleHorizontal className="h-5 w-5 mr-2 text-white/80" />
+              <span>Landscape (4:3)</span>
+            </SelectItem>
+            <SelectItem value="3:4" className="flex items-center">
+              <RectangleVertical className="h-5 w-5 mr-2 text-white/80" />
+              <span>Portrait (3:4)</span>
+            </SelectItem>
+            <SelectItem value="16:9" className="flex items-center">
+              <RectangleHorizontal className="h-5 w-5 mr-2 text-white/80" />
+              <span>Widescreen (16:9)</span>
+            </SelectItem>
+            <SelectItem value="2:3" className="flex items-center">
+              <RectangleVertical className="h-5 w-5 mr-2 text-white/80" />
+              <span>Portrait (2:3)</span>
+            </SelectItem>
+            <SelectItem value="3:2" className="flex items-center">
+              <RectangleHorizontal className="h-5 w-5 mr-2 text-white/80" />
+              <span>Landscape (3:2)</span>
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -81,4 +123,24 @@ export const RatioAndImagesPanel = ({
       </div>
     </div>
   );
+};
+
+// Helper function to get the label text
+const getAspectRatioLabel = (ratio: string): string => {
+  switch (ratio) {
+    case "1:1":
+      return "Square (1:1)";
+    case "4:3":
+      return "Landscape (4:3)";
+    case "3:4":
+      return "Portrait (3:4)";
+    case "16:9":
+      return "Widescreen (16:9)";
+    case "2:3":
+      return "Portrait (2:3)";
+    case "3:2":
+      return "Landscape (3:2)";
+    default:
+      return ratio;
+  }
 };
