@@ -18,7 +18,7 @@ type PromptInputPanelProps = PromptSettings &
 
 // Custom Magic Wand SVG component
 const MagicWandIcon = () => (
-  <svg width="31" height="35" viewBox="0 0 31 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="24" height="24" viewBox="0 0 31 35" fill="none" xmlns="http://www.w3.org/2000/svg" className="scale-75">
     <g clipPath="url(#clip0_1270_1546)">
       <path d="M7.90323 24.4028H6.80566V26.0262H7.90323V24.4028Z" fill="currentColor"/>
       <path d="M24.7761 9.44951L26.107 7.04129L28.5405 5.72433L26.107 4.40738L24.7761 1.99916L23.4453 4.40738L21.0118 5.72433L23.4453 7.04129L24.7761 9.44951ZM24.2539 5.20884L24.7761 4.26504L25.2984 5.20884L26.2521 5.72562L25.2984 6.2424L24.7761 7.18619L24.2539 6.2424L23.3002 5.72562L24.2539 5.20884Z" fill="currentColor"/>
@@ -111,23 +111,24 @@ export const PromptInputPanel = ({
               orientation="vertical" 
               className="absolute left-24 top-0 bottom-0 h-full bg-white/10" 
             />
-            <div className="absolute bottom-2 left-3">
+            <div className="absolute bottom-2 left-3 flex flex-col gap-2">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <button 
                       type="button" 
-                      className="h-14 w-14 rounded-md bg-white/5 backdrop-blur border border-white/10 p-1 hover:bg-white/10 transition-all flex flex-col items-center justify-center group relative"
+                      className="h-14 w-14 rounded-md bg-white/5 backdrop-blur border border-white/10 hover:bg-white/10 transition-all flex flex-col items-center justify-center group relative"
                       onClick={handleImprovePrompt}
                       disabled={isImprovingPrompt || !prompt.trim()}
                     >
-                      <div className="flex flex-col items-center justify-center">
-                        {isImprovingPrompt ? 
-                          <Loader2 className="h-6 w-6 animate-spin text-white/70" /> : 
-                          <MagicWandIcon className="text-white/70 h-6 w-6 group-hover:text-white transition-colors" />
-                        }
-                        <span className="text-[10px] font-medium text-white/70 group-hover:text-white transition-colors mt-1">Magic Prompt</span>
-                      </div>
+                      {isImprovingPrompt ? 
+                        <Loader2 className="h-5 w-5 animate-spin text-white/70" /> : 
+                        <div className="flex flex-col items-center">
+                          <MagicWandIcon />
+                          <span className="text-[10px] font-medium text-white/70 group-hover:text-white transition-colors mt-0.5">Magic</span>
+                          <span className="text-[10px] font-medium text-white/70 group-hover:text-white transition-colors -mt-0.5">Prompt</span>
+                        </div>
+                      }
                     </button>
                   </TooltipTrigger>
                   <TooltipContent side="bottom">
