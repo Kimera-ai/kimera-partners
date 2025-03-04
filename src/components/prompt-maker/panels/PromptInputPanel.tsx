@@ -86,7 +86,7 @@ export const PromptInputPanel = ({
             </TooltipProvider>
           </div>
           
-          <Textarea id="prompt" placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..." value={prompt} onChange={e => setPrompt(e.target.value)} className="min-h-32 resize-none border-white/10 text-white pl-28 bg-[#0b0b0b]" />
+          <Textarea id="prompt" placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..." value={prompt} onChange={e => setPrompt(e.target.value)} className="min-h-32 resize-none border-white/10 text-white pl-28 bg-zinc-800" />
         </div>
       </div>
     </div>;
