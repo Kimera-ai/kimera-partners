@@ -117,16 +117,14 @@ export const PromptInputPanel = ({
                   <TooltipTrigger asChild>
                     <button 
                       type="button" 
-                      className="h-14 w-14 rounded-md bg-white/5 backdrop-blur border border-white/10 hover:bg-white/10 transition-all flex flex-col items-center justify-center group relative"
+                      className="h-14 w-14 rounded-md bg-white/5 backdrop-blur border border-white/10 hover:bg-white/10 transition-all flex items-center justify-center group relative"
                       onClick={handleImprovePrompt}
                       disabled={isImprovingPrompt || !prompt.trim()}
                     >
                       {isImprovingPrompt ? 
                         <Loader2 className="h-5 w-5 animate-spin text-white/70" /> : 
-                        <div className="flex flex-col items-center">
+                        <div className="flex items-center justify-center">
                           <MagicWandIcon />
-                          <span className="text-[10px] font-medium text-white/70 group-hover:text-white transition-colors mt-0.5">Magic</span>
-                          <span className="text-[10px] font-medium text-white/70 group-hover:text-white transition-colors -mt-0.5">Prompt</span>
                         </div>
                       }
                     </button>
