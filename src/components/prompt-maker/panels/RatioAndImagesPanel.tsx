@@ -105,9 +105,6 @@ export const RatioAndImagesPanel = ({
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          <span className="ml-1 text-xs text-muted-foreground underline cursor-help">
-            (costs {CREDITS_PER_GENERATION} credits per image)
-          </span>
         </div>
         <Select value={numberOfImages} onValueChange={setNumberOfImages}>
           <SelectTrigger id="numberOfImages" className="w-full bg-background/50 border-white/10 text-white">
