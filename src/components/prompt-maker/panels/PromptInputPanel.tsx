@@ -1,4 +1,3 @@
-
 import React, { useRef } from "react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -85,7 +84,7 @@ export const PromptInputPanel = ({
               className="h-32 resize-none bg-background/50 border-white/10 text-white pl-24" 
             />
             <div className="absolute bottom-3 left-3">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
                 <Button 
                   variant="ghost" 
                   size="icon" 
