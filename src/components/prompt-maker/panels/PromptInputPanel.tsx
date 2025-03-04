@@ -1,4 +1,3 @@
-
 import React, { useRef } from "react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,7 +17,7 @@ type PromptInputPanelProps = PromptSettings &
 
 // Custom Magic Wand SVG component
 const MagicWandIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 31 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="18" height="18" viewBox="0 0 31 35" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g clipPath="url(#clip0_1270_1546)">
       <path d="M7.90323 24.4028H6.80566V26.0262H7.90323V24.4028Z" fill="currentColor"/>
       <path d="M24.7761 9.44951L26.107 7.04129L28.5405 5.72433L26.107 4.40738L24.7761 1.99916L23.4453 4.40738L21.0118 5.72433L23.4453 7.04129L24.7761 9.44951ZM24.2539 5.20884L24.7761 4.26504L25.2984 5.20884L26.2521 5.72562L25.2984 6.2424L24.7761 7.18619L24.2539 6.2424L23.3002 5.72562L24.2539 5.20884Z" fill="currentColor"/>
@@ -85,53 +84,45 @@ export const PromptInputPanel = ({
           disabled={isUploading || workflow === 'no-reference'} 
           ref={fileInputRef}
         />
-        <div className="relative">
-          <div className="absolute left-3 top-3 z-10" style={{ pointerEvents: 'auto' }}>
-            <div className="flex flex-col space-y-3">
-              <ImagePreview 
-                imagePreview={imagePreview} 
-                isUploading={isUploading} 
-                isProcessing={isProcessing} 
-                onRemove={removeImage} 
-                disabled={workflow === 'no-reference'} 
-              />
-              
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button 
-                      type="button" 
-                      className="h-14 w-14 rounded-md bg-white/5 backdrop-blur border border-white/10 hover:bg-white/10 disabled:opacity-50 disabled:hover:bg-white/5 transition-all flex items-center justify-center"
-                      onClick={handleImprovePrompt}
-                      disabled={isImprovingPrompt || !prompt.trim()}
-                    >
-                      {isImprovingPrompt ? 
-                        <Loader2 className="h-5 w-5 animate-spin text-white/70" /> : 
-                        <MagicWandIcon />
-                      }
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">
-                    <p>Enhance your prompt with AI</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-          </div>
-          <div className="relative">
-            <Textarea 
-              id="prompt" 
-              placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..." 
-              value={prompt} 
-              onChange={e => setPrompt(e.target.value)} 
-              className="h-32 resize-none bg-background/50 border-white/10 text-white pl-28" 
+        <div className="relative flex">
+          <div className="absolute top-0 bottom-0 left-0 w-24 flex flex-col justify-center items-center gap-3 px-3 border-r border-white/10 z-10">
+            <ImagePreview 
+              imagePreview={imagePreview} 
+              isUploading={isUploading} 
+              isProcessing={isProcessing} 
+              onRemove={removeImage} 
+              disabled={workflow === 'no-reference'} 
             />
-            {/* Vertical divider */}
-            <Separator 
-              orientation="vertical" 
-              className="absolute left-24 top-0 bottom-0 h-full bg-white/10" 
-            />
+            
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button 
+                    type="button" 
+                    className="h-12 w-12 rounded-md bg-white/5 backdrop-blur border border-white/10 hover:bg-white/10 disabled:opacity-50 disabled:hover:bg-white/5 transition-all flex items-center justify-center"
+                    onClick={handleImprovePrompt}
+                    disabled={isImprovingPrompt || !prompt.trim()}
+                  >
+                    {isImprovingPrompt ? 
+                      <Loader2 className="h-5 w-5 animate-spin text-white/70" /> : 
+                      <MagicWandIcon />
+                    }
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  <p>Enhance your prompt with AI</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
+          
+          <Textarea 
+            id="prompt" 
+            placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..." 
+            value={prompt} 
+            onChange={e => setPrompt(e.target.value)} 
+            className="min-h-32 resize-none bg-background/50 border-white/10 text-white pl-28" 
+          />
         </div>
       </div>
     </div>
