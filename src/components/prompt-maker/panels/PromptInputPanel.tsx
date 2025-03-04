@@ -1,3 +1,4 @@
+
 import React, { useRef } from "react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -54,20 +55,6 @@ export const PromptInputPanel = ({
     }
   };
   return <div>
-      <div className="flex items-center gap-1.5">
-        <Label htmlFor="prompt" className="text-sm font-medium block text-white/80 text-left">Prompt</Label>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Info className="h-4 w-4 text-white/60 hover:text-white/80 cursor-help transition-colors" />
-            </TooltipTrigger>
-            <TooltipContent className="bg-background/90 border-white/10 text-white">
-              <p>Describe the image you want to generate in detail</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
-      
       <div className="relative">
         <Input id="reference-image" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={isUploading || workflow === 'no-reference'} ref={fileInputRef} />
         <div className="relative flex">
