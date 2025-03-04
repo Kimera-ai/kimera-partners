@@ -1,3 +1,4 @@
+
 import React, { useRef } from "react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -7,6 +8,7 @@ import { Loader2, Sparkles, Info } from "lucide-react";
 import { ImagePreview } from "../ImagePreview";
 import { PromptSettings, ImageSettings } from "../types";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Separator } from "@/components/ui/separator";
 
 type PromptInputPanelProps = PromptSettings & 
   ImageSettings & {
@@ -82,6 +84,11 @@ export const PromptInputPanel = ({
               value={prompt} 
               onChange={e => setPrompt(e.target.value)} 
               className="h-32 resize-none bg-background/50 border-white/10 text-white pl-24" 
+            />
+            {/* Vertical divider */}
+            <Separator 
+              orientation="vertical" 
+              className="absolute left-20 top-0 bottom-0 h-full bg-white/10 my-2 z-10" 
             />
             <div className="absolute bottom-3 left-3">
               <div className="flex items-center gap-1">
