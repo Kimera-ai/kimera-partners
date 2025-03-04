@@ -1,4 +1,3 @@
-
 import React, { useRef } from "react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -90,13 +89,36 @@ export const PromptInputPanel = ({
             position: 'absolute',
             isolation: 'isolate'
           }}>
-            <ImagePreview 
-              imagePreview={imagePreview} 
-              isUploading={isUploading} 
-              isProcessing={isProcessing} 
-              onRemove={removeImage} 
-              disabled={workflow === 'no-reference'} 
-            />
+            <div className="flex flex-col space-y-2">
+              <ImagePreview 
+                imagePreview={imagePreview} 
+                isUploading={isUploading} 
+                isProcessing={isProcessing} 
+                onRemove={removeImage} 
+                disabled={workflow === 'no-reference'} 
+              />
+              
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button 
+                      type="button" 
+                      className="h-14 w-14 rounded-md bg-white/5 backdrop-blur border border-white/10 hover:bg-white/10 disabled:opacity-50 disabled:hover:bg-white/5 transition-all flex items-center justify-center"
+                      onClick={handleImprovePrompt}
+                      disabled={isImprovingPrompt || !prompt.trim()}
+                    >
+                      {isImprovingPrompt ? 
+                        <Loader2 className="h-5 w-5 animate-spin text-white/70" /> : 
+                        <MagicWandIcon />
+                      }
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    <p>Enhance your prompt with AI</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           </div>
           <div className="relative">
             <Textarea 
@@ -111,30 +133,6 @@ export const PromptInputPanel = ({
               orientation="vertical" 
               className="absolute left-24 top-0 bottom-0 h-full bg-white/10" 
             />
-            <div className="absolute bottom-2 left-3 flex flex-col gap-2">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button 
-                      type="button" 
-                      className="h-14 w-14 rounded-md bg-white/5 backdrop-blur border border-white/10 hover:bg-white/10 transition-all flex items-center justify-center group relative"
-                      onClick={handleImprovePrompt}
-                      disabled={isImprovingPrompt || !prompt.trim()}
-                    >
-                      {isImprovingPrompt ? 
-                        <Loader2 className="h-5 w-5 animate-spin text-white/70" /> : 
-                        <div className="flex items-center justify-center">
-                          <MagicWandIcon />
-                        </div>
-                      }
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">
-                    <p>Enhance your prompt with AI</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
           </div>
         </div>
       </div>
