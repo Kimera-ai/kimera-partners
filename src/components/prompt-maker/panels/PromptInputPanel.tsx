@@ -1,3 +1,4 @@
+
 import React, { useRef } from "react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,7 +18,7 @@ type PromptInputPanelProps = PromptSettings &
 
 // Custom Magic Wand SVG component
 const MagicWandIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 31 35" fill="none" xmlns="http://www.w3.org/2000/svg" className="scale-75">
+  <svg width="20" height="20" viewBox="0 0 31 35" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g clipPath="url(#clip0_1270_1546)">
       <path d="M7.90323 24.4028H6.80566V26.0262H7.90323V24.4028Z" fill="currentColor"/>
       <path d="M24.7761 9.44951L26.107 7.04129L28.5405 5.72433L26.107 4.40738L24.7761 1.99916L23.4453 4.40738L21.0118 5.72433L23.4453 7.04129L24.7761 9.44951ZM24.2539 5.20884L24.7761 4.26504L25.2984 5.20884L26.2521 5.72562L25.2984 6.2424L24.7761 7.18619L24.2539 6.2424L23.3002 5.72562L24.2539 5.20884Z" fill="currentColor"/>
@@ -85,11 +86,8 @@ export const PromptInputPanel = ({
           ref={fileInputRef}
         />
         <div className="relative">
-          <div ref={previewRef} className="absolute left-3 top-3 z-[9999] pointer-events-auto" style={{
-            position: 'absolute',
-            isolation: 'isolate'
-          }}>
-            <div className="flex flex-col space-y-2">
+          <div className="absolute left-3 top-3 z-10" style={{ pointerEvents: 'auto' }}>
+            <div className="flex flex-col space-y-3">
               <ImagePreview 
                 imagePreview={imagePreview} 
                 isUploading={isUploading} 
