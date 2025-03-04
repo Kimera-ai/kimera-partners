@@ -61,7 +61,7 @@ export const ControlPanel = ({
   uploadedImageUrl
 }: ControlPanelProps) => {
   const CREDITS_PER_GENERATION = 14;
-  return <Card className="p-6 backdrop-blur border border-white/5 shadow-lg max-w-2xl mx-auto bg-zinc-900">
+  return <Card className="p-6 backdrop-blur border border-white/5 shadow-lg max-w-2xl mx-auto bg-[#17151e]">
       <div className="space-y-4">
         <PromptInputPanel prompt={prompt} setPrompt={setPrompt} isImprovingPrompt={isImprovingPrompt} handleImprovePrompt={handleImprovePrompt} imagePreview={imagePreview} isUploading={isUploading} isProcessing={isProcessing} handleImageUpload={handleImageUpload} removeImage={removeImage} workflow={workflow} uploadedImageUrl={uploadedImageUrl} />
 
