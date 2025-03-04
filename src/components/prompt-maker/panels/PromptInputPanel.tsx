@@ -8,6 +8,7 @@ import { ImagePreview } from "../ImagePreview";
 import { PromptSettings, ImageSettings } from "../types";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Separator } from "@/components/ui/separator";
+
 type PromptInputPanelProps = PromptSettings & ImageSettings & {
   isProcessing: boolean;
   workflow: string;
@@ -31,6 +32,7 @@ const MagicWandIcon = () => <svg width="16" height="16" viewBox="0 0 31 35" fill
       </clipPath>
     </defs>
   </svg>;
+
 export const PromptInputPanel = ({
   prompt,
   setPrompt,
@@ -86,7 +88,7 @@ export const PromptInputPanel = ({
             </TooltipProvider>
           </div>
           
-          <Textarea id="prompt" placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..." value={prompt} onChange={e => setPrompt(e.target.value)} className="min-h-32 resize-none border-white/10 text-white pl-28 bg-zinc-800" />
+          <Textarea id="prompt" placeholder="A magical forest with glowing mushrooms, ethereal lighting, fantasy atmosphere..." value={prompt} onChange={e => setPrompt(e.target.value)} className="min-h-32 resize-none border-white/10 text-[#A1A1AA] pl-28 bg-zinc-800" />
         </div>
       </div>
     </div>;
