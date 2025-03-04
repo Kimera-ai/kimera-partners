@@ -90,8 +90,8 @@ export const PromptInputPanel = ({
               orientation="vertical" 
               className="absolute left-24 top-0 bottom-0 h-full bg-white/10" 
             />
-            <div className="absolute bottom-3 left-3">
-              <div className="flex items-center gap-1">
+            <div className="absolute bottom-2 left-3">
+              <div className="flex flex-col items-center">
                 <Button 
                   variant="ghost" 
                   size="icon" 
@@ -102,7 +102,7 @@ export const PromptInputPanel = ({
                 >
                   {isImprovingPrompt ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                 </Button>
-                <span className="text-xs text-primary/70 font-medium">Magic Prompt</span>
+                <span className="text-xs text-primary/70 font-medium mt-1 w-full text-center">Magic Prompt</span>
               </div>
             </div>
           </div>
