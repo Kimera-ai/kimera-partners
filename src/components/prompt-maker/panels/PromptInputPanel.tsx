@@ -1,3 +1,4 @@
+
 import React, { useRef } from "react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -84,16 +85,19 @@ export const PromptInputPanel = ({
               className="h-32 resize-none bg-background/50 border-white/10 text-white pl-24" 
             />
             <div className="absolute bottom-3 left-3">
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="text-primary/70 hover:text-primary hover:bg-primary/10 hover:scale-110 transition-all hover:shadow-[0_0_15px_rgba(155,135,245,0.3)] backdrop-blur-sm" 
-                onClick={handleImprovePrompt} 
-                disabled={isImprovingPrompt || !prompt.trim()}
-                type="button"
-              >
-                {isImprovingPrompt ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="text-primary/70 hover:text-primary hover:bg-primary/10 hover:scale-110 transition-all hover:shadow-[0_0_15px_rgba(155,135,245,0.3)] backdrop-blur-sm" 
+                  onClick={handleImprovePrompt} 
+                  disabled={isImprovingPrompt || !prompt.trim()}
+                  type="button"
+                >
+                  {isImprovingPrompt ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                </Button>
+                <span className="text-xs text-primary/70 font-medium">Magic Prompt</span>
+              </div>
             </div>
           </div>
         </div>
