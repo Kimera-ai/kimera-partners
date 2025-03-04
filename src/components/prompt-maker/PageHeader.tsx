@@ -18,8 +18,8 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   showCredits
 }) => {
   return (
-    <div className="flex items-center justify-between mb-6">
-      <h1 className="text-2xl font-bold tracking-tight text-white">
+    <div className="flex flex-col md:flex-row items-center justify-between mb-6">
+      <h1 className="text-2xl font-bold tracking-tight text-white text-center mx-auto mb-4 md:mb-0">
         What will you create?
       </h1>
       {showCredits && (
