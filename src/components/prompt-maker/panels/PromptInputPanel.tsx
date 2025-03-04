@@ -102,7 +102,7 @@ export const PromptInputPanel = ({
                 >
                   {isImprovingPrompt ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                 </Button>
-                <span className="text-xs text-primary/70 font-medium mt-1 w-full text-center">Magic Prompt</span>
+                <span className="text-[10px] text-primary/70 font-medium mt-1 w-full text-center">Magic Prompt</span>
               </div>
             </div>
           </div>
