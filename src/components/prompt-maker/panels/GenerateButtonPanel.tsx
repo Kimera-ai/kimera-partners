@@ -36,7 +36,7 @@ export const GenerateButtonPanel = ({
   return (
     <>
       <Button 
-        className="w-full bg-primary hover:bg-primary/90 text-white" 
+        className="w-full bg-[#FF2B6E] hover:bg-[#FF068B] text-white disabled:bg-[#C8C8C9] disabled:text-gray-600 disabled:opacity-80" 
         disabled={isButtonDisabled}
         onClick={handleGenerate}
         type="button"
