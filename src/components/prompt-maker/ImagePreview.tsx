@@ -9,6 +9,7 @@ interface ImagePreviewProps {
   isProcessing: boolean;
   onRemove: (e: React.MouseEvent) => void;
   disabled?: boolean;
+  onImageClick?: () => void;
 }
 
 export const ImagePreview = ({
@@ -16,15 +17,18 @@ export const ImagePreview = ({
   isUploading,
   isProcessing,
   onRemove,
-  disabled
+  disabled,
+  onImageClick
 }: ImagePreviewProps) => {
+  // This component is now essentially a legacy component as we've incorporated its functionality
+  // directly in PromptInputPanel for consistent styling between icons
   if (!imagePreview) {
     return (
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
             <label htmlFor="reference-image" className={`cursor-pointer block ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
-              <div className="h-12 w-12 rounded-md bg-white/5 backdrop-blur border border-white/10 p-3 hover:bg-white/10 flex items-center justify-center">
+              <div className="h-12 w-12 rounded-md bg-white/5 backdrop-blur border border-white/10 p-3 hover:bg-white/10 transition-colors flex items-center justify-center">
                 <svg width="16" height="16" viewBox="0 0 30 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-white/70">
                   <path d="M26.0001 17.25H24.7501C24.7501 17.25 24.7501 16.006 24.7501 16C24.7501 15.0419 23.2501 15.0225 23.2501 16V17.25C23.2501 17.25 22.0043 17.25 22.0001 17.25C21.0597 17.25 21.0079 18.75 22.0001 18.75H23.2501C23.2501 18.75 23.2501 19.9952 23.2501 20C23.2501 20.9452 24.7501 20.9763 24.7501 20V18.75C24.7501 18.75 25.9917 18.75 26 18.75C26.9548 18.75 26.9721 17.25 26.0001 17.25Z" fill="currentColor"/>
                   <path d="M12.25 6.5C12.25 7.74072 13.2593 8.75 14.5 8.75C15.7407 8.75 16.75 7.74072 16.75 6.5C16.75 5.25928 15.7407 4.25 14.5 4.25C13.2593 4.25 12.25 5.25928 12.25 6.5ZM15.25 6.5C15.25 6.91357 14.9136 7.25 14.5 7.25C14.0864 7.25 13.75 6.91357 13.75 6.5C13.75 6.08643 14.0864 5.75 14.5 5.75C14.9136 5.75 15.25 6.08643 15.25 6.5Z" fill="currentColor"/>
