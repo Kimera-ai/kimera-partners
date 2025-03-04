@@ -66,7 +66,7 @@ export const ControlPanel = ({
   const CREDITS_PER_GENERATION = 14;
   
   return (
-    <Card className="p-6 bg-card/60 backdrop-blur border border-white/5 shadow-lg">
+    <Card className="p-6 bg-card/60 backdrop-blur border border-white/5 shadow-lg max-w-2xl mx-auto">
       <div className="space-y-4">
         <PromptInputPanel 
           prompt={prompt}
