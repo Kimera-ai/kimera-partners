@@ -17,9 +17,7 @@ export const CreditDisplay = ({ credits, isLoadingCredits, CREDITS_PER_GENERATIO
           {isLoadingCredits ? <Loader2 className="w-4 h-4 animate-spin" /> : `${credits ?? 0} credits`}
         </span>
       </div>
-      <div className="text-sm text-muted-foreground backdrop-blur px-4 py-2 rounded-full bg-background/50 border border-white/5">
-        Cost per generation: {CREDITS_PER_GENERATION} credits
-      </div>
+      {/* Cost per generation element has been hidden */}
     </div>
   );
 };
