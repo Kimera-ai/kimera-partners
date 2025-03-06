@@ -1,3 +1,4 @@
+
 import React from "react";
 import { WorkflowPanel } from "./panels/WorkflowPanel";
 import { RatioAndImagesPanel } from "./panels/RatioAndImagesPanel";
@@ -5,6 +6,7 @@ import { StylePanel } from "./panels/StylePanel";
 import { AdvancedSettingsPanel } from "./panels/AdvancedSettingsPanel";
 import { GenerationSettings, ImageSettings } from "./types";
 import { ChevronDown } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface SidebarProps extends 
   Pick<GenerationSettings, "workflow" | "setWorkflow" | "ratio" | "setRatio" | "style" | "setStyle" | "loraScale" | "setLoraScale" | "seed" | "setSeed" | "numberOfImages" | "setNumberOfImages">,
@@ -31,6 +33,30 @@ export const Sidebar: React.FC<SidebarProps> = ({
   removeImage,
   CREDITS_PER_GENERATION
 }) => {
+  const { toast } = useToast();
+
+  const handleResetDefaults = () => {
+    // Reset all settings to their default values
+    setWorkflow("no-reference");
+    setRatio("2:3");
+    setStyle("Photographic");
+    setLoraScale("0.5");
+    setSeed("random");
+    setNumberOfImages("1");
+    
+    // If there's an image preview, remove it
+    if (imagePreview) {
+      removeImage(new MouseEvent('click') as React.MouseEvent);
+    }
+    
+    // Show confirmation toast
+    toast({
+      title: "Settings Reset",
+      description: "All settings have been reset to their default values.",
+      duration: 3000
+    });
+  };
+
   return (
     <div className="w-full h-full bg-[#1A1625] p-4 space-y-3 overflow-y-auto">
       {/* Workflow Panel (Mode/Preset in the image) */}
@@ -86,8 +112,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       
       {/* Reset to Defaults Button at the bottom */}
       <div className="fixed bottom-4 left-0 w-[260px] px-4">
-        <button className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-md 
-          bg-[#1D1A27] border border-white/10 text-white/70 hover:bg-[#252031] transition-colors">
+        <button 
+          className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-md 
+            bg-[#1D1A27] border border-white/10 text-white/70 hover:bg-[#252031] transition-colors"
+          onClick={handleResetDefaults}
+        >
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
             <path d="M3 3v5h5"></path>
