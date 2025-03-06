@@ -46,7 +46,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
     
     // If there's an image preview, remove it
     if (imagePreview) {
-      removeImage(new MouseEvent('click') as React.MouseEvent);
+      // Create a synthetic React MouseEvent instead of using the native MouseEvent
+      // We're creating an empty object and casting it to the type React expects
+      const syntheticEvent = {} as React.MouseEvent<Element, MouseEvent>;
+      removeImage(syntheticEvent);
     }
     
     // Show confirmation toast
