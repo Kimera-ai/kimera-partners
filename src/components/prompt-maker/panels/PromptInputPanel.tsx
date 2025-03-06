@@ -89,7 +89,28 @@ export const PromptInputPanel = ({
           </Tooltip>
         </TooltipProvider>
         
-        {/* Hiding the Prompt Enhance button */}
+        {/* Adding back the Prompt Enhance button */}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                className={`h-8 w-8 rounded-md bg-[#242038] border border-purple-500/30 flex items-center justify-center ${isImprovingPrompt || isProcessing || !prompt ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-[#302b45]'} transition-colors`}
+                onClick={handleImprovePrompt}
+                disabled={isImprovingPrompt || isProcessing || !prompt}
+              >
+                {isImprovingPrompt ? (
+                  <Loader2 className="h-4 w-4 animate-spin text-white/70" />
+                ) : (
+                  <MagicWandIcon />
+                )}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="bg-[#242038] border-purple-500/30">
+              <p>Enhance prompt with AI</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
       
       <Input id="reference-image" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={isUploading || workflow === 'no-reference'} ref={fileInputRef} />
