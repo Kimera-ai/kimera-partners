@@ -11,17 +11,21 @@ interface PageHeaderProps {
 }
 
 export const PageHeader: React.FC<PageHeaderProps> = ({ 
-  title, 
   credits, 
   isLoadingCredits, 
   CREDITS_PER_GENERATION,
   showCredits
 }) => {
   return (
-    <div className="flex flex-col items-center justify-center mb-6 gap-3">
-      <h1 className="text-2xl font-bold tracking-tight text-white">
-        What will you create?
-      </h1>
+    <div className="flex items-center justify-between w-full mb-6 px-4">
+      <div className="flex items-center gap-2">
+        <span className="bg-gradient-to-r from-[#D946EF] to-[#9b87f5] bg-clip-text text-transparent text-lg font-semibold">
+          Image
+        </span>
+        <span className="text-lg text-white font-semibold">
+          Creation
+        </span>
+      </div>
       {showCredits && (
         <CreditDisplay 
           credits={credits} 

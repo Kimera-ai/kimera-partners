@@ -8,16 +8,15 @@ interface CreditDisplayProps {
   CREDITS_PER_GENERATION: number;
 }
 
-export const CreditDisplay = ({ credits, isLoadingCredits, CREDITS_PER_GENERATION }: CreditDisplayProps) => {
+export const CreditDisplay = ({ credits, isLoadingCredits }: CreditDisplayProps) => {
   return (
-    <div className="flex items-center justify-center gap-3 w-full flex-wrap">
-      <div className="flex items-center gap-2 backdrop-blur px-4 py-2 rounded-full bg-background/50 border border-white/5">
-        <Coins className="w-4 h-4 text-yellow-500" />
-        <span className={`text-sm font-bold ${credits !== null && credits < CREDITS_PER_GENERATION ? 'text-red-500' : 'text-[#F4F4F5]'}`}>
-          {isLoadingCredits ? <Loader2 className="w-4 h-4 animate-spin" /> : `${credits ?? 0} credits`}
-        </span>
-      </div>
-      {/* Cost per generation element has been hidden */}
+    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900/50 border border-zinc-800">
+      <span className="bg-[#D946EF] w-5 h-5 rounded-full flex items-center justify-center">
+        <Coins className="w-3 h-3 text-white" />
+      </span>
+      <span className="text-sm text-white font-medium">
+        {isLoadingCredits ? <Loader2 className="w-4 h-4 animate-spin" /> : credits?.toLocaleString() ?? '0'}
+      </span>
     </div>
   );
 };
