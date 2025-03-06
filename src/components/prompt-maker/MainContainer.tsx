@@ -23,15 +23,15 @@ export const MainContainer = forwardRef<HTMLDivElement, MainContainerProps>(
           />
         </div>
         
-        <div className="relative z-10 overflow-visible flex-1">
-          {children}
-        </div>
-        
         {sidebar && (
-          <div className="relative z-20 h-screen sticky top-0 overflow-y-auto">
+          <div className="relative z-20 h-screen sticky top-0 overflow-y-auto w-[260px] bg-[#1A1625] border-r border-white/10">
             {sidebar}
           </div>
         )}
+        
+        <div className="relative z-10 overflow-visible flex-1 bg-[#141220]">
+          {children}
+        </div>
       </div>
     );
   }

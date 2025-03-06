@@ -34,30 +34,27 @@ export const GenerateButtonPanel = ({
     if ((workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl) return "Upload an image";
     if (credits !== null && credits < CREDITS_PER_GENERATION) return "Insufficient Credits";
     if (isLoadingCredits) return "Loading Credits...";
-    return `Generate (${totalCost} credits)`;
+    return `Generate`;
   };
 
   return (
-    <>
-      <button 
-        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-md font-medium 
-        bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 
+    <button 
+      className="flex items-center justify-center gap-2 py-2 px-6 rounded-md font-medium 
+        bg-gradient-to-r from-purple-500 to-pink-500
         disabled:opacity-50 disabled:cursor-not-allowed"
-        disabled={isButtonDisabled}
-        onClick={handleGenerate}
-        type="button"
-      >
-        <Sparkles className="w-4 h-4 text-white" />
-        <span className="text-white">
-          {getButtonText()}
+      disabled={isButtonDisabled}
+      onClick={handleGenerate}
+      type="button"
+    >
+      <Sparkles className="w-4 h-4 text-white" />
+      <span className="text-white text-sm">
+        {getButtonText()}
+      </span>
+      {!isButtonDisabled && (
+        <span className="ml-1 bg-white/20 text-white text-xs px-1.5 py-0.5 rounded-full">
+          {totalCost}
         </span>
-      </button>
-
-      {credits !== null && credits < CREDITS_PER_GENERATION && (
-        <div className="text-sm text-red-400 bg-red-950/20 border border-red-500/20 p-3 rounded-md mt-3">
-          You don't have enough credits to generate images. Please contact support@kimera.ai to purchase more credits.
-        </div>
       )}
-    </>
+    </button>
   );
 };

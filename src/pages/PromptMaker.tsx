@@ -1,3 +1,4 @@
+
 import { useState, useRef } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { useSession } from "@/hooks/useSession";
@@ -82,7 +83,6 @@ const PromptMaker = () => {
   );
 
   useScrollToLatestJob(latestJobRef, jobRefs, generationJobs);
-
   const { handleDownload } = useImageDownloader();
 
   const handleImageClick = (generation: any) => {
@@ -115,16 +115,18 @@ const PromptMaker = () => {
   return (
     <BaseLayout>
       <MainContainer containerRef={containerRef} sidebar={sidebarContent}>
-        <div className="max-w-3xl mx-auto px-4 py-6">
-          <PageHeader 
-            title="Kimera Image Generation"
-            credits={credits}
-            isLoadingCredits={isLoadingCredits}
-            CREDITS_PER_GENERATION={CREDITS_PER_GENERATION}
-            showCredits={!!session?.user}
-          />
+        <div className="w-full h-full p-6">
+          <div className="mb-6">
+            <PageHeader 
+              title="Kimera Image Generation"
+              credits={credits}
+              isLoadingCredits={isLoadingCredits}
+              CREDITS_PER_GENERATION={CREDITS_PER_GENERATION}
+              showCredits={!!session?.user}
+            />
+          </div>
 
-          <div className="space-y-6">
+          <div className="max-w-4xl mx-auto space-y-6">
             <ControlPanel
               prompt={prompt}
               setPrompt={setPrompt}

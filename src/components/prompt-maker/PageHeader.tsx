@@ -18,7 +18,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   showCredits
 }) => {
   return (
-    <div className="flex flex-col items-center justify-center max-w-2xl mx-auto mb-6 gap-3">
+    <div className="flex flex-col items-center justify-center mb-6 gap-3">
       <h1 className="text-2xl font-bold tracking-tight text-white">
         What will you create?
       </h1>

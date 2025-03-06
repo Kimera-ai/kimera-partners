@@ -2,142 +2,95 @@
 import React from "react";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { GenerationSettings } from "../types";
-import { Info, Square, RectangleHorizontal, RectangleVertical } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 type RatioAndImagesPanelProps = Pick<GenerationSettings, "ratio" | "setRatio" | "numberOfImages" | "setNumberOfImages"> & {
   CREDITS_PER_GENERATION: number;
-};
-
-// Helper component to render aspect ratio icon based on ratio value
-const AspectRatioIcon = ({ ratio }: { ratio: string }) => {
-  switch (ratio) {
-    case "1:1":
-      return <Square className="h-5 w-5 mr-2 text-white/80 group-hover:text-[#FF2B6E]" />;
-    case "4:3":
-    case "16:9":
-    case "3:2":
-      return <RectangleHorizontal className="h-5 w-5 mr-2 text-white/80 group-hover:text-[#FF2B6E]" />;
-    case "3:4":
-    case "2:3":
-      return <RectangleVertical className="h-5 w-5 mr-2 text-white/80 group-hover:text-[#FF2B6E]" />;
-    default:
-      return <Square className="h-5 w-5 mr-2 text-white/80 group-hover:text-[#FF2B6E]" />;
-  }
 };
 
 export const RatioAndImagesPanel = ({ 
   ratio, 
   setRatio, 
   numberOfImages, 
-  setNumberOfImages, 
-  CREDITS_PER_GENERATION 
+  setNumberOfImages,
+  CREDITS_PER_GENERATION
 }: RatioAndImagesPanelProps) => {
   return (
-    <div className="grid grid-cols-2 gap-4">
-      <div className="space-y-2">
-        <div className="flex items-center gap-1.5">
-          <Label htmlFor="ratio" className="text-sm font-medium block text-white/80 text-left">Aspect Ratio</Label>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Info className="h-4 w-4 text-white/60 hover:text-white/80 cursor-help transition-colors" />
-              </TooltipTrigger>
-              <TooltipContent className="bg-background/90 border-white/10 text-white">
-                <p>Determines the shape and dimensions of your image</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+    <div className="p-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-white/10">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7.5 15.5V13.25M10.5 15.5V10.5M13.5 15.5V12.25M16.5 15.5V9.5M5.25 21H18.75C19.9926 21 21 19.9926 21 18.75V5.25C21 4.00736 19.9926 3 18.75 3H5.25C4.00736 3 3 4.00736 3 5.25V18.75C3 19.9926 4.00736 21 5.25 21Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </span>
+          <span className="text-sm text-white/80 font-medium">Image Dimensions</span>
         </div>
-        <Select value={ratio} onValueChange={setRatio}>
-          <SelectTrigger id="ratio" className="w-full bg-background/50 border-white/10 text-white">
-            <SelectValue placeholder="Select ratio">
-              {ratio && (
-                <div className="flex items-center">
-                  <AspectRatioIcon ratio={ratio} />
-                  <span>{getAspectRatioLabel(ratio)}</span>
-                </div>
-              )}
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent className="bg-background border-white/10 text-white">
-            <SelectItem value="1:1" className="flex items-center group">
-              <Square className="h-5 w-5 mr-2 text-white/80 group-hover:text-[#FF2B6E]" />
-              <span>Square (1:1)</span>
-            </SelectItem>
-            <SelectItem value="4:3" className="flex items-center group">
-              <RectangleHorizontal className="h-5 w-5 mr-2 text-white/80 group-hover:text-[#FF2B6E]" />
-              <span>Landscape (4:3)</span>
-            </SelectItem>
-            <SelectItem value="3:4" className="flex items-center group">
-              <RectangleVertical className="h-5 w-5 mr-2 text-white/80 group-hover:text-[#FF2B6E]" />
-              <span>Portrait (3:4)</span>
-            </SelectItem>
-            <SelectItem value="16:9" className="flex items-center group">
-              <RectangleHorizontal className="h-5 w-5 mr-2 text-white/80 group-hover:text-[#FF2B6E]" />
-              <span>Widescreen (16:9)</span>
-            </SelectItem>
-            <SelectItem value="2:3" className="flex items-center group">
-              <RectangleVertical className="h-5 w-5 mr-2 text-white/80 group-hover:text-[#FF2B6E]" />
-              <span>Portrait (2:3)</span>
-            </SelectItem>
-            <SelectItem value="3:2" className="flex items-center group">
-              <RectangleHorizontal className="h-5 w-5 mr-2 text-white/80 group-hover:text-[#FF2B6E]" />
-              <span>Landscape (3:2)</span>
-            </SelectItem>
-          </SelectContent>
-        </Select>
+        <ChevronDown className="w-4 h-4 text-white/60" />
       </div>
-
-      <div className="space-y-2">
-        <div className="flex items-center gap-1.5">
-          <Label htmlFor="numberOfImages" className="text-sm font-medium block text-white/80 text-left">
-            Number of Images
-          </Label>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Info className="h-4 w-4 text-white/60 hover:text-white/80 cursor-help transition-colors" />
-              </TooltipTrigger>
-              <TooltipContent className="bg-background/90 border-white/10 text-white">
-                <p>Choose how many variations to generate in one batch</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+      
+      <div className="mt-3 grid grid-cols-4 gap-2">
+        <button className={`flex items-center justify-center aspect-[2/3] rounded-md ${ratio === '2:3' ? 'bg-purple-500/30 border-purple-500' : 'bg-[#141220] border-white/10'} border transition-colors`}>
+          <span className="text-xs text-white">2:3</span>
+        </button>
+        <button className={`flex items-center justify-center aspect-square rounded-md ${ratio === '1:1' ? 'bg-purple-500/30 border-purple-500' : 'bg-[#141220] border-white/10'} border transition-colors`}>
+          <span className="text-xs text-white">1:1</span>
+        </button>
+        <button className={`flex items-center justify-center aspect-[16/9] rounded-md ${ratio === '16:9' ? 'bg-purple-500/30 border-purple-500' : 'bg-[#141220] border-white/10'} border transition-colors`}>
+          <span className="text-xs text-white">16:9</span>
+        </button>
+        <button className={`flex items-center justify-center aspect-square rounded-md bg-[#141220] border-white/10 border transition-colors`}>
+          <span className="text-xs text-white">More</span>
+        </button>
+      </div>
+      
+      <div className="grid grid-cols-3 gap-2 mt-3">
+        <button className={`py-1 px-2 rounded-md border ${numberOfImages === '1' ? 'bg-purple-500/30 border-purple-500' : 'bg-[#141220] border-white/10'}`}>
+          <span className="text-xs text-white">Small</span>
+          <div className="text-[10px] text-white/60">1184×672</div>
+        </button>
+        <button className={`py-1 px-2 rounded-md border ${numberOfImages === '2' ? 'bg-purple-500/30 border-purple-500' : 'bg-[#141220] border-white/10'}`}>
+          <span className="text-xs text-white">Medium</span>
+          <div className="text-[10px] text-white/60">1376×784</div>
+        </button>
+        <button className={`py-1 px-2 rounded-md border ${numberOfImages === '4' ? 'bg-purple-500/30 border-purple-500' : 'bg-[#141220] border-white/10'}`}>
+          <span className="text-xs text-white">Large</span>
+          <div className="text-[10px] text-white/60">1472×832</div>
+        </button>
+      </div>
+      
+      <div className="mt-4">
+        <div className="flex items-center gap-1.5 mb-2">
+          <Label htmlFor="numberOfImages" className="text-sm font-medium text-white/80">Number of Images</Label>
         </div>
-        <Select value={numberOfImages} onValueChange={setNumberOfImages}>
-          <SelectTrigger id="numberOfImages" className="w-full bg-background/50 border-white/10 text-white">
-            <SelectValue placeholder="Select number of images" />
-          </SelectTrigger>
-          <SelectContent className="bg-background border-white/10 text-white">
-            <SelectItem value="1">1 image</SelectItem>
-            <SelectItem value="2">2 images</SelectItem>
-            <SelectItem value="3">3 images</SelectItem>
-            <SelectItem value="4">4 images</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="grid grid-cols-4 gap-2">
+          <button 
+            className={`flex justify-center py-1.5 rounded border ${numberOfImages === '1' ? 'bg-purple-500/30 border-purple-500' : 'bg-[#141220] border-white/10'}`}
+            onClick={() => setNumberOfImages('1')}
+          >
+            <span className="text-xs text-white">1</span>
+          </button>
+          <button 
+            className={`flex justify-center py-1.5 rounded border ${numberOfImages === '2' ? 'bg-purple-500/30 border-purple-500' : 'bg-[#141220] border-white/10'}`}
+            onClick={() => setNumberOfImages('2')}
+          >
+            <span className="text-xs text-white">2</span>
+          </button>
+          <button 
+            className={`flex justify-center py-1.5 rounded border ${numberOfImages === '3' ? 'bg-purple-500/30 border-purple-500' : 'bg-[#141220] border-white/10'}`}
+            onClick={() => setNumberOfImages('3')}
+          >
+            <span className="text-xs text-white">3</span>
+          </button>
+          <button 
+            className={`flex justify-center py-1.5 rounded border ${numberOfImages === '4' ? 'bg-purple-500/30 border-purple-500' : 'bg-[#141220] border-white/10'}`}
+            onClick={() => setNumberOfImages('4')}
+          >
+            <span className="text-xs text-white">4</span>
+          </button>
+        </div>
       </div>
     </div>
   );
-};
-
-// Helper function to get the label text
-const getAspectRatioLabel = (ratio: string): string => {
-  switch (ratio) {
-    case "1:1":
-      return "Square (1:1)";
-    case "4:3":
-      return "Landscape (4:3)";
-    case "3:4":
-      return "Portrait (3:4)";
-    case "16:9":
-      return "Widescreen (16:9)";
-    case "2:3":
-      return "Portrait (2:3)";
-    case "3:2":
-      return "Landscape (3:2)";
-    default:
-      return ratio;
-  }
 };
