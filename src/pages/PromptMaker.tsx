@@ -15,6 +15,7 @@ import { MainContainer } from "@/components/prompt-maker/MainContainer";
 import { PageHeader } from "@/components/prompt-maker/PageHeader";
 import { JobsContainer } from "@/components/prompt-maker/JobsContainer";
 import { Sidebar } from "@/components/prompt-maker/Sidebar";
+import { GeneratedImageData } from "@/components/prompt-maker/GenerationJob";
 
 const PromptMaker = () => {
   const { session } = useSession();
@@ -90,6 +91,23 @@ const PromptMaker = () => {
     setShowPromptDialog(true);
   };
 
+  // New function to handle clicks on images in the GenerationJobs component
+  const handleGeneratedImageClick = (imageData: GeneratedImageData) => {
+    // Convert the image data to the same format as expected by PromptDialog
+    const generationData = {
+      image_url: imageData.url,
+      prompt: prompt,
+      style: style,
+      ratio: ratio,
+      lora_scale: loraScale,
+      seed: imageData.seed,
+      pipeline_id: imageData.pipeline_id,
+      created_at: new Date().toISOString()
+    };
+    
+    handleImageClick(generationData);
+  };
+
   const sidebarContent = (
     <Sidebar
       workflow={workflow}
@@ -160,6 +178,7 @@ const PromptMaker = () => {
               generationJobs={generationJobs}
               formatTime={formatTime}
               handleDownload={handleDownload}
+              onImageClick={handleGeneratedImageClick}
               jobRefs={jobRefs}
             />
           </div>
