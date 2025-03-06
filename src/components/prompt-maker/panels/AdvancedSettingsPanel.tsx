@@ -48,19 +48,27 @@ export const AdvancedSettingsPanel = ({
               <Label htmlFor="seed" className="text-sm font-medium text-white/80">Seed</Label>
             </TooltipTrigger>
             <TooltipContent side="right" className="bg-[#242038] border-purple-500/30 max-w-xs text-white">
-              <p>Seed determines the initial randomness of the generation. Use -1 for random results, or set a specific number to recreate the same image later.</p>
+              <p>Seed determines the initial randomness of the generation. Use "random" or -1 for random results, or set a specific number to recreate the same image later.</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-        <Input 
-          id="seed" 
-          type="number" 
-          value={seed} 
-          onChange={(e) => setSeed(e.target.value)}
-          min={-1}
-          placeholder="-1 for random"
-          className="bg-[#141220] border-white/10 text-white"
-        />
+        <div className="flex gap-2">
+          <Input 
+            id="seed" 
+            type="text" 
+            value={seed} 
+            onChange={(e) => setSeed(e.target.value)}
+            placeholder="random or number"
+            className="bg-[#141220] border-white/10 text-white flex-1"
+          />
+          <button
+            onClick={() => setSeed("random")}
+            className="px-2 py-1 text-xs bg-[#242038] hover:bg-[#302b45] text-white/80 rounded border border-white/10 transition-colors"
+          >
+            Random
+          </button>
+        </div>
+        <p className="text-xs text-white/50 mt-1">Type "random" or -1 for random seed, or any number for consistent results</p>
       </div>
       
       {/* Hiding Private Mode toggle */}

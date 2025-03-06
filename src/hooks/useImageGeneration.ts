@@ -148,6 +148,9 @@ export const useImageGeneration = (
       
       // Only create the number of requests that match the numberOfImages selection
       for (let i = 0; i < numImagesToGenerate; i++) {
+        // Fix: Properly handle random seed value
+        const seedValue = currentSeed === "random" ? -1 : parseInt(currentSeed);
+        
         const requestBody = {
           pipeline_id: getPipelineId(),
           imageUrl: currentUploadedImageUrl || defaultImageUrl,
@@ -156,9 +159,11 @@ export const useImageGeneration = (
           data: {
             lora_scale: parseFloat(currentLoraScale),
             style: currentStyle,
-            seed: currentSeed === "random" ? -1 : 1234
+            seed: seedValue
           }
         };
+        
+        console.log(`Request for image ${i+1} with seed:`, seedValue);
         
         generateRequests.push(fetch('https://api.kimera.ai/v1/pipeline/run', {
           method: 'POST',
