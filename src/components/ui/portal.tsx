@@ -100,7 +100,7 @@ export const Navigation = () => {
               <NavLink href="/prompt-maker">
                 <div className="flex items-center gap-1">
                   <Sparkles className="h-4 w-4" />
-                  <span>Prompt Maker</span>
+                  <span>Image Creation</span>
                 </div>
               </NavLink>
               <NavLink href="/api">
@@ -162,7 +162,7 @@ export const Navigation = () => {
               <NavLink href="/prompt-maker" onClick={closeMobileMenu}>
                 <div className="flex items-center gap-1">
                   <Sparkles className="h-4 w-4" />
-                  <span>Prompt Maker</span>
+                  <span>Image Creation</span>
                 </div>
               </NavLink>
               <NavLink href="/api" onClick={closeMobileMenu}>
