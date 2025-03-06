@@ -1,6 +1,6 @@
 
-import { Clock, Loader2, Share2 } from "lucide-react";
-import React, { forwardRef } from "react";
+import { Clock, Loader2, Share2, Check } from "lucide-react";
+import React, { forwardRef, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 
@@ -34,6 +34,7 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
   ({ job, formatTime, handleDownload, onImageClick }, ref) => {
     const validImages = job.generatedImages.filter(img => img !== null) as GeneratedImageData[];
     const { toast } = useToast();
+    const [copiedImageUrl, setCopiedImageUrl] = useState<string | null>(null);
     
     console.log(`Job ${job.id}: completed=${job.isCompleted}, validImages=${validImages.length}`);
     
@@ -50,6 +51,15 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
       try {
         // Create a shareable link from the image URL
         await navigator.clipboard.writeText(imageUrl);
+        
+        // Set copied state to show feedback
+        setCopiedImageUrl(imageUrl);
+        
+        // Reset after 2 seconds
+        setTimeout(() => {
+          setCopiedImageUrl(null);
+        }, 2000);
+        
         toast({
           title: "Link copied!",
           description: "Image link has been copied to clipboard",
@@ -123,14 +133,18 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
                     </svg>
                   </button>
                   <button 
-                    className="bg-white/10 hover:bg-white/20 text-white p-1 rounded-full transition-colors"
+                    className={`bg-white/10 hover:bg-white/20 text-white p-1 rounded-full transition-colors ${copiedImageUrl === imageData.url ? 'bg-green-500/50 text-white' : ''}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       handleShare(imageData.url);
                     }}
                     title="Copy image link"
                   >
-                    <Share2 size={20} />
+                    {copiedImageUrl === imageData.url ? (
+                      <Check size={20} />
+                    ) : (
+                      <Share2 size={20} />
+                    )}
                   </button>
                 </div>
               </div>
