@@ -3,7 +3,7 @@ import React from "react";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
-import { GenerationSettings, CreditInfo } from "../types";
+import { GenerationSettings } from "../types";
 import { Info, Square, RectangleHorizontal, RectangleVertical } from "lucide-react";
 
 type RatioAndImagesPanelProps = Pick<GenerationSettings, "ratio" | "setRatio" | "numberOfImages" | "setNumberOfImages"> & {
@@ -14,16 +14,16 @@ type RatioAndImagesPanelProps = Pick<GenerationSettings, "ratio" | "setRatio" | 
 const AspectRatioIcon = ({ ratio }: { ratio: string }) => {
   switch (ratio) {
     case "1:1":
-      return <Square className="h-5 w-5 mr-2 text-white/80" />;
+      return <Square className="h-5 w-5 mr-2 text-white/80 group-hover:text-[#FF2B6E]" />;
     case "4:3":
     case "16:9":
     case "3:2":
-      return <RectangleHorizontal className="h-5 w-5 mr-2 text-white/80" />;
+      return <RectangleHorizontal className="h-5 w-5 mr-2 text-white/80 group-hover:text-[#FF2B6E]" />;
     case "3:4":
     case "2:3":
-      return <RectangleVertical className="h-5 w-5 mr-2 text-white/80" />;
+      return <RectangleVertical className="h-5 w-5 mr-2 text-white/80 group-hover:text-[#FF2B6E]" />;
     default:
-      return <Square className="h-5 w-5 mr-2 text-white/80" />;
+      return <Square className="h-5 w-5 mr-2 text-white/80 group-hover:text-[#FF2B6E]" />;
   }
 };
 
@@ -62,28 +62,28 @@ export const RatioAndImagesPanel = ({
             </SelectValue>
           </SelectTrigger>
           <SelectContent className="bg-background border-white/10 text-white">
-            <SelectItem value="1:1" className="flex items-center">
-              <Square className="h-5 w-5 mr-2 text-white/80" />
+            <SelectItem value="1:1" className="flex items-center group">
+              <Square className="h-5 w-5 mr-2 text-white/80 group-hover:text-[#FF2B6E]" />
               <span>Square (1:1)</span>
             </SelectItem>
-            <SelectItem value="4:3" className="flex items-center">
-              <RectangleHorizontal className="h-5 w-5 mr-2 text-white/80" />
+            <SelectItem value="4:3" className="flex items-center group">
+              <RectangleHorizontal className="h-5 w-5 mr-2 text-white/80 group-hover:text-[#FF2B6E]" />
               <span>Landscape (4:3)</span>
             </SelectItem>
-            <SelectItem value="3:4" className="flex items-center">
-              <RectangleVertical className="h-5 w-5 mr-2 text-white/80" />
+            <SelectItem value="3:4" className="flex items-center group">
+              <RectangleVertical className="h-5 w-5 mr-2 text-white/80 group-hover:text-[#FF2B6E]" />
               <span>Portrait (3:4)</span>
             </SelectItem>
-            <SelectItem value="16:9" className="flex items-center">
-              <RectangleHorizontal className="h-5 w-5 mr-2 text-white/80" />
+            <SelectItem value="16:9" className="flex items-center group">
+              <RectangleHorizontal className="h-5 w-5 mr-2 text-white/80 group-hover:text-[#FF2B6E]" />
               <span>Widescreen (16:9)</span>
             </SelectItem>
-            <SelectItem value="2:3" className="flex items-center">
-              <RectangleVertical className="h-5 w-5 mr-2 text-white/80" />
+            <SelectItem value="2:3" className="flex items-center group">
+              <RectangleVertical className="h-5 w-5 mr-2 text-white/80 group-hover:text-[#FF2B6E]" />
               <span>Portrait (2:3)</span>
             </SelectItem>
-            <SelectItem value="3:2" className="flex items-center">
-              <RectangleHorizontal className="h-5 w-5 mr-2 text-white/80" />
+            <SelectItem value="3:2" className="flex items-center group">
+              <RectangleHorizontal className="h-5 w-5 mr-2 text-white/80 group-hover:text-[#FF2B6E]" />
               <span>Landscape (3:2)</span>
             </SelectItem>
           </SelectContent>

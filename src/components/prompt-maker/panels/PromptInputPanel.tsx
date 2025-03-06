@@ -6,10 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2, Info } from "lucide-react";
 import { ImagePreview } from "../ImagePreview";
-import { PromptSettings, ImageSettings } from "../types";
+import { PromptSettings, ImageSettings, GenerationSettings } from "../types";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Separator } from "@/components/ui/separator";
-type PromptInputPanelProps = PromptSettings & ImageSettings & {
+
+type PromptInputPanelProps = PromptSettings & 
+  Pick<ImageSettings, "imagePreview" | "isUploading" | "handleImageUpload" | "removeImage" | "uploadedImageUrl"> & {
   isProcessing: boolean;
   workflow: string;
 };
@@ -32,6 +34,7 @@ const MagicWandIcon = () => <svg width="16" height="16" viewBox="0 0 31 35" fill
       </clipPath>
     </defs>
   </svg>;
+
 export const PromptInputPanel = ({
   prompt,
   setPrompt,

@@ -64,16 +64,23 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
             setPrompt={setPrompt} 
             isImprovingPrompt={isImprovingPrompt} 
             handleImprovePrompt={handleImprovePrompt} 
+            imagePreview={imagePreview}
+            isUploading={isUploading}
+            handleImageUpload={handleImageUpload}
+            removeImage={removeImage}
+            isProcessing={isProcessing}
+            workflow={workflow}
+            uploadedImageUrl={uploadedImageUrl}
           />
           
           {/* Workflow selection (no-reference, with-reference, cartoon) */}
           <WorkflowPanel 
             workflow={workflow} 
-            setWorkflow={setWorkflow} 
-            imagePreview={imagePreview} 
-            isUploading={isUploading} 
-            handleImageUpload={handleImageUpload} 
-            removeImage={removeImage} 
+            setWorkflow={setWorkflow}
+            imagePreview={imagePreview}
+            isUploading={isUploading}
+            handleImageUpload={handleImageUpload}
+            removeImage={removeImage}
           />
         </div>
         
@@ -84,7 +91,8 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
             ratio={ratio} 
             setRatio={setRatio} 
             numberOfImages={numberOfImages} 
-            setNumberOfImages={setNumberOfImages} 
+            setNumberOfImages={setNumberOfImages}
+            CREDITS_PER_GENERATION={CREDITS_PER_GENERATION}
           />
           
           {/* Style selection */}

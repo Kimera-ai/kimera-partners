@@ -2,13 +2,14 @@
 import React from "react";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { GenerationSettings } from "../types";
+import { GenerationSettings, ImageSettings } from "../types";
 import { Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-type WorkflowPanelProps = Pick<GenerationSettings, "workflow" | "setWorkflow">;
+type WorkflowPanelProps = Pick<GenerationSettings, "workflow" | "setWorkflow"> & 
+  Pick<ImageSettings, "imagePreview" | "isUploading" | "handleImageUpload" | "removeImage">;
 
-export const WorkflowPanel = ({ workflow, setWorkflow }: WorkflowPanelProps) => {
+export const WorkflowPanel = ({ workflow, setWorkflow, imagePreview, isUploading, handleImageUpload, removeImage }: WorkflowPanelProps) => {
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-1.5">
