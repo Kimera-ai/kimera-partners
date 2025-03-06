@@ -130,6 +130,7 @@ const PromptMaker = () => {
             credits={credits}
             isLoadingCredits={isLoadingCredits}
             uploadedImageUrl={uploadedImageUrl}
+            CREDITS_PER_GENERATION={CREDITS_PER_GENERATION}
           />
 
           {/* Generation Jobs */}

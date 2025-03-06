@@ -8,6 +8,7 @@ interface GenerateButtonPanelProps extends CreditInfo, GenerationState {
   isUploading: boolean;
   workflow: string;
   uploadedImageUrl: string | null;
+  numberOfImages: string;
 }
 
 export const GenerateButtonPanel = ({
@@ -18,25 +19,29 @@ export const GenerateButtonPanel = ({
   CREDITS_PER_GENERATION,
   isLoadingCredits,
   isProcessing,
-  handleGenerate
+  handleGenerate,
+  numberOfImages
 }: GenerateButtonPanelProps) => {
   const isButtonDisabled = isUploading || 
     ((workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl) || 
     (credits !== null && credits < CREDITS_PER_GENERATION) || 
     isLoadingCredits;
 
+  const numImages = parseInt(numberOfImages) || 1;
+  const totalCost = CREDITS_PER_GENERATION * numImages;
+
   const getButtonText = () => {
     if (isUploading) return "Uploading...";
     if ((workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl) return "Upload an image";
     if (credits !== null && credits < CREDITS_PER_GENERATION) return "Insufficient Credits";
     if (isLoadingCredits) return "Loading Credits...";
-    return "Generate";
+    return `Generate (${totalCost} credits)`;
   };
 
   return (
     <>
       <Button 
-        className="w-full bg-[#FF2B6E] hover:bg-[#FF068B] text-white disabled:bg-[#C8C8C9] disabled:text-gray-600 disabled:opacity-80" 
+        className="w-full bg-gradient-to-r from-[#9b87f5] to-[#7E69AB] hover:from-[#8B5CF6] hover:to-[#6E59A5] text-white disabled:bg-[#C8C8C9] disabled:text-gray-600 disabled:opacity-80 disabled:bg-none" 
         disabled={isButtonDisabled}
         onClick={handleGenerate}
         type="button"

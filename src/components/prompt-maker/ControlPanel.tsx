@@ -1,49 +1,33 @@
-import React, { useRef } from "react";
-import { Card } from "@/components/ui/card";
-import { WorkflowPanel } from "./panels/WorkflowPanel";
-import { StylePanel } from "./panels/StylePanel";
-import { RatioAndImagesPanel } from "./panels/RatioAndImagesPanel";
-import { AdvancedSettingsPanel } from "./panels/AdvancedSettingsPanel";
+
+import React from "react";
 import { PromptInputPanel } from "./panels/PromptInputPanel";
+import { WorkflowPanel } from "./panels/WorkflowPanel";
+import { RatioAndImagesPanel } from "./panels/RatioAndImagesPanel";
+import { StylePanel } from "./panels/StylePanel";
+import { AdvancedSettingsPanel } from "./panels/AdvancedSettingsPanel";
 import { GenerateButtonPanel } from "./panels/GenerateButtonPanel";
-interface ControlPanelProps {
-  prompt: string;
-  setPrompt: (prompt: string) => void;
-  imagePreview: string | null;
-  isUploading: boolean;
-  isProcessing: boolean;
-  isImprovingPrompt: boolean;
-  handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
-  removeImage: (e: React.MouseEvent) => void;
-  handleImprovePrompt: () => Promise<void>;
-  handleGenerate: () => Promise<void>;
-  workflow: string;
-  setWorkflow: (workflow: string) => void;
-  ratio: string;
-  setRatio: (ratio: string) => void;
-  style: string;
-  setStyle: (style: string) => void;
-  loraScale: string;
-  setLoraScale: (loraScale: string) => void;
-  seed: string;
-  setSeed: (seed: string) => void;
-  numberOfImages: string;
-  setNumberOfImages: (numberOfImages: string) => void;
-  credits: number | null;
-  isLoadingCredits: boolean;
-  uploadedImageUrl: string | null;
+import { CreditInfo, GenerationSettings, GenerationState, ImageSettings, PromptSettings } from "./types";
+
+interface ControlPanelProps extends 
+  PromptSettings, 
+  ImageSettings, 
+  GenerationSettings, 
+  GenerationState,
+  CreditInfo {
+    isUploading: boolean;
+    isProcessing: boolean;
+    CREDITS_PER_GENERATION: number;
 }
-export const ControlPanel = ({
+
+export const ControlPanel: React.FC<ControlPanelProps> = ({
   prompt,
   setPrompt,
+  isImprovingPrompt,
+  handleImprovePrompt,
   imagePreview,
   isUploading,
-  isProcessing,
-  isImprovingPrompt,
   handleImageUpload,
   removeImage,
-  handleImprovePrompt,
-  handleGenerate,
   workflow,
   setWorkflow,
   ratio,
@@ -56,24 +40,81 @@ export const ControlPanel = ({
   setSeed,
   numberOfImages,
   setNumberOfImages,
+  isProcessing,
+  handleGenerate,
   credits,
   isLoadingCredits,
+  CREDITS_PER_GENERATION,
   uploadedImageUrl
-}: ControlPanelProps) => {
-  const CREDITS_PER_GENERATION = 14;
-  return <Card className="p-6 backdrop-blur border border-white/5 shadow-lg max-w-2xl mx-auto bg-[#17151e]">
-      <div className="space-y-4">
-        <PromptInputPanel prompt={prompt} setPrompt={setPrompt} isImprovingPrompt={isImprovingPrompt} handleImprovePrompt={handleImprovePrompt} imagePreview={imagePreview} isUploading={isUploading} isProcessing={isProcessing} handleImageUpload={handleImageUpload} removeImage={removeImage} workflow={workflow} uploadedImageUrl={uploadedImageUrl} />
-
-        <WorkflowPanel workflow={workflow} setWorkflow={setWorkflow} />
-
-        <StylePanel style={style} setStyle={setStyle} />
-
-        <RatioAndImagesPanel ratio={ratio} setRatio={setRatio} numberOfImages={numberOfImages} setNumberOfImages={setNumberOfImages} CREDITS_PER_GENERATION={CREDITS_PER_GENERATION} />
-
-        <AdvancedSettingsPanel loraScale={loraScale} setLoraScale={setLoraScale} seed={seed} setSeed={setSeed} />
-
-        <GenerateButtonPanel isUploading={isUploading} workflow={workflow} uploadedImageUrl={uploadedImageUrl} credits={credits} CREDITS_PER_GENERATION={CREDITS_PER_GENERATION} isLoadingCredits={isLoadingCredits} isProcessing={isProcessing} handleGenerate={handleGenerate} />
+}) => {
+  return (
+    <div className="w-full rounded-xl overflow-hidden border border-white/10 bg-opacity-30 backdrop-blur-lg bg-black/20 shadow-xl">
+      {/* Panel header */}
+      <div className="p-3 bg-black/30 text-left border-b border-white/5">
+        <h2 className="text-white/90 font-medium">Create your image</h2>
       </div>
-    </Card>;
+      
+      {/* Panel body */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+        {/* Left side */}
+        <div className="space-y-4">
+          {/* Prompt input area */}
+          <PromptInputPanel 
+            prompt={prompt} 
+            setPrompt={setPrompt} 
+            isImprovingPrompt={isImprovingPrompt} 
+            handleImprovePrompt={handleImprovePrompt} 
+          />
+          
+          {/* Workflow selection (no-reference, with-reference, cartoon) */}
+          <WorkflowPanel 
+            workflow={workflow} 
+            setWorkflow={setWorkflow} 
+            imagePreview={imagePreview} 
+            isUploading={isUploading} 
+            handleImageUpload={handleImageUpload} 
+            removeImage={removeImage} 
+          />
+        </div>
+        
+        {/* Right side */}
+        <div className="space-y-4">
+          {/* Aspect ratio and number of images */}
+          <RatioAndImagesPanel 
+            ratio={ratio} 
+            setRatio={setRatio} 
+            numberOfImages={numberOfImages} 
+            setNumberOfImages={setNumberOfImages} 
+          />
+          
+          {/* Style selection */}
+          <StylePanel 
+            style={style} 
+            setStyle={setStyle} 
+          />
+          
+          {/* Advanced settings (LoRA scale, seed) */}
+          <AdvancedSettingsPanel 
+            loraScale={loraScale} 
+            setLoraScale={setLoraScale} 
+            seed={seed} 
+            setSeed={setSeed} 
+          />
+          
+          {/* Generate button + credit info */}
+          <GenerateButtonPanel 
+            isUploading={isUploading}
+            workflow={workflow}
+            uploadedImageUrl={uploadedImageUrl}
+            credits={credits}
+            isLoadingCredits={isLoadingCredits}
+            CREDITS_PER_GENERATION={CREDITS_PER_GENERATION}
+            isProcessing={isProcessing}
+            handleGenerate={handleGenerate}
+            numberOfImages={numberOfImages}
+          />
+        </div>
+      </div>
+    </div>
+  );
 };
