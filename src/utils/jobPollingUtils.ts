@@ -1,139 +1,159 @@
-import { supabase } from "@/integrations/supabase/client";
-import { JobPollingConfig, JobStatusResponse } from "@/types/generationJobs";
+
+import { toast } from "sonner";
 import { GenerationJobType } from "@/components/prompt-maker/GenerationJob";
 
-const API_KEY = "1712edc40e3eb72c858332fe7500bf33e885324f8c1cd52b8cded2cdfd724cee";
+interface JobPollingConfig {
+  apiJobId: string;
+  imageIndex: number;
+  jobId: string;
+  jobPrompt: string;
+  jobStyle: string;
+  jobRatio: string;
+  jobLoraScale: string;
+}
 
-export const pollJobStatus = async (
+// Poll the status of a job until it's completed
+export const pollJobStatus = (
   config: JobPollingConfig,
   setGenerationJobs: React.Dispatch<React.SetStateAction<GenerationJobType[]>>,
-  onJobComplete: (completedImages: string[], jobConfig: Omit<JobPollingConfig, 'apiJobId' | 'imageIndex'>) => Promise<void>
+  handleJobComplete: (
+    completedImages: string[], 
+    jobConfig: {
+      jobId: string;
+      jobPrompt: string;
+      jobStyle: string;
+      jobRatio: string;
+      jobLoraScale: string;
+      pipeline_id?: string;
+      seed?: number | string;
+    }
+  ) => void
 ) => {
-  const { jobId, apiJobId, imageIndex, jobPrompt, jobStyle, jobRatio, jobLoraScale } = config;
+  const { apiJobId, imageIndex, jobId, jobPrompt, jobStyle, jobRatio, jobLoraScale } = config;
+  let pollingIntervalId: number;
+  let pollingAttempts = 0;
+  const MAX_POLLING_ATTEMPTS = 60; // 5 minutes at 5-second intervals
   
-  const pollInterval = setInterval(async () => {
+  const pollJob = async () => {
     try {
-      setGenerationJobs(prev => 
-        prev.map(job => 
-          job.id === jobId 
-            ? { ...job, status: `Checking status for image ${imageIndex + 1}...` } 
-            : job
-        )
-      );
-      
-      const statusResponse = await fetch(`https://api.kimera.ai/v1/pipeline/run/${apiJobId}`, {
+      const response = await fetch(`https://api.kimera.ai/v1/pipeline/run/${apiJobId}`, {
+        method: 'GET',
         headers: {
-          'x-api-key': API_KEY
+          'x-api-key': "1712edc40e3eb72c858332fe7500bf33e885324f8c1cd52b8cded2cdfd724cee",
         }
       });
       
-      if (!statusResponse.ok) {
-        clearInterval(pollInterval);
-        
-        setGenerationJobs(prev => 
-          prev.map(job => 
-            job.id === jobId 
-              ? { ...job, status: `Error: Failed to check status for image ${imageIndex + 1}`, isCompleted: true } 
-              : job
-          )
-        );
-        
-        throw new Error(`Failed to check status for image ${imageIndex + 1}`);
+      if (!response.ok) {
+        throw new Error(`Error checking job status: ${response.statusText}`);
       }
       
-      const status: JobStatusResponse = await statusResponse.json();
-      console.log(`Current status for job ${jobId}, image ${imageIndex + 1}:`, status);
+      const data = await response.json();
       
-      let statusMessage = getStatusMessage(status, imageIndex);
-      
-      if (status.status === 'completed') {
-        clearInterval(pollInterval);
+      if (data.status === 'done') {
+        // Job is complete
+        clearInterval(pollingIntervalId);
         
-        setGenerationJobs(prev => {
-          const updatedJobs = prev.map(job => {
+        if (!data.result?.images?.[0]) {
+          throw new Error('No images found in result');
+        }
+        
+        // Extract the image URL from the result
+        const imageUrl = data.result.images[0].url;
+        
+        // Get the response's pipeline_id and seed
+        const pipeline_id = data.pipeline_id;
+        const seed = data.data?.seed;
+        
+        // Mark the job as completed
+        setGenerationJobs(prevJobs => {
+          // Find the job
+          const updatedJobs = prevJobs.map(job => {
             if (job.id === jobId) {
-              const newGeneratedImages = [...job.generatedImages];
-              newGeneratedImages[imageIndex] = status.result || null;
+              // Create a copy of the generatedImages array
+              const updatedImages = [...job.generatedImages];
+              // Update the image at the correct index
+              updatedImages[imageIndex] = imageUrl;
               
-              const newCompletedImages = job.completedImages + 1;
-              const isAllCompleted = newCompletedImages === job.totalImages;
+              // Calculate if all images are completed
+              const completedImagesCount = updatedImages.filter(img => img !== null).length;
+              const allImagesCompleted = completedImagesCount === job.totalImages;
               
-              const jobStatus = isAllCompleted 
-                ? "All images generated successfully!" 
-                : `Completed ${newCompletedImages} of ${job.totalImages} images...`;
-              
+              // Update the job
               return {
                 ...job,
-                generatedImages: newGeneratedImages,
-                completedImages: newCompletedImages,
-                isCompleted: isAllCompleted,
-                displayImages: true,
-                status: jobStatus
+                generatedImages: updatedImages,
+                completedImages: completedImagesCount,
+                status: allImagesCompleted ? "All images generated successfully!" : `Generated ${completedImagesCount} of ${job.totalImages} images...`,
+                isCompleted: allImagesCompleted,
+                displayImages: true, // Always display images once they're available
               };
             }
             return job;
           });
           
+          // Check if all images for this job are now complete
           const currentJob = updatedJobs.find(j => j.id === jobId);
-          if (currentJob && currentJob.completedImages === currentJob.totalImages) {
-            const completedImages = currentJob.generatedImages
-              .filter(img => img !== null)
-              .slice(0, currentJob.totalImages) as string[];
+          if (currentJob && currentJob.isCompleted) {
+            // Filter out null values and get valid image URLs
+            const completedImages = currentJob.generatedImages.filter(img => img !== null) as string[];
             
-            onJobComplete(completedImages, { jobId, jobPrompt, jobStyle, jobRatio, jobLoraScale });
+            // Notify the parent component that all images are complete
+            handleJobComplete(completedImages, {
+              jobId,
+              jobPrompt,
+              jobStyle,
+              jobRatio,
+              jobLoraScale,
+              pipeline_id,
+              seed
+            });
           }
           
           return updatedJobs;
         });
-      } else if (status.status === 'failed' || status.status === 'Error') {
-        clearInterval(pollInterval);
         
-        setGenerationJobs(prev => 
-          prev.map(job => 
-            job.id === jobId 
-              ? { 
-                  ...job, 
-                  status: `Error: Image ${imageIndex + 1} processing failed`, 
-                  isCompleted: true 
-                } 
-              : job
+      } else if (data.status === 'processing') {
+        // Job is still processing, update the status
+        setGenerationJobs(prevJobs => 
+          prevJobs.map(job => 
+            job.id === jobId ? {
+              ...job,
+              status: `Processing image ${imageIndex + 1} of ${job.totalImages}...`
+            } : job
           )
         );
         
-        throw new Error(`Image ${imageIndex + 1} processing failed`);
-      } else {
-        if (statusMessage) {
-          setGenerationJobs(prev => 
-            prev.map(job => 
-              job.id === jobId ? { ...job, status: statusMessage } : job
-            )
-          );
+        // Check if we've exceeded the max number of polling attempts
+        pollingAttempts++;
+        if (pollingAttempts >= MAX_POLLING_ATTEMPTS) {
+          clearInterval(pollingIntervalId);
+          throw new Error(`Generation timeout after ${MAX_POLLING_ATTEMPTS * 5} seconds`);
         }
+      } else if (data.status === 'failed') {
+        // Job failed
+        clearInterval(pollingIntervalId);
+        throw new Error(data.message || 'Generation failed');
       }
-      
     } catch (error) {
-      clearInterval(pollInterval);
-      console.error(`Error polling status for job ${jobId}, image ${imageIndex + 1}:`, error);
+      clearInterval(pollingIntervalId);
+      console.error('Error polling job status:', error);
+      
+      // Update job status to show error
+      setGenerationJobs(prevJobs => 
+        prevJobs.map(job => 
+          job.id === jobId ? {
+            ...job,
+            status: `Error: ${error instanceof Error ? error.message : 'Failed to process image'}`
+          } : job
+        )
+      );
+      
+      // Show toast notification for error
+      toast.error(`Error: ${error instanceof Error ? error.message : 'Failed to process image'}`);
     }
-  }, 5000);
-};
-
-export const getStatusMessage = (status: JobStatusResponse, imageIndex: number): string => {
-  if (status.status === 'pending') {
-    return `Image ${imageIndex + 1}: Waiting in queue...`;
-  } else if (status.status === 'processing') {
-    return `Image ${imageIndex + 1}: Processing...`;
-  } else if (status.status === 'AI Dream') {
-    if (status.progress && status.progress.step && status.progress.total) {
-      return `Image ${imageIndex + 1}: Creating (${status.progress.step}/${status.progress.total})...`;
-    }
-    return `Image ${imageIndex + 1}: Creating image...`;
-  } else if (status.status === 'Face Swap') {
-    if (status.progress && status.progress.step && status.progress.total) {
-      return `Image ${imageIndex + 1}: Applying reference (${status.progress.step}/${status.progress.total})...`;
-    }
-    return `Image ${imageIndex + 1}: Applying reference...`;
-  } else {
-    return `Image ${imageIndex + 1}: ${status.status || "Processing"}: ${status.progress?.step || ""}/${status.progress?.total || ""}`;
-  }
+  };
+  
+  // Poll immediately then every 5 seconds
+  pollJob();
+  pollingIntervalId = setInterval(pollJob, 5000) as unknown as number;
 };

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -40,7 +39,6 @@ export const useImageGeneration = (
     try {
       setIsImprovingPrompt(true);
       
-      // Use direct supabase client import instead of session.supabase
       const { data, error } = await supabase.functions.invoke('improve-prompt', {
         body: { prompt }
       });
@@ -82,7 +80,6 @@ export const useImageGeneration = (
     const numImages = parseInt(numberOfImages);
     const totalCost = CREDITS_PER_GENERATION * numImages;
     
-    // Improved credit check logic
     if (credits === null || isLoadingCredits) {
       toast({
         title: "Loading Credits",
@@ -113,13 +110,10 @@ export const useImageGeneration = (
     }
 
     try {
-      // Create a new job ID for this generation
       const jobId = startNewJob(numImages);
       
-      // Parse the number of images to generate
       const numImagesToGenerate = parseInt(numberOfImages);
       
-      // Update job status
       updateJobStatus(jobId, `Preparing to generate ${numImagesToGenerate} images...`);
       
       const defaultImageUrl = "https://www.jeann.online/cdn-cgi/image/format=jpeg/https://kimera-media.s3.eu-north-1.amazonaws.com/623b36fe-ac7f-4c56-a124-cddb942a38e5_event/623b36fe-ac7f-4c56-a124-cddb942a38e5_source.jpeg";
@@ -134,7 +128,8 @@ export const useImageGeneration = (
         }
       };
       
-      // Update job status
+      const pipelineId = getPipelineId();
+      
       updateJobStatus(jobId, `Sending ${numImagesToGenerate} requests to Kimera API...`);
       
       const generateRequests = [];
@@ -146,13 +141,11 @@ export const useImageGeneration = (
       const currentSeed = seed;
       const currentUploadedImageUrl = uploadedImageUrl;
       
-      // Only create the number of requests that match the numberOfImages selection
       for (let i = 0; i < numImagesToGenerate; i++) {
-        // Fix: Properly handle random seed value
         const seedValue = currentSeed === "random" ? -1 : parseInt(currentSeed);
         
         const requestBody = {
-          pipeline_id: getPipelineId(),
+          pipeline_id: pipelineId,
           imageUrl: currentUploadedImageUrl || defaultImageUrl,
           ratio: currentRatio,
           prompt: `${currentStyle} style: ${currentPrompt}` || `${currentStyle} this image`,
@@ -182,7 +175,6 @@ export const useImageGeneration = (
           const errorData = await responses[i].json();
           console.error(`Pipeline error response for request ${i+1}:`, errorData);
           
-          // Update job status to error
           updateJobStatus(jobId, `Error: Failed to process image ${i+1}`);
           
           throw new Error(`Failed to process image ${i+1}`);
@@ -194,14 +186,12 @@ export const useImageGeneration = (
       
       console.log(`Jobs started with IDs for job ${jobId}:`, apiJobIds);
       
-      // Update job status
       updateJobStatus(jobId, `Processing ${numImagesToGenerate} images...`);
       
       apiJobIds.forEach((apiJobId, index) => {
         pollJobStatus(apiJobId, index, jobId, currentPrompt, currentStyle, currentRatio, currentLoraScale);
       });
       
-      // Update credits after generation is started - with improved error handling
       const creditUpdateSuccess = await updateUserCredits(CREDITS_PER_GENERATION * numImagesToGenerate);
       if (!creditUpdateSuccess) {
         toast({
@@ -210,7 +200,6 @@ export const useImageGeneration = (
           description: "Failed to update credits, but your generation request was submitted."
         });
       } else {
-        // Update local credits state immediately to reflect the change
         setCredits(prevCredits => (prevCredits !== null ? prevCredits - (CREDITS_PER_GENERATION * numImagesToGenerate) : null));
       }
       

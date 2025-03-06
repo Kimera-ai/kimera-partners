@@ -36,13 +36,16 @@ export const storeGeneratedImages = async (
   session: any,
   completedImages: string[],
   jobConfig: {
+    jobId: string;
     jobPrompt: string;
     jobStyle: string;
     jobRatio: string;
     jobLoraScale: string;
+    pipeline_id?: string;
+    seed?: number | string;
   }
 ) => {
-  const { jobPrompt, jobStyle, jobRatio, jobLoraScale } = jobConfig;
+  const { jobPrompt, jobStyle, jobRatio, jobLoraScale, pipeline_id, seed } = jobConfig;
   
   try {
     await Promise.all(completedImages.map(imageUrl => 
@@ -52,7 +55,9 @@ export const storeGeneratedImages = async (
         prompt: jobPrompt,
         style: jobStyle,
         ratio: jobRatio,
-        lora_scale: jobLoraScale
+        lora_scale: jobLoraScale,
+        pipeline_id: pipeline_id,
+        seed: seed
       })
     ));
     return true;
