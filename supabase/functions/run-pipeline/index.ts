@@ -43,6 +43,16 @@ serve(async (req) => {
 
     const data = await response.json();
 
+    // Ensure pipeline_id is included in the response
+    if (!data.pipeline_id) {
+      data.pipeline_id = PIPELINE_ID;
+    }
+
+    // Ensure seed is included in the response
+    if (!data.seed && data.data?.seed !== undefined) {
+      data.seed = String(data.data.seed);
+    }
+
     return new Response(
       JSON.stringify(data),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

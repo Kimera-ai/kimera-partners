@@ -58,6 +58,9 @@ export const storeGeneratedImages = async (
       seed
     });
     
+    // Convert any seed value to string before storing
+    const seedString = seed !== undefined ? String(seed) : null;
+    
     await Promise.all(completedImages.map(imageUrl => 
       supabase.from('generated_images').insert({
         user_id: session?.user?.id,
@@ -66,8 +69,8 @@ export const storeGeneratedImages = async (
         style: jobStyle,
         ratio: jobRatio,
         lora_scale: jobLoraScale,
-        pipeline_id: pipeline_id,
-        seed: seed
+        pipeline_id: pipeline_id || null,
+        seed: seedString
       })
     ));
     return true;

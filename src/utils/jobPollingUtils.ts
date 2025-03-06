@@ -68,7 +68,8 @@ export const pollJobStatus = (
         
         // Get the response's pipeline_id and seed
         const responsePipelineId = data.pipeline_id;
-        const responseSeed = data.data?.seed;
+        // Ensure seed is treated as a string
+        const responseSeed = data.data?.seed !== undefined ? String(data.data.seed) : (seed !== undefined ? String(seed) : null);
         
         // Mark the job as completed
         setGenerationJobs(prevJobs => {
@@ -112,7 +113,7 @@ export const pollJobStatus = (
               jobRatio,
               jobLoraScale,
               pipeline_id: responsePipelineId || pipeline_id,
-              seed: responseSeed || seed
+              seed: responseSeed
             });
           }
           
