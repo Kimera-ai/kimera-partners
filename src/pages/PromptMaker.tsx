@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { useSession } from "@/hooks/useSession";
@@ -14,6 +13,7 @@ import { PromptDialog } from "@/components/prompt-maker/PromptDialog";
 import { MainContainer } from "@/components/prompt-maker/MainContainer";
 import { PageHeader } from "@/components/prompt-maker/PageHeader";
 import { JobsContainer } from "@/components/prompt-maker/JobsContainer";
+import { Sidebar } from "@/components/prompt-maker/Sidebar";
 
 const PromptMaker = () => {
   const { session } = useSession();
@@ -81,7 +81,6 @@ const PromptMaker = () => {
     uploadedImageUrl
   );
 
-  // Use the custom hook for scrolling to the latest job
   useScrollToLatestJob(latestJobRef, jobRefs, generationJobs);
 
   const { handleDownload } = useImageDownloader();
@@ -91,59 +90,80 @@ const PromptMaker = () => {
     setShowPromptDialog(true);
   };
 
+  const sidebarContent = (
+    <Sidebar
+      workflow={workflow}
+      setWorkflow={setWorkflow}
+      ratio={ratio}
+      setRatio={setRatio}
+      style={style}
+      setStyle={setStyle}
+      loraScale={loraScale}
+      setLoraScale={setLoraScale}
+      seed={seed}
+      setSeed={setSeed}
+      numberOfImages={numberOfImages}
+      setNumberOfImages={setNumberOfImages}
+      imagePreview={imagePreview}
+      isUploading={isUploading}
+      handleImageUpload={handleImageUpload}
+      removeImage={removeImage}
+      CREDITS_PER_GENERATION={CREDITS_PER_GENERATION}
+    />
+  );
+
   return (
     <BaseLayout>
-      <MainContainer containerRef={containerRef}>
-        <PageHeader 
-          title="Kimera Image Generation"
-          credits={credits}
-          isLoadingCredits={isLoadingCredits}
-          CREDITS_PER_GENERATION={CREDITS_PER_GENERATION}
-          showCredits={!!session?.user}
-        />
-
-        <div className="space-y-6">
-          {/* Control Panel */}
-          <ControlPanel
-            prompt={prompt}
-            setPrompt={setPrompt}
-            imagePreview={imagePreview}
-            isUploading={isUploading}
-            isProcessing={isProcessing}
-            isImprovingPrompt={isImprovingPrompt}
-            handleImageUpload={handleImageUpload}
-            removeImage={removeImage}
-            handleImprovePrompt={handleImprovePrompt}
-            handleGenerate={handleGenerate}
-            workflow={workflow}
-            setWorkflow={setWorkflow}
-            ratio={ratio}
-            setRatio={setRatio}
-            style={style}
-            setStyle={setStyle}
-            loraScale={loraScale}
-            setLoraScale={setLoraScale}
-            seed={seed}
-            setSeed={setSeed}
-            numberOfImages={numberOfImages}
-            setNumberOfImages={setNumberOfImages}
+      <MainContainer containerRef={containerRef} sidebar={sidebarContent}>
+        <div className="max-w-3xl mx-auto px-4 py-6">
+          <PageHeader 
+            title="Kimera Image Generation"
             credits={credits}
             isLoadingCredits={isLoadingCredits}
-            uploadedImageUrl={uploadedImageUrl}
             CREDITS_PER_GENERATION={CREDITS_PER_GENERATION}
+            showCredits={!!session?.user}
           />
 
-          {/* Generation Jobs */}
-          <JobsContainer 
-            generationJobs={generationJobs}
-            formatTime={formatTime}
-            handleDownload={handleDownload}
-            jobRefs={jobRefs}
-          />
+          <div className="space-y-6">
+            <ControlPanel
+              prompt={prompt}
+              setPrompt={setPrompt}
+              imagePreview={imagePreview}
+              isUploading={isUploading}
+              isProcessing={isProcessing}
+              isImprovingPrompt={isImprovingPrompt}
+              handleImageUpload={handleImageUpload}
+              removeImage={removeImage}
+              handleImprovePrompt={handleImprovePrompt}
+              handleGenerate={handleGenerate}
+              workflow={workflow}
+              setWorkflow={setWorkflow}
+              ratio={ratio}
+              setRatio={setRatio}
+              style={style}
+              setStyle={setStyle}
+              loraScale={loraScale}
+              setLoraScale={setLoraScale}
+              seed={seed}
+              setSeed={setSeed}
+              numberOfImages={numberOfImages}
+              setNumberOfImages={setNumberOfImages}
+              credits={credits}
+              isLoadingCredits={isLoadingCredits}
+              uploadedImageUrl={uploadedImageUrl}
+              CREDITS_PER_GENERATION={CREDITS_PER_GENERATION}
+            />
+
+            <JobsContainer 
+              generationJobs={generationJobs}
+              formatTime={formatTime}
+              handleDownload={handleDownload}
+              jobRefs={jobRefs}
+            />
+          </div>
         </div>
       </MainContainer>
 
-      {/* Previous Generations (History) as side drawer */}
       <PreviousGenerations 
         previousGenerations={previousGenerations} 
         handleImageClick={handleImageClick}
@@ -151,7 +171,6 @@ const PromptMaker = () => {
         setIsHistoryOpen={setIsHistoryOpen}
       />
 
-      {/* Prompt Dialog */}
       <PromptDialog 
         showPromptDialog={showPromptDialog}
         setShowPromptDialog={setShowPromptDialog}

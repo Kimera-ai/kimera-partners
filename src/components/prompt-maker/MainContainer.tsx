@@ -5,12 +5,13 @@ import React, { forwardRef } from "react";
 interface MainContainerProps {
   children: React.ReactNode;
   containerRef: React.RefObject<HTMLDivElement>;
+  sidebar?: React.ReactNode;
 }
 
 export const MainContainer = forwardRef<HTMLDivElement, MainContainerProps>(
-  ({ children, containerRef }, ref) => {
+  ({ children, containerRef, sidebar }, ref) => {
     return (
-      <div className="relative min-h-screen overflow-visible" ref={containerRef}>
+      <div className="relative min-h-screen overflow-visible flex" ref={containerRef}>
         <div className="absolute inset-0 pointer-events-none">
           <DotPattern 
             width={24} 
@@ -22,9 +23,15 @@ export const MainContainer = forwardRef<HTMLDivElement, MainContainerProps>(
           />
         </div>
         
-        <div className="relative z-10 overflow-visible">
+        <div className="relative z-10 overflow-visible flex-1">
           {children}
         </div>
+        
+        {sidebar && (
+          <div className="relative z-20 h-screen sticky top-0 overflow-y-auto">
+            {sidebar}
+          </div>
+        )}
       </div>
     );
   }

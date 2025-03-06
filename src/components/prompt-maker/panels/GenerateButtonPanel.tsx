@@ -1,6 +1,5 @@
 
 import React from "react";
-import { Button } from "@/components/ui/button";
 import { Sparkles } from "lucide-react";
 import { CreditInfo, GenerationState } from "../types";
 
@@ -55,7 +54,7 @@ export const GenerateButtonPanel = ({
       </button>
 
       {credits !== null && credits < CREDITS_PER_GENERATION && (
-        <div className="text-sm text-red-400 bg-red-950/20 border border-red-500/20 p-3 rounded-md">
+        <div className="text-sm text-red-400 bg-red-950/20 border border-red-500/20 p-3 rounded-md mt-3">
           You don't have enough credits to generate images. Please contact support@kimera.ai to purchase more credits.
         </div>
       )}
