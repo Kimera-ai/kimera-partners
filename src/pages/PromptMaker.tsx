@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { useSession } from "@/hooks/useSession";
@@ -91,9 +90,7 @@ const PromptMaker = () => {
     setShowPromptDialog(true);
   };
 
-  // New function to handle clicks on images in the GenerationJobs component
   const handleGeneratedImageClick = (imageData: GeneratedImageData) => {
-    // Convert the image data to the same format as expected by PromptDialog
     const generationData = {
       image_url: imageData.url,
       prompt: prompt,
