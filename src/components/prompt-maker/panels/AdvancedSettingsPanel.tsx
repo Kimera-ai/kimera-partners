@@ -14,6 +14,12 @@ export const AdvancedSettingsPanel = ({
   seed, 
   setSeed 
 }: AdvancedSettingsPanelProps) => {
+  // Function to generate a random seed between 1 and 2147483647 (max positive 32-bit integer)
+  const generateRandomSeed = () => {
+    const randomSeed = Math.floor(Math.random() * 2147483647) + 1;
+    setSeed(randomSeed.toString());
+  };
+
   return (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -62,7 +68,7 @@ export const AdvancedSettingsPanel = ({
             className="bg-[#141220] border-white/10 text-white flex-1"
           />
           <button
-            onClick={() => setSeed("random")}
+            onClick={generateRandomSeed}
             className="px-2 py-1 text-xs bg-[#242038] hover:bg-[#302b45] text-white/80 rounded border border-white/10 transition-colors"
           >
             Random
