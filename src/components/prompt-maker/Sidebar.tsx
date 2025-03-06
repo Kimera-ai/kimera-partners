@@ -5,7 +5,7 @@ import { RatioAndImagesPanel } from "./panels/RatioAndImagesPanel";
 import { StylePanel } from "./panels/StylePanel";
 import { AdvancedSettingsPanel } from "./panels/AdvancedSettingsPanel";
 import { GenerationSettings, ImageSettings } from "./types";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, HelpCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -103,7 +103,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className="text-sm text-white/80 font-medium">Advanced Settings</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-sm text-white/80 font-medium">Advanced Settings</span>
+                    <HelpCircle size={14} className="text-white/60" />
+                  </div>
                 </TooltipTrigger>
                 <TooltipContent side="right" className="bg-[#242038] border-purple-500/30 text-white">
                   <p>Fine-tune your generation with advanced parameters like LoRA Scale and Seed</p>

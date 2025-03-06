@@ -3,7 +3,7 @@ import React from "react";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { GenerationSettings, ImageSettings } from "../types";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, HelpCircle } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 type WorkflowPanelProps = Pick<GenerationSettings, "workflow" | "setWorkflow"> & 
@@ -21,7 +21,10 @@ export const WorkflowPanel = ({ workflow, setWorkflow, imagePreview, isUploading
           </span>
           <TooltipProvider>
             <Tooltip>
-              <TooltipTrigger className="text-sm text-white/80 font-medium">Mode / Preset</TooltipTrigger>
+              <TooltipTrigger className="flex items-center gap-1.5">
+                <span className="text-sm text-white/80 font-medium">Mode / Preset</span>
+                <HelpCircle size={14} className="text-white/60" />
+              </TooltipTrigger>
               <TooltipContent side="right" className="bg-[#242038] border-purple-500/30 text-white">
                 <p>Select generation mode: <br />
                 • Image Generator: Create images from scratch <br />

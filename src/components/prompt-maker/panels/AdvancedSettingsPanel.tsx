@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { GenerationSettings } from "../types";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { HelpCircle } from "lucide-react";
 
 type AdvancedSettingsPanelProps = Pick<GenerationSettings, "loraScale" | "setLoraScale" | "seed" | "setSeed">;
 
@@ -27,7 +28,10 @@ export const AdvancedSettingsPanel = ({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Label htmlFor="loraScale" className="text-sm font-medium text-white/80">LoRA Scale</Label>
+                <div className="flex items-center gap-1.5">
+                  <Label htmlFor="loraScale" className="text-sm font-medium text-white/80">LoRA Scale</Label>
+                  <HelpCircle size={14} className="text-white/60" />
+                </div>
               </TooltipTrigger>
               <TooltipContent side="right" className="bg-[#242038] border-purple-500/30 max-w-xs text-white">
                 <p>Controls the strength of style adaptation. Higher values make the style more prominent, while lower values produce more subtle effects.</p>
@@ -51,7 +55,10 @@ export const AdvancedSettingsPanel = ({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Label htmlFor="seed" className="text-sm font-medium text-white/80">Seed</Label>
+              <div className="flex items-center gap-1.5">
+                <Label htmlFor="seed" className="text-sm font-medium text-white/80">Seed</Label>
+                <HelpCircle size={14} className="text-white/60" />
+              </div>
             </TooltipTrigger>
             <TooltipContent side="right" className="bg-[#242038] border-purple-500/30 max-w-xs text-white">
               <p>Seed determines the initial randomness of the generation. Use "random" or -1 for random results, or set a specific number to recreate the same image later.</p>
