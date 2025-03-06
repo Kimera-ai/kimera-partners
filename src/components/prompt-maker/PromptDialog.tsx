@@ -2,7 +2,8 @@
 import React, { useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { Download, Share2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface PromptDialogProps {
   showPromptDialog: boolean;
@@ -17,6 +18,8 @@ export const PromptDialog = ({
   selectedGeneration,
   handleDownload
 }: PromptDialogProps) => {
+  const { toast } = useToast();
+  
   if (!selectedGeneration) return null;
   
   // Reset pointer events when dialog opens/closes
@@ -31,6 +34,33 @@ export const PromptDialog = ({
       document.body.style.pointerEvents = '';
     };
   }, [showPromptDialog]);
+  
+  const handleShare = async () => {
+    try {
+      const imageUrl = selectedGeneration?.image_url;
+      
+      if (!imageUrl) {
+        throw new Error('No valid image URL to share');
+      }
+      
+      // Copy the URL to clipboard
+      await navigator.clipboard.writeText(imageUrl);
+      
+      toast({
+        title: "Link copied!",
+        description: "Image link has been copied to clipboard",
+        duration: 3000
+      });
+    } catch (error) {
+      console.error('Error sharing image:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to copy link to clipboard",
+        duration: 3000
+      });
+    }
+  };
   
   return (
     <Dialog 
@@ -108,12 +138,21 @@ export const PromptDialog = ({
               </p>
             </div>
             
-            <Button 
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 mt-2" 
-              onClick={() => handleDownload(selectedGeneration?.image_url)}
-            >
-              <Download className="h-4 w-4 mr-2" /> Download Image
-            </Button>
+            <div className="flex gap-2 mt-2">
+              <Button 
+                className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600" 
+                onClick={() => handleDownload(selectedGeneration?.image_url)}
+              >
+                <Download className="h-4 w-4 mr-2" /> Download
+              </Button>
+              <Button 
+                variant="outline" 
+                className="flex-1 border-white/10 hover:bg-white/10"
+                onClick={handleShare}
+              >
+                <Share2 className="h-4 w-4 mr-2" /> Share Link
+              </Button>
+            </div>
           </div>
         </div>
       </DialogContent>
