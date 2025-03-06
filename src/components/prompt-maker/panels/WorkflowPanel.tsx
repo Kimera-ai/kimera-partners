@@ -25,8 +25,8 @@ export const WorkflowPanel = ({ workflow, setWorkflow, imagePreview, isUploading
               <TooltipContent side="right" className="bg-[#242038] border-purple-500/30 text-white">
                 <p>Select generation mode: <br />
                 • Image Generator: Create images from scratch <br />
-                • Reference Mode: Generate based on a reference image <br />
-                • Cartoonify: Convert your image to cartoon style</p>
+                • Face Gen: Generate faces based on an uploaded image <br />
+                • Reference Mode: Use an image as reference for your creation</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -40,8 +40,8 @@ export const WorkflowPanel = ({ workflow, setWorkflow, imagePreview, isUploading
           </SelectTrigger>
           <SelectContent className="bg-[#1D1A27] border-white/10 text-white">
             <SelectItem value="no-reference">Image Generator</SelectItem>
-            <SelectItem value="with-reference">Reference Mode</SelectItem>
-            <SelectItem value="cartoon">Cartoonify</SelectItem>
+            <SelectItem value="with-reference">Face Gen</SelectItem>
+            <SelectItem value="cartoon">Reference Mode</SelectItem>
           </SelectContent>
         </Select>
       </div>

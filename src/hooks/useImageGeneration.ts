@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -115,6 +114,7 @@ export const useImageGeneration = (
           case "with-reference":
             return "FYpcEIUj";
           case "cartoon":
+            return "803a4MBY";
           case "no-reference":
           default:
             return "803a4MBY";
