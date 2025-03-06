@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
-import { Menu, X, Server, Users, Megaphone, DollarSign } from "lucide-react";
+import { Menu, X, Server, Users, Megaphone, DollarSign, Sparkles } from "lucide-react";
 import { useState } from "react";
 
 const NavLink = ({ href, children, onClick }: { href: string; children: React.ReactNode; onClick?: () => void }) => {
@@ -97,6 +97,12 @@ export const Navigation = () => {
                   <span>Pricing</span>
                 </div>
               </NavLink>
+              <NavLink href="/prompt-maker">
+                <div className="flex items-center gap-1">
+                  <Sparkles className="h-4 w-4" />
+                  <span>Prompt Maker</span>
+                </div>
+              </NavLink>
               <NavLink href="/api">
                 <div className="flex items-center gap-1">
                   <Server className="h-4 w-4" />
@@ -151,6 +157,12 @@ export const Navigation = () => {
                 <div className="flex items-center gap-1">
                   <DollarSign className="h-4 w-4" />
                   <span>Pricing</span>
+                </div>
+              </NavLink>
+              <NavLink href="/prompt-maker" onClick={closeMobileMenu}>
+                <div className="flex items-center gap-1">
+                  <Sparkles className="h-4 w-4" />
+                  <span>Prompt Maker</span>
                 </div>
               </NavLink>
               <NavLink href="/api" onClick={closeMobileMenu}>
