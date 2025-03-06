@@ -82,13 +82,13 @@ export const Navigation = () => {
               <NavLink href="/partner-program">
                 <div className="flex items-center gap-1">
                   <Users className="h-4 w-4" />
-                  <span>Partner Program</span>
+                  <span>Program</span>
                 </div>
               </NavLink>
               <NavLink href="/marketing-kit">
                 <div className="flex items-center gap-1">
                   <Megaphone className="h-4 w-4" />
-                  <span>Marketing Kit</span>
+                  <span>Marketing</span>
                 </div>
               </NavLink>
               <NavLink href="/pricing">
@@ -100,7 +100,7 @@ export const Navigation = () => {
               <NavLink href="/prompt-maker">
                 <div className="flex items-center gap-1">
                   <Sparkles className="h-4 w-4" />
-                  <span>Image Creation</span>
+                  <span>Creation</span>
                 </div>
               </NavLink>
               <NavLink href="/api">
@@ -144,13 +144,13 @@ export const Navigation = () => {
               <NavLink href="/partner-program" onClick={closeMobileMenu}>
                 <div className="flex items-center gap-1">
                   <Users className="h-4 w-4" />
-                  <span>Partner Program</span>
+                  <span>Program</span>
                 </div>
               </NavLink>
               <NavLink href="/marketing-kit" onClick={closeMobileMenu}>
                 <div className="flex items-center gap-1">
                   <Megaphone className="h-4 w-4" />
-                  <span>Marketing Kit</span>
+                  <span>Marketing</span>
                 </div>
               </NavLink>
               <NavLink href="/pricing" onClick={closeMobileMenu}>
@@ -162,7 +162,7 @@ export const Navigation = () => {
               <NavLink href="/prompt-maker" onClick={closeMobileMenu}>
                 <div className="flex items-center gap-1">
                   <Sparkles className="h-4 w-4" />
-                  <span>Image Creation</span>
+                  <span>Creation</span>
                 </div>
               </NavLink>
               <NavLink href="/api" onClick={closeMobileMenu}>
@@ -208,3 +208,4 @@ export const Navigation = () => {
     </nav>
   );
 };
+
