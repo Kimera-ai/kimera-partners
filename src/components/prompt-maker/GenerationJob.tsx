@@ -1,4 +1,3 @@
-
 import { Clock, Loader2 } from "lucide-react";
 import React, { forwardRef } from "react";
 import { Card } from "@/components/ui/card";
@@ -16,9 +15,10 @@ export interface GenerationJobType {
   totalImages: number;
   generatedImages: (GeneratedImageData | null)[];
   isCompleted: boolean;
-  displayImages: boolean; // Flag to control when to display images
+  displayImages: boolean;
   startTime: number;
   elapsedTime: number;
+  error?: string | null;
 }
 
 interface GenerationJobProps {
@@ -30,12 +30,10 @@ interface GenerationJobProps {
 
 export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobProps>(
   ({ job, formatTime, handleDownload, onImageClick }, ref) => {
-    // Get non-null images
     const validImages = job.generatedImages.filter(img => img !== null) as GeneratedImageData[];
     
     console.log(`Job ${job.id}: completed=${job.isCompleted}, validImages=${validImages.length}`);
     
-    // Determine grid columns based on number of images
     const getGridClass = (imageCount: number) => {
       switch (imageCount) {
         case 1: return "grid-cols-1";
@@ -45,22 +43,22 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
       }
     };
 
-    // Only show the images grid when there are valid images and 
-    // either all images are completed OR the displayImages flag is true
-    const shouldShowImages = validImages.length > 0 && job.displayImages;
+    const shouldShowImages = validImages.length > 0 && (job.displayImages || job.error);
 
     return (
-      <Card ref={ref} className="p-4 bg-card/40 backdrop-blur border border-white/5 shadow-md mb-4">
+      <Card ref={ref} className={`p-4 bg-card/40 backdrop-blur border ${job.error ? 'border-red-500/20' : 'border-white/5'} shadow-md mb-4`}>
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             {!job.isCompleted ? (
               <Loader2 className="h-4 w-4 text-primary animate-spin" />
+            ) : job.error ? (
+              <div className="h-4 w-4 rounded-full bg-red-500"></div>
             ) : (
               <div className="h-4 w-4 rounded-full bg-green-500"></div>
             )}
-            <div className="font-medium">
-              {job.status} 
-              {job.totalImages > 0 && (
+            <div className={`font-medium ${job.error ? 'text-red-500' : ''}`}>
+              {job.status}
+              {job.totalImages > 0 && !job.error && (
                 <span className="text-muted-foreground ml-1 text-sm">
                   ({job.completedImages}/{job.totalImages} images)
                 </span>
@@ -73,7 +71,6 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
           </div>
         </div>
         
-        {/* Display all images when shouldShowImages is true */}
         {shouldShowImages && (
           <div className={`grid ${getGridClass(validImages.length)} gap-3 mt-3`}>
             {validImages.map((imageData, index) => (
@@ -91,7 +88,7 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
                   <button 
                     className="bg-white/10 hover:bg-white/20 text-white p-1 rounded-full transition-colors"
                     onClick={(e) => {
-                      e.stopPropagation(); // Prevent triggering the parent onClick
+                      e.stopPropagation();
                       handleDownload(imageData.url);
                     }}
                   >

@@ -1,4 +1,3 @@
-
 import { toast } from "sonner";
 import { GenerationJobType } from "@/components/prompt-maker/GenerationJob";
 
@@ -14,7 +13,6 @@ interface JobPollingConfig {
   seed?: number | string;
 }
 
-// Poll the status of a job until it's completed
 export const pollJobStatus = (
   config: JobPollingConfig,
   setGenerationJobs: React.Dispatch<React.SetStateAction<GenerationJobType[]>>,
@@ -35,10 +33,12 @@ export const pollJobStatus = (
   let pollingIntervalId: number;
   let pollingAttempts = 0;
   const MAX_POLLING_ATTEMPTS = 60; // 5 minutes at 5-second intervals
+  const MAX_TIME_WITHOUT_PROGRESS = 30; // 30 polling attempts (2.5 minutes) without progress
+  let lastProgressTime = Date.now();
   
   const pollJob = async () => {
     try {
-      console.log(`Polling job status for ID: ${apiJobId}`);
+      console.log(`Polling job status for ID: ${apiJobId}, attempt ${pollingAttempts + 1}`);
       
       const response = await fetch(`https://api.kimera.ai/v1/pipeline/run/${apiJobId}`, {
         method: 'GET',
@@ -53,9 +53,13 @@ export const pollJobStatus = (
       
       const data = await response.json();
       console.log(`Job status response for ${apiJobId}:`, data);
+
+      // Check for explicit failure states
+      if (data.status === 'failed' || data.status === 'error') {
+        throw new Error(data.message || 'Generation failed');
+      }
       
       if (data.status === 'completed' || data.status === 'done') {
-        // Job is complete
         clearInterval(pollingIntervalId);
         
         if (!data.images?.[0] && !data.result?.images?.[0]) {
@@ -68,52 +72,42 @@ export const pollJobStatus = (
         
         // Get the response's pipeline_id and seed
         const responsePipelineId = data.pipeline_id;
-        // Ensure seed is treated as a string
         const responseSeed = data.data?.seed !== undefined ? String(data.data.seed) : (seed !== undefined ? String(seed) : null);
         
-        // Mark the job as completed
         setGenerationJobs(prevJobs => {
-          // Find the job
           const updatedJobs = prevJobs.map(job => {
             if (job.id === jobId) {
-              // Create a copy of the generatedImages array
               const updatedImages = [...job.generatedImages];
-              // Update the image at the correct index
               updatedImages[imageIndex] = {
                 url: imageUrl,
                 seed: responseSeed,
                 pipeline_id: responsePipelineId || pipeline_id
               };
               
-              // Calculate if all images are completed
               const completedImagesCount = updatedImages.filter(img => img !== null).length;
               const allImagesCompleted = completedImagesCount === job.totalImages;
               
-              // Update the job
               return {
                 ...job,
                 generatedImages: updatedImages,
                 completedImages: completedImagesCount,
                 status: allImagesCompleted ? "All images generated successfully!" : `Generated ${completedImagesCount} of ${job.totalImages} images...`,
                 isCompleted: allImagesCompleted,
-                // Only set displayImages to true when all images are complete
-                displayImages: allImagesCompleted || job.displayImages
+                displayImages: allImagesCompleted,
+                error: null // Clear any error state
               };
             }
             return job;
           });
           
-          // Check if all images for this job are now complete
           const currentJob = updatedJobs.find(j => j.id === jobId);
-          if (currentJob && currentJob.isCompleted) {
-            // Filter out null values and get valid image data
-            const completedImageData = currentJob.generatedImages.filter(img => img !== null) as { url: string, seed: string | null, pipeline_id: string | null }[];
+          if (currentJob?.isCompleted) {
+            const completedImageData = currentJob.generatedImages
+              .filter(img => img !== null) as { url: string, seed: string | null, pipeline_id: string | null }[];
             const completedImageUrls = completedImageData.map(img => img.url);
             
-            // Get the last generated image's metadata for the job
             const lastImage = completedImageData[completedImageData.length - 1];
             
-            // Notify the parent component that all images are complete
             handleJobComplete(completedImageUrls, {
               jobId,
               jobPrompt,
@@ -129,7 +123,9 @@ export const pollJobStatus = (
         });
         
       } else if (data.status === 'processing' || data.status === 'AI Dream' || data.status === 'Image Resize') {
-        // Job is still processing, update the status
+        // Update last progress time when we see the job is still actively processing
+        lastProgressTime = Date.now();
+        
         setGenerationJobs(prevJobs => 
           prevJobs.map(job => 
             job.id === jobId ? {
@@ -139,16 +135,18 @@ export const pollJobStatus = (
           )
         );
         
-        // Check if we've exceeded the max number of polling attempts
         pollingAttempts++;
-        if (pollingAttempts >= MAX_POLLING_ATTEMPTS) {
+        
+        // Check for timeout conditions
+        const timeWithoutProgress = (Date.now() - lastProgressTime) / 1000;
+        if (pollingAttempts >= MAX_POLLING_ATTEMPTS || timeWithoutProgress > MAX_TIME_WITHOUT_PROGRESS * 5) {
           clearInterval(pollingIntervalId);
-          throw new Error(`Generation timeout after ${MAX_POLLING_ATTEMPTS * 5} seconds`);
+          throw new Error(
+            pollingAttempts >= MAX_POLLING_ATTEMPTS 
+              ? `Generation timed out after ${MAX_POLLING_ATTEMPTS * 5} seconds` 
+              : `Generation stuck - no progress for ${Math.floor(timeWithoutProgress)} seconds`
+          );
         }
-      } else if (data.status === 'failed') {
-        // Job failed
-        clearInterval(pollingIntervalId);
-        throw new Error(data.message || 'Generation failed');
       }
     } catch (error) {
       clearInterval(pollingIntervalId);
@@ -159,12 +157,13 @@ export const pollJobStatus = (
         prevJobs.map(job => 
           job.id === jobId ? {
             ...job,
-            status: `Error: ${error instanceof Error ? error.message : 'Failed to process image'}`
+            status: `Error: ${error instanceof Error ? error.message : 'Failed to process image'}`,
+            error: error instanceof Error ? error.message : 'Failed to process image',
+            isCompleted: true // Mark as completed so the UI can show the error state
           } : job
         )
       );
       
-      // Show toast notification for error
       toast.error(`Error: ${error instanceof Error ? error.message : 'Failed to process image'}`);
     }
   };
