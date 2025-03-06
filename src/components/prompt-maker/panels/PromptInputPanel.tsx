@@ -117,7 +117,7 @@ export const PromptInputPanel = ({
       
       <Textarea 
         id="prompt" 
-        placeholder="Two enemy soldiers stand side by side in a dense, misty jungle, their faces filled with fear and tension..." 
+        placeholder="Generate a high-quality, creative, and engaging image about [specific topic]. The tone should be [tone: fun, professional, mysterious, etc.], and it should include [specific details or constraints]. Make it unique and compelling!" 
         value={prompt} 
         onChange={e => setPrompt(e.target.value)} 
         className="min-h-32 resize-none bg-[#141220] border-purple-500/20 rounded-lg text-white pl-14 pr-4"
