@@ -79,7 +79,11 @@ export const pollJobStatus = (
               // Create a copy of the generatedImages array
               const updatedImages = [...job.generatedImages];
               // Update the image at the correct index
-              updatedImages[imageIndex] = imageUrl;
+              updatedImages[imageIndex] = {
+                url: imageUrl,
+                seed: responseSeed,
+                pipeline_id: responsePipelineId || pipeline_id
+              };
               
               // Calculate if all images are completed
               const completedImagesCount = updatedImages.filter(img => img !== null).length;
@@ -92,7 +96,7 @@ export const pollJobStatus = (
                 completedImages: completedImagesCount,
                 status: allImagesCompleted ? "All images generated successfully!" : `Generated ${completedImagesCount} of ${job.totalImages} images...`,
                 isCompleted: allImagesCompleted,
-                // Always show images immediately
+                // Only display images when all are complete or when 2 seconds have passed since the last update
                 displayImages: true,
               };
             }
@@ -102,18 +106,22 @@ export const pollJobStatus = (
           // Check if all images for this job are now complete
           const currentJob = updatedJobs.find(j => j.id === jobId);
           if (currentJob && currentJob.isCompleted) {
-            // Filter out null values and get valid image URLs
-            const completedImages = currentJob.generatedImages.filter(img => img !== null) as string[];
+            // Filter out null values and get valid image data
+            const completedImageData = currentJob.generatedImages.filter(img => img !== null) as { url: string, seed: string | null, pipeline_id: string | null }[];
+            const completedImageUrls = completedImageData.map(img => img.url);
+            
+            // Get the last generated image's metadata for the job
+            const lastImage = completedImageData[completedImageData.length - 1];
             
             // Notify the parent component that all images are complete
-            handleJobComplete(completedImages, {
+            handleJobComplete(completedImageUrls, {
               jobId,
               jobPrompt,
               jobStyle,
               jobRatio,
               jobLoraScale,
-              pipeline_id: responsePipelineId || pipeline_id,
-              seed: responseSeed
+              pipeline_id: lastImage?.pipeline_id || pipeline_id,
+              seed: lastImage?.seed || responseSeed
             });
           }
           

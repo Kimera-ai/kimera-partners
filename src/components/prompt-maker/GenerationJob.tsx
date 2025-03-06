@@ -3,12 +3,18 @@ import { Clock, Loader2 } from "lucide-react";
 import React, { forwardRef } from "react";
 import { Card } from "@/components/ui/card";
 
+export interface GeneratedImageData {
+  url: string;
+  seed: string | null;
+  pipeline_id: string | null;
+}
+
 export interface GenerationJobType {
   id: string;
   status: string;
   completedImages: number;
   totalImages: number;
-  generatedImages: (string | null)[];
+  generatedImages: (GeneratedImageData | null)[];
   isCompleted: boolean;
   displayImages: boolean; // Flag to control when to display images
   startTime: number;
@@ -22,10 +28,10 @@ interface GenerationJobProps {
 }
 
 export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobProps>(({ job, formatTime, handleDownload }, ref) => {
-  // Always display images when they exist - don't rely on the displayImages flag
+  // Always display images when they exist and displayImages is true
   
   // Get non-null images
-  const validImages = job.generatedImages.filter(img => img !== null) as string[];
+  const validImages = job.generatedImages.filter(img => img !== null) as GeneratedImageData[];
   
   console.log(`Job ${job.id}: completed=${job.isCompleted}, validImages=${validImages.length}`);
   
@@ -64,19 +70,19 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
       </div>
       
       {/* Display all images as soon as they're available */}
-      {validImages.length > 0 && (
+      {job.displayImages && validImages.length > 0 && (
         <div className={`grid ${getGridClass(validImages.length)} gap-3 mt-3`}>
-          {validImages.map((imageUrl, index) => (
+          {validImages.map((imageData, index) => (
             <div key={index} className="relative group rounded-md overflow-hidden bg-black aspect-[3/4]">
               <img 
-                src={imageUrl} 
+                src={imageData.url} 
                 alt={`Generated ${index}`} 
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                 <button 
                   className="bg-white/10 hover:bg-white/20 text-white p-1 rounded-full transition-colors"
-                  onClick={() => handleDownload(imageUrl)}
+                  onClick={() => handleDownload(imageData.url)}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
