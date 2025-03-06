@@ -37,10 +37,7 @@ export const useImageGeneration = (
 
   const handleImprovePrompt = async () => {
     if (!prompt) {
-      toast({
-        title: "Empty Prompt",
-        description: "Please enter a prompt to improve",
-        variant: "destructive",
+      toast.error("Please enter a prompt to improve", {
         duration: 5000
       });
       return;
@@ -56,18 +53,13 @@ export const useImageGeneration = (
       
       if (data?.improvedPrompt) {
         setPrompt(data.improvedPrompt);
-        toast({
-          title: "Prompt Improved",
-          description: "Your prompt has been enhanced with more details.",
+        toast.success("Your prompt has been enhanced with more details.", {
           duration: 5000
         });
       }
     } catch (error) {
       console.error('Error improving prompt:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to improve the prompt. Please try again.",
+      toast.error("Failed to improve the prompt. Please try again.", {
         duration: 5000
       });
     } finally {
@@ -77,10 +69,7 @@ export const useImageGeneration = (
 
   const handleGenerate = async () => {
     if (!session?.user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please sign in to generate images.",
-        variant: "destructive",
+      toast.error("Please sign in to generate images.", {
         duration: 5000
       });
       return;
@@ -90,29 +79,21 @@ export const useImageGeneration = (
     const totalCost = CREDITS_PER_GENERATION * numImages;
     
     if (credits === null || isLoadingCredits) {
-      toast({
-        title: "Loading Credits",
-        description: "Please wait while we check your available credits.",
+      toast.info("Please wait while we check your available credits.", {
         duration: 3000
       });
       return;
     }
     
     if (credits < totalCost) {
-      toast({
-        title: "Insufficient Credits",
-        description: `You need ${totalCost} credits to generate ${numImages} ${numImages === 1 ? 'image' : 'images'}, but you only have ${credits}. Please contact support@kimera.ai to purchase more credits.`,
-        variant: "destructive",
+      toast.error(`You need ${totalCost} credits to generate ${numImages} ${numImages === 1 ? 'image' : 'images'}, but you only have ${credits}. Please contact support@kimera.ai to purchase more credits.`, {
         duration: 8000
       });
       return;
     }
 
     if ((workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl) {
-      toast({
-        title: "Image Required",
-        description: `Please upload an image when using the ${workflow === 'with-reference' ? 'Basic with image reference' : 'Cartoon'} workflow.`,
-        variant: "destructive",
+      toast.error(`Please upload an image when using the ${workflow === 'with-reference' ? 'Basic with image reference' : 'Cartoon'} workflow.`, {
         duration: 5000
       });
       return;
@@ -225,11 +206,7 @@ export const useImageGeneration = (
       // Deduct credits for the generation
       const creditUpdateSuccess = await updateUserCredits(CREDITS_PER_GENERATION * numImagesToGenerate);
       if (!creditUpdateSuccess) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to update credits, but your generation request was submitted."
-        });
+        toast.error("Failed to update credits, but your generation request was submitted.");
       } else {
         setCredits(prevCredits => (prevCredits !== null ? prevCredits - (CREDITS_PER_GENERATION * numImagesToGenerate) : null));
       }
