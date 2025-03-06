@@ -22,7 +22,7 @@ export const WorkflowPanel = ({ workflow, setWorkflow, imagePreview, isUploading
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger className="text-sm text-white/80 font-medium">Mode / Preset</TooltipTrigger>
-              <TooltipContent side="right" className="bg-[#242038] border-purple-500/30">
+              <TooltipContent side="right" className="bg-[#242038] border-purple-500/30 text-white">
                 <p>Select generation mode: <br />
                 • Image Generator: Create images from scratch <br />
                 • Reference Mode: Generate based on a reference image <br />

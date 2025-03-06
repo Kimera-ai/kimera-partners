@@ -105,7 +105,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <TooltipTrigger asChild>
                   <span className="text-sm text-white/80 font-medium">Advanced Settings</span>
                 </TooltipTrigger>
-                <TooltipContent side="right" className="bg-[#242038] border-purple-500/30">
+                <TooltipContent side="right" className="bg-[#242038] border-purple-500/30 text-white">
                   <p>Fine-tune your generation with advanced parameters like LoRA Scale and Seed</p>
                 </TooltipContent>
               </Tooltip>
@@ -140,7 +140,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <span className="text-sm">Reset to Defaults</span>
               </button>
             </TooltipTrigger>
-            <TooltipContent side="top" className="bg-[#242038] border-purple-500/30">
+            <TooltipContent side="top" className="bg-[#242038] border-purple-500/30 text-white">
               <p>Restore all settings to their default values</p>
             </TooltipContent>
           </Tooltip>

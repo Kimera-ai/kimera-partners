@@ -21,7 +21,7 @@ export const StylePanel = ({ style, setStyle }: StylePanelProps) => {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger className="text-sm text-white/80 font-medium">Style</TooltipTrigger>
-              <TooltipContent side="right" className="bg-[#242038] border-purple-500/30 max-w-xs">
+              <TooltipContent side="right" className="bg-[#242038] border-purple-500/30 max-w-xs text-white">
                 <p>Select visual style for your images: Cinematic, Animated, Digital Art, etc. Each style influences the final look of your generation.</p>
               </TooltipContent>
             </Tooltip>

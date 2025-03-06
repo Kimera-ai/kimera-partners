@@ -23,7 +23,7 @@ export const AdvancedSettingsPanel = ({
               <TooltipTrigger asChild>
                 <Label htmlFor="loraScale" className="text-sm font-medium text-white/80">LoRA Scale</Label>
               </TooltipTrigger>
-              <TooltipContent side="right" className="bg-[#242038] border-purple-500/30 max-w-xs">
+              <TooltipContent side="right" className="bg-[#242038] border-purple-500/30 max-w-xs text-white">
                 <p>Controls the strength of style adaptation. Higher values make the style more prominent, while lower values produce more subtle effects.</p>
               </TooltipContent>
             </Tooltip>
@@ -47,7 +47,7 @@ export const AdvancedSettingsPanel = ({
             <TooltipTrigger asChild>
               <Label htmlFor="seed" className="text-sm font-medium text-white/80">Seed</Label>
             </TooltipTrigger>
-            <TooltipContent side="right" className="bg-[#242038] border-purple-500/30 max-w-xs">
+            <TooltipContent side="right" className="bg-[#242038] border-purple-500/30 max-w-xs text-white">
               <p>Seed determines the initial randomness of the generation. Use -1 for random results, or set a specific number to recreate the same image later.</p>
             </TooltipContent>
           </Tooltip>

@@ -28,7 +28,7 @@ export const RatioAndImagesPanel = ({
               <TooltipTrigger asChild>
                 <Label htmlFor="numberOfImages" className="text-sm font-medium text-white/80">Number of Images</Label>
               </TooltipTrigger>
-              <TooltipContent side="right" className="bg-[#242038] border-purple-500/30">
+              <TooltipContent side="right" className="bg-[#242038] border-purple-500/30 text-white">
                 <p>Generate multiple variations in a single generation. Each image costs {CREDITS_PER_GENERATION} credits.</p>
               </TooltipContent>
             </Tooltip>
