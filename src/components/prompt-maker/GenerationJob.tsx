@@ -28,8 +28,6 @@ interface GenerationJobProps {
 }
 
 export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobProps>(({ job, formatTime, handleDownload }, ref) => {
-  // Always display images when they exist and displayImages is true
-  
   // Get non-null images
   const validImages = job.generatedImages.filter(img => img !== null) as GeneratedImageData[];
   
@@ -44,6 +42,10 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
       default: return "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4";
     }
   };
+
+  // Only show the images grid when there are valid images and 
+  // either all images are completed OR the displayImages flag is true
+  const shouldShowImages = validImages.length > 0 && job.displayImages;
 
   return (
     <Card ref={ref} className="p-4 bg-card/40 backdrop-blur border border-white/5 shadow-md mb-4">
@@ -69,8 +71,8 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
         </div>
       </div>
       
-      {/* Display all images as soon as they're available */}
-      {job.displayImages && validImages.length > 0 && (
+      {/* Display all images when shouldShowImages is true */}
+      {shouldShowImages && (
         <div className={`grid ${getGridClass(validImages.length)} gap-3 mt-3`}>
           {validImages.map((imageData, index) => (
             <div key={index} className="relative group rounded-md overflow-hidden bg-black aspect-[3/4]">

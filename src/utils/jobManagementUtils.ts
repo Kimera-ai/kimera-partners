@@ -24,7 +24,7 @@ export const createNewJob = (
     totalImages: numImagesToGenerate,
     generatedImages: new Array(numImagesToGenerate).fill(null),
     isCompleted: false,
-    displayImages: true, // Always set to true to show images as soon as they're available
+    displayImages: false, // Initially set to false, will be set to true when all images are complete
     startTime: Date.now(),
     elapsedTime: 0
   };

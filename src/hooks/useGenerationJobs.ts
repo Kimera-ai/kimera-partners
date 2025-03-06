@@ -59,6 +59,15 @@ export const useGenerationJobs = (session: any) => {
     // Add all images to the generatedImages collection at once
     setGeneratedImages(prev => [...prev, ...completedImages]);
     
+    // Set displayImages flag to true for the completed job
+    setGenerationJobs(prevJobs => 
+      prevJobs.map(job => 
+        job.id === jobConfig.jobId 
+          ? { ...job, displayImages: true } 
+          : job
+      )
+    );
+    
     toast({
       title: "Success",
       description: `Job completed! All images have been generated successfully!`,

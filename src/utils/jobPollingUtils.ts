@@ -96,8 +96,8 @@ export const pollJobStatus = (
                 completedImages: completedImagesCount,
                 status: allImagesCompleted ? "All images generated successfully!" : `Generated ${completedImagesCount} of ${job.totalImages} images...`,
                 isCompleted: allImagesCompleted,
-                // Only display images when all are complete or when 2 seconds have passed since the last update
-                displayImages: true,
+                // Only set displayImages to true when all images are complete
+                displayImages: allImagesCompleted || job.displayImages
               };
             }
             return job;
