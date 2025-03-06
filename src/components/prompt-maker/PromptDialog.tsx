@@ -1,8 +1,8 @@
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Download, Share2 } from "lucide-react";
+import { Download, Share2, Check, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface PromptDialogProps {
@@ -19,12 +19,14 @@ export const PromptDialog = ({
   handleDownload
 }: PromptDialogProps) => {
   const { toast } = useToast();
+  const [isCopied, setIsCopied] = useState(false);
   
   // Reset pointer events when dialog opens/closes
   useEffect(() => {
     if (!showPromptDialog) {
       // Ensure pointer events are restored when dialog is closed
       document.body.style.pointerEvents = '';
+      setIsCopied(false); // Reset copy state when dialog closes
     }
     
     return () => {
@@ -41,6 +43,14 @@ export const PromptDialog = ({
       
       // Copy the URL to clipboard
       await navigator.clipboard.writeText(selectedGeneration.image_url);
+      
+      // Set copied state to true
+      setIsCopied(true);
+      
+      // Reset after 2 seconds
+      setTimeout(() => {
+        setIsCopied(false);
+      }, 2000);
       
       toast({
         title: "Link copied!",
@@ -144,10 +154,18 @@ export const PromptDialog = ({
                 </Button>
                 <Button 
                   variant="outline" 
-                  className="flex-1 border-white/10 hover:bg-white/10"
+                  className={`flex-1 border-white/10 hover:bg-white/10 transition-all duration-300 ${isCopied ? 'bg-green-500/20 border-green-500/50 text-green-500' : ''}`}
                   onClick={handleShare}
                 >
-                  <Share2 className="h-4 w-4 mr-2" /> Share Link
+                  {isCopied ? (
+                    <>
+                      <Check className="h-4 w-4 mr-2" /> Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Share2 className="h-4 w-4 mr-2" /> Share Link
+                    </>
+                  )}
                 </Button>
               </div>
             </div>
