@@ -4,7 +4,6 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { GenerationSettings } from "../types";
-import { Switch } from "@/components/ui/switch";
 
 type AdvancedSettingsPanelProps = Pick<GenerationSettings, "loraScale" | "setLoraScale" | "seed" | "setSeed">;
 
@@ -45,14 +44,7 @@ export const AdvancedSettingsPanel = ({
         />
       </div>
       
-      <div className="mt-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Label htmlFor="privateMode" className="text-sm font-medium text-white/80">Private Mode</Label>
-          </div>
-          <Switch id="privateMode" className="data-[state=checked]:bg-purple-500" />
-        </div>
-      </div>
+      {/* Hiding Private Mode toggle */}
     </div>
   );
 };

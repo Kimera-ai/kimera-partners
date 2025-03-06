@@ -1,4 +1,3 @@
-
 import React from "react";
 import { WorkflowPanel } from "./panels/WorkflowPanel";
 import { RatioAndImagesPanel } from "./panels/RatioAndImagesPanel";
@@ -46,30 +45,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         />
       </div>
       
-      {/* Prompt Enhance (similar to the image) */}
-      <div className="bg-[#1D1A27] rounded-lg border border-purple-500/20">
-        <div className="p-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-white/10">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 19L19 12L22 15L15 22L12 19Z" fill="currentColor"/>
-                  <path d="M18 13L16.5 5.5L2 2L5.5 16.5L13 18L18 13Z" fill="currentColor"/>
-                  <circle cx="7.5" cy="7.5" r="2.5" fill="currentColor"/>
-                </svg>
-              </span>
-              <span className="text-sm text-white/80 font-medium">Prompt Enhance</span>
-            </div>
-            <ChevronDown className="w-4 h-4 text-white/60" />
-          </div>
-          <div className="mt-2">
-            <select className="w-full bg-[#141220] border border-white/10 rounded text-white/90 text-sm py-1.5 px-2">
-              <option value="auto">Auto</option>
-              <option value="manual">Manual</option>
-            </select>
-          </div>
-        </div>
-      </div>
+      {/* Hiding Prompt Enhance section */}
       
       {/* Style Panel */}
       <div className="bg-[#1D1A27] rounded-lg border border-purple-500/20">
@@ -79,7 +55,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         />
       </div>
       
-      {/* Image Dimensions Panel */}
+      {/* Hiding Image Dimensions Panel but keeping Number of Images functionality */}
       <div className="bg-[#1D1A27] rounded-lg border border-purple-500/20">
         <RatioAndImagesPanel 
           ratio={ratio} 

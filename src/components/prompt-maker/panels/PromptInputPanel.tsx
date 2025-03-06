@@ -89,24 +89,7 @@ export const PromptInputPanel = ({
           </Tooltip>
         </TooltipProvider>
         
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div 
-                className={`h-8 w-8 rounded-md bg-[#242038] border border-purple-500/30 hover:bg-[#302b45] transition-colors flex items-center justify-center ${isImprovingPrompt || !prompt.trim() ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                onClick={isImprovingPrompt || !prompt.trim() ? undefined : handleImprovePrompt}
-              >
-                {isImprovingPrompt ? 
-                  <Loader2 className="h-4 w-4 animate-spin text-white/70" /> : 
-                  <MagicWandIcon />
-                }
-              </div>
-            </TooltipTrigger>
-            <TooltipContent side="right" className="bg-[#242038] border-purple-500/30">
-              <p>Enhance your prompt with AI</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        {/* Hiding the Prompt Enhance button */}
       </div>
       
       <Input id="reference-image" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={isUploading || workflow === 'no-reference'} ref={fileInputRef} />
