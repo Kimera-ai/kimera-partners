@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { GenerationSettings } from "../types";
 import { ChevronDown } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 type StylePanelProps = Pick<GenerationSettings, "style" | "setStyle">;
 
@@ -17,7 +18,14 @@ export const StylePanel = ({ style, setStyle }: StylePanelProps) => {
               <path d="M2 12C2 10.6868 2 10.0302 2.15224 9.45815C2.35523 8.70032 2.83742 8.05964 3.5 7.6C4.01546 7.25596 4.64725 7.09675 5.5 7.04196C5.5 5.76724 5.5 4.63052 5.5 4.25185C5.5 3.55865 5.5 3.21204 5.59513 2.91191C5.86388 2.07289 6.59243 1.5 7.5 1.5C7.81674 1.5 8.17348 1.58841 8.875 1.75661L9.09974 1.82142C9.65612 1.95685 9.93431 2.02457 10.1746 2.11795C10.5425 2.26461 10.8752 2.48224 11.1507 2.75764C11.3389 2.9458 11.5007 3.15876 11.8964 3.67633L12.103 3.954C12.6918 4.72936 12.9862 5.11704 13.171 5.53064C13.4464 6.15305 13.5616 6.83426 13.5 7.5C14.3499 7.5 15.0499 7.5 15.75 7.5C17.1312 7.5 18 8.36883 18 9.75V10.5H19.5C20.8807 10.5 22 11.6193 22 13V16.5C22 17.8807 20.8807 19 19.5 19H17.25M17.25 19V10.5M17.25 19H15.75M15.75 19H5.25C3.73122 19 2.5 17.7688 2.5 16.25V13.75C2.5 12.2312 3.73122 11 5.25 11H15.75M15.75 19V11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </span>
-          <span className="text-sm text-white/80 font-medium">Style</span>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger className="text-sm text-white/80 font-medium">Style</TooltipTrigger>
+              <TooltipContent side="right" className="bg-[#242038] border-purple-500/30 max-w-xs">
+                <p>Select visual style for your images: Cinematic, Animated, Digital Art, etc. Each style influences the final look of your generation.</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
         <ChevronDown className="w-4 h-4 text-white/60" />
       </div>

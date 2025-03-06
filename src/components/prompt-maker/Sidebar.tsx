@@ -7,6 +7,7 @@ import { AdvancedSettingsPanel } from "./panels/AdvancedSettingsPanel";
 import { GenerationSettings, ImageSettings } from "./types";
 import { ChevronDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface SidebarProps extends 
   Pick<GenerationSettings, "workflow" | "setWorkflow" | "ratio" | "setRatio" | "style" | "setStyle" | "loraScale" | "setLoraScale" | "seed" | "setSeed" | "numberOfImages" | "setNumberOfImages">,
@@ -99,7 +100,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="bg-[#1D1A27] rounded-lg border border-purple-500/20 mb-8">
         <div className="p-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-white/80 font-medium">Advanced Settings</span>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="text-sm text-white/80 font-medium">Advanced Settings</span>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="bg-[#242038] border-purple-500/30">
+                  <p>Fine-tune your generation with advanced parameters like LoRA Scale and Seed</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             <ChevronDown className="w-4 h-4 text-white/60" />
           </div>
           <div className="mt-2 space-y-3">
@@ -115,17 +125,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
       
       {/* Reset to Defaults Button at the bottom */}
       <div className="fixed bottom-4 left-0 w-[260px] px-4">
-        <button 
-          className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-md 
-            bg-[#1D1A27] border border-white/10 text-white/70 hover:bg-[#252031] transition-colors"
-          onClick={handleResetDefaults}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-            <path d="M3 3v5h5"></path>
-          </svg>
-          <span className="text-sm">Reset to Defaults</span>
-        </button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button 
+                className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-md 
+                  bg-[#1D1A27] border border-white/10 text-white/70 hover:bg-[#252031] transition-colors"
+                onClick={handleResetDefaults}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                  <path d="M3 3v5h5"></path>
+                </svg>
+                <span className="text-sm">Reset to Defaults</span>
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="bg-[#242038] border-purple-500/30">
+              <p>Restore all settings to their default values</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
     </div>
   );
