@@ -69,8 +69,10 @@ export type Database = {
           id: string
           image_url: string
           lora_scale: string | null
+          pipeline_id: string | null
           prompt: string | null
           ratio: string | null
+          seed: string | null
           style: string | null
           updated_at: string
           user_id: string | null
@@ -80,8 +82,10 @@ export type Database = {
           id?: string
           image_url: string
           lora_scale?: string | null
+          pipeline_id?: string | null
           prompt?: string | null
           ratio?: string | null
+          seed?: string | null
           style?: string | null
           updated_at?: string
           user_id?: string | null
@@ -91,8 +95,10 @@ export type Database = {
           id?: string
           image_url?: string
           lora_scale?: string | null
+          pipeline_id?: string | null
           prompt?: string | null
           ratio?: string | null
+          seed?: string | null
           style?: string | null
           updated_at?: string
           user_id?: string | null

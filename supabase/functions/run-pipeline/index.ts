@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { imageUrl, prompt, ratio = "2:3" } = await req.json();
+    const { imageUrl, prompt, ratio = "2:3", loraScale = 0.5, style = "Cinematic", seed = -1 } = await req.json();
 
     if (!imageUrl || !prompt) {
       return new Response(
@@ -34,9 +34,9 @@ serve(async (req) => {
         ratio,
         prompt,
         data: {
-          lora_scale: 0.5,
-          style: "Cinematic",
-          seed: -1
+          lora_scale: loraScale,
+          style: style,
+          seed: seed
         }
       })
     });
