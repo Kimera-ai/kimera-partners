@@ -52,6 +52,8 @@ export const useGenerationJobs = (session: any) => {
       jobStyle: string;
       jobRatio: string;
       jobLoraScale: string;
+      pipeline_id?: string;
+      seed?: number | string;
     }
   ) => {
     // Add all images to the generatedImages collection at once
@@ -91,17 +93,20 @@ export const useGenerationJobs = (session: any) => {
     );
   };
 
-  const startJobPolling = (
-    apiJobId: string, 
-    imageIndex: number, 
-    jobId: string, 
-    jobPrompt: string, 
-    jobStyle: string, 
-    jobRatio: string, 
-    jobLoraScale: string
-  ) => {
+  // Update this function to match the expected interface
+  const startJobPolling = (config: {
+    apiJobId: string;
+    imageIndex: number;
+    jobId: string;
+    jobPrompt: string;
+    jobStyle: string;
+    jobRatio: string;
+    jobLoraScale: string;
+    pipeline_id?: string;
+    seed?: number | string;
+  }) => {
     pollJobStatus(
-      { apiJobId, imageIndex, jobId, jobPrompt, jobStyle, jobRatio, jobLoraScale },
+      config,
       setGenerationJobs,
       handleJobComplete
     );

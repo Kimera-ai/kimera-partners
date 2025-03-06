@@ -1,8 +1,7 @@
 
 import { useState } from 'react';
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const CREDITS_PER_GENERATION = 14;
 
@@ -14,7 +13,17 @@ export const useImageGeneration = (
   setCredits: (creditsFn: ((prev: number | null) => number | null)) => void,
   startNewJob: (numImagesToGenerate: number) => string,
   updateJobStatus: (jobId: string, status: string) => void,
-  pollJobStatus: (config: any) => void,
+  pollJobStatus: (config: {
+    apiJobId: string;
+    imageIndex: number;
+    jobId: string;
+    jobPrompt: string;
+    jobStyle: string;
+    jobRatio: string;
+    jobLoraScale: string;
+    pipeline_id?: string;
+    seed?: number | string;
+  }) => void,
   uploadedImageUrl: string | null
 ) => {
   const [workflow, setWorkflow] = useState("no-reference");
@@ -25,8 +34,6 @@ export const useImageGeneration = (
   const [seed, setSeed] = useState("random");
   const [numberOfImages, setNumberOfImages] = useState("1");
   const [isImprovingPrompt, setIsImprovingPrompt] = useState(false);
-
-  const { toast } = useToast();
 
   const handleImprovePrompt = async () => {
     if (!prompt) {
