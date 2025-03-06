@@ -49,7 +49,7 @@ export const GenerateButtonPanel = ({
         type="button"
       >
         <Sparkles className="w-4 h-4 text-white" />
-        <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400">
+        <span className="text-white">
           {getButtonText()}
         </span>
       </button>
