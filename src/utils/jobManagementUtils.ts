@@ -48,6 +48,16 @@ export const storeGeneratedImages = async (
   const { jobPrompt, jobStyle, jobRatio, jobLoraScale, pipeline_id, seed } = jobConfig;
   
   try {
+    console.log("Storing generated images with data:", { 
+      images: completedImages.length,
+      prompt: jobPrompt,
+      style: jobStyle,
+      ratio: jobRatio,
+      lora_scale: jobLoraScale,
+      pipeline_id,
+      seed
+    });
+    
     await Promise.all(completedImages.map(imageUrl => 
       supabase.from('generated_images').insert({
         user_id: session?.user?.id,

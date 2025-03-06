@@ -10,6 +10,8 @@ interface JobPollingConfig {
   jobStyle: string;
   jobRatio: string;
   jobLoraScale: string;
+  pipeline_id?: string;
+  seed?: number | string;
 }
 
 // Poll the status of a job until it's completed
@@ -29,13 +31,15 @@ export const pollJobStatus = (
     }
   ) => void
 ) => {
-  const { apiJobId, imageIndex, jobId, jobPrompt, jobStyle, jobRatio, jobLoraScale } = config;
+  const { apiJobId, imageIndex, jobId, jobPrompt, jobStyle, jobRatio, jobLoraScale, pipeline_id, seed } = config;
   let pollingIntervalId: number;
   let pollingAttempts = 0;
   const MAX_POLLING_ATTEMPTS = 60; // 5 minutes at 5-second intervals
   
   const pollJob = async () => {
     try {
+      console.log(`Polling job status for ID: ${apiJobId}`);
+      
       const response = await fetch(`https://api.kimera.ai/v1/pipeline/run/${apiJobId}`, {
         method: 'GET',
         headers: {
@@ -48,6 +52,7 @@ export const pollJobStatus = (
       }
       
       const data = await response.json();
+      console.log(`Job status response for ${apiJobId}:`, data);
       
       if (data.status === 'done') {
         // Job is complete
@@ -59,10 +64,11 @@ export const pollJobStatus = (
         
         // Extract the image URL from the result
         const imageUrl = data.result.images[0].url;
+        console.log(`Image generated successfully: ${imageUrl}`);
         
         // Get the response's pipeline_id and seed
-        const pipeline_id = data.pipeline_id;
-        const seed = data.data?.seed;
+        const responsePipelineId = data.pipeline_id;
+        const responseSeed = data.data?.seed;
         
         // Mark the job as completed
         setGenerationJobs(prevJobs => {
@@ -104,8 +110,8 @@ export const pollJobStatus = (
               jobStyle,
               jobRatio,
               jobLoraScale,
-              pipeline_id,
-              seed
+              pipeline_id: responsePipelineId || pipeline_id,
+              seed: responseSeed || seed
             });
           }
           
