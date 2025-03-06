@@ -1,5 +1,5 @@
 
-import { GenerationJobType } from "@/components/prompt-maker/GenerationJob";
+import { GenerationJobType } from '@/components/prompt-maker/GenerationJob';
 import { supabase } from "@/integrations/supabase/client";
 
 export const formatTime = (milliseconds: number) => {
@@ -24,7 +24,7 @@ export const createNewJob = (
     totalImages: numImagesToGenerate,
     generatedImages: new Array(numImagesToGenerate).fill(null),
     isCompleted: false,
-    displayImages: false, // Initial flag is false
+    displayImages: true, // Set to true by default to ensure images display when available
     startTime: Date.now(),
     elapsedTime: 0
   };

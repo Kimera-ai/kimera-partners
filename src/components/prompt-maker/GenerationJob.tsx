@@ -22,11 +22,13 @@ interface GenerationJobProps {
 }
 
 export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobProps>(({ job, formatTime, handleDownload }, ref) => {
-  // Display images as soon as they're available if displayImages is true
-  const shouldDisplayImages = job.displayImages || job.isCompleted;
+  // Display images if they are available and the displayImages flag is true
+  const shouldDisplayImages = job.displayImages;
   
   // Get non-null images
   const validImages = job.generatedImages.filter(img => img !== null) as string[];
+  
+  console.log(`Job ${job.id}: display=${shouldDisplayImages}, completed=${job.isCompleted}, validImages=${validImages.length}`);
   
   // Determine grid columns based on number of images
   const getGridClass = (imageCount: number) => {
@@ -62,8 +64,8 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
         </div>
       </div>
       
-      {/* Display images based on shouldDisplayImages flag */}
-      {shouldDisplayImages && validImages.length > 0 && (
+      {/* Display images when they are available */}
+      {validImages.length > 0 && (
         <div className={`grid ${getGridClass(validImages.length)} gap-3 mt-3`}>
           {validImages.map((imageUrl, index) => (
             <div key={index} className="relative group rounded-md overflow-hidden bg-black aspect-[3/4]">

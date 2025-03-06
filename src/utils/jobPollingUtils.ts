@@ -54,16 +54,16 @@ export const pollJobStatus = (
       const data = await response.json();
       console.log(`Job status response for ${apiJobId}:`, data);
       
-      if (data.status === 'done') {
+      if (data.status === 'completed' || data.status === 'done') {
         // Job is complete
         clearInterval(pollingIntervalId);
         
-        if (!data.result?.images?.[0]) {
+        if (!data.images?.[0] && !data.result?.images?.[0]) {
           throw new Error('No images found in result');
         }
         
         // Extract the image URL from the result
-        const imageUrl = data.result.images[0].url;
+        const imageUrl = data.images?.[0] || data.result?.images?.[0];
         console.log(`Image generated successfully: ${imageUrl}`);
         
         // Get the response's pipeline_id and seed
@@ -118,7 +118,7 @@ export const pollJobStatus = (
           return updatedJobs;
         });
         
-      } else if (data.status === 'processing') {
+      } else if (data.status === 'processing' || data.status === 'AI Dream' || data.status === 'Image Resize') {
         // Job is still processing, update the status
         setGenerationJobs(prevJobs => 
           prevJobs.map(job => 
