@@ -40,15 +40,19 @@ export const GenerateButtonPanel = ({
 
   return (
     <>
-      <Button 
-        className="w-full bg-gradient-to-r from-[#9b87f5] to-[#7E69AB] hover:from-[#8B5CF6] hover:to-[#6E59A5] text-white disabled:bg-[#C8C8C9] disabled:text-gray-600 disabled:opacity-80 disabled:bg-none" 
+      <button 
+        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-md font-medium 
+        bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 
+        disabled:opacity-50 disabled:cursor-not-allowed"
         disabled={isButtonDisabled}
         onClick={handleGenerate}
         type="button"
       >
-        <Sparkles className="w-4 h-4 mr-2" />
-        {getButtonText()}
-      </Button>
+        <Sparkles className="w-4 h-4 text-white" />
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400">
+          {getButtonText()}
+        </span>
+      </button>
 
       {credits !== null && credits < CREDITS_PER_GENERATION && (
         <div className="text-sm text-red-400 bg-red-950/20 border border-red-500/20 p-3 rounded-md">
