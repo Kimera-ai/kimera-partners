@@ -10,6 +10,16 @@ interface UserCreditRow {
   last_reset: string | null;
 }
 
+// Define the shape of the data returned from Supabase
+interface SupabaseUserCredit {
+  user_id: string;
+  credits: number;
+  last_reset: string | null;
+  profiles: {
+    email: string;
+  } | null;
+}
+
 export const useUserCreditsTable = () => {
   const [creditRows, setCreditRows] = useState<UserCreditRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -26,14 +36,17 @@ export const useUserCreditsTable = () => {
           user_id,
           credits,
           last_reset,
-          profiles:user_id(email)
+          profiles(email)
         `)
         .order('credits', { ascending: false });
       
       if (error) throw error;
       
       if (data) {
-        const formattedData: UserCreditRow[] = data.map(row => ({
+        // Explicitly cast the data to the expected type
+        const typedData = data as unknown as SupabaseUserCredit[];
+        
+        const formattedData: UserCreditRow[] = typedData.map(row => ({
           id: row.user_id,
           email: row.profiles?.email || 'Unknown',
           credits: row.credits,
