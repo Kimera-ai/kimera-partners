@@ -80,7 +80,7 @@ export const pollJobStatus = (
         
         // Get the response's pipeline_id and seed
         const responsePipelineId = data.pipeline_id;
-        const responseSeed = data.data?.seed !== undefined ? String(data.data.seed) : (seed !== undefined ? String(seed) : null);
+        const extractedSeed = data.data?.seed !== undefined ? String(data.data.seed) : (seed !== undefined ? String(seed) : null);
         
         setGenerationJobs(prevJobs => {
           const updatedJobs = prevJobs.map(job => {
@@ -88,7 +88,7 @@ export const pollJobStatus = (
               const updatedImages = [...job.generatedImages];
               updatedImages[imageIndex] = {
                 url: imageUrl,
-                seed: responseSeed,
+                seed: extractedSeed,
                 pipeline_id: responsePipelineId || pipeline_id
               };
               
@@ -123,7 +123,7 @@ export const pollJobStatus = (
               jobRatio,
               jobLoraScale,
               pipeline_id: lastImage?.pipeline_id || pipeline_id,
-              seed: lastImage?.seed || responseSeed
+              seed: lastImage?.seed || extractedSeed
             });
           }
           
@@ -220,7 +220,7 @@ export const pollJobStatus = (
               jobRatio,
               jobLoraScale,
               pipeline_id: lastImage?.pipeline_id || pipeline_id,
-              seed: lastImage?.seed || responseSeed
+              seed: lastImage?.seed || extractedSeed
             });
           }
         }

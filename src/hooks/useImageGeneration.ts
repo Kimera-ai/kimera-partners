@@ -1,6 +1,8 @@
+
 import { useState } from 'react';
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { GenerationJobType } from '@/components/prompt-maker/GenerationJob';
 
 const CREDITS_PER_GENERATION = 14;
 
@@ -235,20 +237,6 @@ export const useImageGeneration = (
       
       const errorMessage = error instanceof Error ? error.message : "Failed to process image";
       toast.error(errorMessage, { duration: 6000 });
-      
-      setGenerationJobs(prevJobs => {
-        return prevJobs.map(job => {
-          if (job.id === jobId) {
-            return {
-              ...job,
-              status: `Error: ${errorMessage}`,
-              error: errorMessage,
-              isCompleted: true
-            };
-          }
-          return job;
-        });
-      });
     }
   };
 
