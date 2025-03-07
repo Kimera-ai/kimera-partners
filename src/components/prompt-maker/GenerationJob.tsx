@@ -166,6 +166,11 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
                     )}
                   </button>
                 </div>
+                {job.error && job.isCompleted && (
+                  <div className="absolute bottom-0 left-0 right-0 bg-amber-500/20 text-amber-200 text-xs py-1 px-2">
+                    Image {index + 1} generated successfully
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -178,7 +183,7 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
               {job.error}
             </p>
             <p className="mt-1 text-xs text-amber-300/70">
-              Some images were successfully generated.
+              {job.completedImages} of {job.totalImages} images were successfully generated.
             </p>
           </div>
         )}

@@ -34,12 +34,80 @@ export const pollJobStatus = (
   let pollingIntervalId: number;
   let pollingAttempts = 0;
   const MAX_POLLING_ATTEMPTS = 60; // 5 minutes at 5-second intervals
-  const MAX_TIME_WITHOUT_PROGRESS = 24; // 2 minutes without progress
+  const MAX_TIME_WITHOUT_PROGRESS = 24; // 2 minutes without progress (24 * 5 seconds = 2 minutes)
   let lastProgressTime = Date.now();
   let lastStatus = '';
   
   // Define extractedSeed at a higher scope so it's available throughout the function
   let extractedSeed: string | null = null;
+  
+  // Set a timeout for the entire polling operation (2 minutes = 120000ms)
+  const GLOBAL_TIMEOUT = 120000; 
+  const timeoutId = setTimeout(() => {
+    // If we reach this point, the polling is taking too long
+    console.warn(`Global timeout reached for image ${imageIndex} in job ${jobId}`);
+    
+    // Clear the polling interval
+    if (pollingIntervalId) {
+      clearInterval(pollingIntervalId);
+    }
+    
+    // Update the job to show the timeout
+    setGenerationJobs(prevJobs => {
+      return prevJobs.map(job => {
+        if (job.id === jobId) {
+          // Count completed images (non-null entries in the array)
+          const completedImages = job.generatedImages.filter(img => img !== null).length;
+          const hasAnyCompletedImages = completedImages > 0;
+          
+          // If we have any completed images, mark as partial success
+          if (hasAnyCompletedImages) {
+            const updatedStatus = `Completed with ${completedImages}/${job.totalImages} images`;
+            
+            // Get the completed image URLs to pass to the completion handler
+            const completedImageData = job.generatedImages
+              .filter(img => img !== null) as { url: string, seed: string | null, pipeline_id: string | null }[];
+            const completedImageUrls = completedImageData.map(img => img.url);
+            
+            if (completedImageData.length > 0) {
+              const lastImage = completedImageData[completedImageData.length - 1];
+              
+              // Call the completion handler with partial results
+              handleJobComplete(completedImageUrls, {
+                jobId,
+                jobPrompt,
+                jobStyle,
+                jobRatio,
+                jobLoraScale,
+                pipeline_id: lastImage?.pipeline_id || pipeline_id,
+                seed: lastImage?.seed || extractedSeed
+              });
+            }
+            
+            return {
+              ...job,
+              status: updatedStatus,
+              isCompleted: true,
+              displayImages: true,
+              error: `Some images could not be generated (timeout after 2 minutes)`
+            };
+          } else {
+            // If no images completed at all, mark as error
+            return {
+              ...job,
+              status: "Error: Generation timed out",
+              isCompleted: true,
+              error: "Image generation timed out after 2 minutes"
+            };
+          }
+        }
+        return job;
+      });
+    });
+    
+    toast.error(`Generation took too long and was stopped after 2 minutes`);
+    
+  }, GLOBAL_TIMEOUT);
   
   const pollJob = async () => {
     try {
@@ -72,6 +140,7 @@ export const pollJobStatus = (
       
       if (data.status === 'completed' || data.status === 'done') {
         clearInterval(pollingIntervalId);
+        clearTimeout(timeoutId); // Clear the global timeout
         
         if (!data.images?.[0] && !data.result?.images?.[0]) {
           throw new Error('No images found in result');
@@ -165,6 +234,7 @@ export const pollJobStatus = (
         const timeWithoutProgress = (Date.now() - lastProgressTime) / 1000;
         if (pollingAttempts >= MAX_POLLING_ATTEMPTS) {
           clearInterval(pollingIntervalId);
+          clearTimeout(timeoutId); // Clear the global timeout
           throw new Error(`Generation timed out after ${MAX_POLLING_ATTEMPTS * 5} seconds`);
         }
         
@@ -197,10 +267,12 @@ export const pollJobStatus = (
           });
           
           clearInterval(pollingIntervalId);
+          clearTimeout(timeoutId); // Clear the global timeout
         }
       }
     } catch (error) {
       clearInterval(pollingIntervalId);
+      clearTimeout(timeoutId); // Clear the global timeout
       console.error('Error polling job status:', error);
       
       // Update job status to show error
@@ -254,4 +326,13 @@ export const pollJobStatus = (
   // Poll immediately then every 5 seconds
   pollJob();
   pollingIntervalId = setInterval(pollJob, 5000) as unknown as number;
+  
+  // Return a function to manually cancel polling if needed
+  return () => {
+    if (pollingIntervalId) {
+      clearInterval(pollingIntervalId);
+    }
+    clearTimeout(timeoutId);
+  };
 };
+
