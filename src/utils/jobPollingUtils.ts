@@ -88,21 +88,31 @@ export const pollJobStatus = (
         setGenerationJobs(prevJobs => {
           const updatedJobs = prevJobs.map(job => {
             if (job.id === jobId) {
+              // Create a copy of the existing generatedImages array
               const updatedImages = [...job.generatedImages];
+              
+              // Update the specific image at the correct index
               updatedImages[imageIndex] = {
                 url: imageUrl,
                 seed: extractedSeed,
                 pipeline_id: responsePipelineId || pipeline_id
               };
               
+              // Count completed images (non-null entries in the array)
               const completedImagesCount = updatedImages.filter(img => img !== null).length;
+              
+              // Check if all images are complete
               const allImagesCompleted = completedImagesCount === job.totalImages;
               
+              // Always set displayImages to true so images show as they complete
+              // This is key to fixing the issue where some images don't display
               return {
                 ...job,
                 generatedImages: updatedImages,
                 completedImages: completedImagesCount,
-                status: allImagesCompleted ? "All images generated successfully!" : `Generated ${completedImagesCount} of ${job.totalImages} images...`,
+                status: allImagesCompleted 
+                  ? "All images generated successfully!" 
+                  : `Generated ${completedImagesCount} of ${job.totalImages} images...`,
                 isCompleted: allImagesCompleted,
                 displayImages: true, // Always show images as they complete
                 error: null // Clear any error state
@@ -111,14 +121,16 @@ export const pollJobStatus = (
             return job;
           });
           
+          // Check if this was the last image for the job and call handleJobComplete if needed
           const currentJob = updatedJobs.find(j => j.id === jobId);
-          if (currentJob?.isCompleted) {
+          if (currentJob && currentJob.isCompleted) {
             const completedImageData = currentJob.generatedImages
               .filter(img => img !== null) as { url: string, seed: string | null, pipeline_id: string | null }[];
             const completedImageUrls = completedImageData.map(img => img.url);
             
             const lastImage = completedImageData[completedImageData.length - 1];
             
+            // This calls the completion handler for the entire job
             handleJobComplete(completedImageUrls, {
               jobId,
               jobPrompt,
@@ -128,6 +140,9 @@ export const pollJobStatus = (
               pipeline_id: lastImage?.pipeline_id || pipeline_id,
               seed: lastImage?.seed || extractedSeed
             });
+          } else if (currentJob) {
+            // If job isn't complete but this image is done, log for debugging
+            console.log(`Image ${imageIndex + 1}/${currentJob.totalImages} complete for job ${jobId}`);
           }
           
           return updatedJobs;
@@ -169,7 +184,7 @@ export const pollJobStatus = (
                     ...job,
                     status: `Completed with ${completedImages}/${job.totalImages} images (some images timed out)`,
                     isCompleted: true,
-                    displayImages: true,
+                    displayImages: true, // Force display of available images
                     error: `Some images could not be generated (timeout after ${Math.floor(timeWithoutProgress)} seconds)`
                   };
                 } else {
@@ -216,6 +231,7 @@ export const pollJobStatus = (
             const completedImageUrls = completedImageData.map(img => img.url);
             const lastImage = completedImageData[completedImageData.length - 1];
             
+            // Even if there was an error, complete the job with available images
             handleJobComplete(completedImageUrls, {
               jobId,
               jobPrompt,

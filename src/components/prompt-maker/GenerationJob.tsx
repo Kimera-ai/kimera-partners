@@ -76,17 +76,15 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
       }
     };
 
-    // Show images if we have valid images AND the job is either:
-    // 1. Marked for display
-    // 2. Has an error but has some valid images
-    // 3. Is completed
-    const shouldShowImages = validImages.length > 0 && (job.displayImages || job.error || job.isCompleted);
+    // Always show images if we have valid images, regardless of job completion status
+    // This is key to fixing the issue where some images don't display
+    const shouldShowImages = validImages.length > 0;
 
     return (
       <Card ref={ref} className={`p-4 bg-card/40 backdrop-blur border ${job.error ? 'border-red-500/20' : 'border-white/5'} shadow-md mb-4`}>
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            {!job.isCompleted ? (
+            {!job.isCompleted && job.completedImages < job.totalImages ? (
               <Loader2 className="h-4 w-4 text-primary animate-spin" />
             ) : job.error ? (
               <AlertTriangle className="h-4 w-4 text-red-500" />
