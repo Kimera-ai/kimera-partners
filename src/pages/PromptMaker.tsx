@@ -128,10 +128,10 @@ const PromptMaker = () => {
   );
 
   return (
-    <BaseLayout>
+    <BaseLayout fullWidth>
       <MainContainer containerRef={containerRef} sidebar={sidebarContent}>
-        <div className="w-full h-full p-6">
-          <div className="mb-6">
+        <div className="w-full h-full p-4 md:p-6">
+          <div className="mb-4 md:mb-6">
             <PageHeader 
               title="Kimera Image Generation"
               credits={credits}
@@ -141,7 +141,7 @@ const PromptMaker = () => {
             />
           </div>
 
-          <div className="max-w-4xl mx-auto space-y-6">
+          <div className="w-full space-y-4 md:space-y-6">
             <ControlPanel
               prompt={prompt}
               setPrompt={setPrompt}
