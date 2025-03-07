@@ -25,11 +25,11 @@ export const WorkflowPanel = ({ workflow, setWorkflow, imagePreview, isUploading
                 <span className="text-sm text-white/80 font-medium">Mode / Preset</span>
                 <HelpCircle size={14} className="text-white/60" />
               </TooltipTrigger>
-              <TooltipContent side="right" className="bg-[#242038] border-purple-500/30 text-white">
-                <p>Select generation mode: <br />
-                • Image Generator: Create images from scratch <br />
-                • Face Gen: Generate faces based on an uploaded image <br />
-                • Reference Mode: Use an image as reference for your creation</p>
+              <TooltipContent side="right" className="bg-[#242038] border-purple-500/30 text-white max-w-[300px]">
+                <p className="text-sm">Select generation mode: <br />
+                • <strong>Image Generator:</strong> Create images from prompt (no image required)<br />
+                • <strong>Face Gen:</strong> Generate faces based on an uploaded reference image<br />
+                • <strong>Reference Mode:</strong> Use your image as reference for creating new images</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -42,9 +42,9 @@ export const WorkflowPanel = ({ workflow, setWorkflow, imagePreview, isUploading
             <SelectValue placeholder="Select workflow" />
           </SelectTrigger>
           <SelectContent className="bg-[#1D1A27] border-white/10 text-white">
-            <SelectItem value="no-reference">Image Generator</SelectItem>
-            <SelectItem value="with-reference">Face Gen</SelectItem>
-            <SelectItem value="cartoon">Reference Mode</SelectItem>
+            <SelectItem value="no-reference">Image Generator (No Image)</SelectItem>
+            <SelectItem value="with-reference">Face Gen (With Image)</SelectItem>
+            <SelectItem value="cartoon">Reference Mode (With Image)</SelectItem>
           </SelectContent>
         </Select>
       </div>

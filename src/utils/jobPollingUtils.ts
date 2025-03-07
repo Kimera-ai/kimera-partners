@@ -1,3 +1,4 @@
+
 import { toast } from "sonner";
 import { GenerationJobType } from "@/components/prompt-maker/GenerationJob";
 
@@ -33,8 +34,9 @@ export const pollJobStatus = (
   let pollingIntervalId: number;
   let pollingAttempts = 0;
   const MAX_POLLING_ATTEMPTS = 60; // 5 minutes at 5-second intervals
-  const MAX_TIME_WITHOUT_PROGRESS = 30; // 30 polling attempts (2.5 minutes) without progress
+  const MAX_TIME_WITHOUT_PROGRESS = 24; // 2 minutes without progress
   let lastProgressTime = Date.now();
+  let lastStatus = '';
   
   const pollJob = async () => {
     try {
@@ -57,6 +59,12 @@ export const pollJobStatus = (
       // Check for explicit failure states
       if (data.status === 'failed' || data.status === 'error') {
         throw new Error(data.message || 'Generation failed');
+      }
+      
+      // If status changed, update last progress time
+      if (data.status !== lastStatus) {
+        lastProgressTime = Date.now();
+        lastStatus = data.status;
       }
       
       if (data.status === 'completed' || data.status === 'done') {
@@ -93,7 +101,7 @@ export const pollJobStatus = (
                 completedImages: completedImagesCount,
                 status: allImagesCompleted ? "All images generated successfully!" : `Generated ${completedImagesCount} of ${job.totalImages} images...`,
                 isCompleted: allImagesCompleted,
-                displayImages: allImagesCompleted,
+                displayImages: true, // Always show images as they complete
                 error: null // Clear any error state
               };
             }
@@ -123,14 +131,12 @@ export const pollJobStatus = (
         });
         
       } else if (data.status === 'processing' || data.status === 'AI Dream' || data.status === 'Image Resize') {
-        // Update last progress time when we see the job is still actively processing
-        lastProgressTime = Date.now();
-        
+        // Update status in job
         setGenerationJobs(prevJobs => 
           prevJobs.map(job => 
             job.id === jobId ? {
               ...job,
-              status: `Processing image ${imageIndex + 1} of ${job.totalImages}...`
+              status: `Processing image ${imageIndex + 1} of ${job.totalImages}... (${data.status})`
             } : job
           )
         );
@@ -139,13 +145,40 @@ export const pollJobStatus = (
         
         // Check for timeout conditions
         const timeWithoutProgress = (Date.now() - lastProgressTime) / 1000;
-        if (pollingAttempts >= MAX_POLLING_ATTEMPTS || timeWithoutProgress > MAX_TIME_WITHOUT_PROGRESS * 5) {
+        if (pollingAttempts >= MAX_POLLING_ATTEMPTS) {
           clearInterval(pollingIntervalId);
-          throw new Error(
-            pollingAttempts >= MAX_POLLING_ATTEMPTS 
-              ? `Generation timed out after ${MAX_POLLING_ATTEMPTS * 5} seconds` 
-              : `Generation stuck - no progress for ${Math.floor(timeWithoutProgress)} seconds`
-          );
+          throw new Error(`Generation timed out after ${MAX_POLLING_ATTEMPTS * 5} seconds`);
+        }
+        
+        if (timeWithoutProgress > MAX_TIME_WITHOUT_PROGRESS * 5) {
+          // Instead of throwing an error immediately, attempt to recover
+          console.warn(`Job ${apiJobId} appears stuck. Attempting to display any completed images.`);
+          
+          setGenerationJobs(prevJobs => {
+            return prevJobs.map(job => {
+              if (job.id === jobId) {
+                // Mark the job as completed with partial results
+                const completedImages = job.generatedImages.filter(img => img !== null).length;
+                
+                // Only mark as completed if we have at least one image
+                if (completedImages > 0) {
+                  return {
+                    ...job,
+                    status: `Completed with ${completedImages}/${job.totalImages} images (some images timed out)`,
+                    isCompleted: true,
+                    displayImages: true,
+                    error: `Some images could not be generated (timeout after ${Math.floor(timeWithoutProgress)} seconds)`
+                  };
+                } else {
+                  // If no images at all, throw error
+                  throw new Error(`Generation stuck - no progress for ${Math.floor(timeWithoutProgress)} seconds`);
+                }
+              }
+              return job;
+            });
+          });
+          
+          clearInterval(pollingIntervalId);
         }
       }
     } catch (error) {
@@ -153,16 +186,47 @@ export const pollJobStatus = (
       console.error('Error polling job status:', error);
       
       // Update job status to show error
-      setGenerationJobs(prevJobs => 
-        prevJobs.map(job => 
-          job.id === jobId ? {
-            ...job,
-            status: `Error: ${error instanceof Error ? error.message : 'Failed to process image'}`,
-            error: error instanceof Error ? error.message : 'Failed to process image',
-            isCompleted: true // Mark as completed so the UI can show the error state
-          } : job
-        )
-      );
+      setGenerationJobs(prevJobs => {
+        const updatedJobs = prevJobs.map(job => {
+          if (job.id === jobId) {
+            // Get any successful images before marking as error
+            const completedImages = job.generatedImages.filter(img => img !== null).length;
+            
+            return {
+              ...job,
+              status: `Error: ${error instanceof Error ? error.message : 'Failed to process image'}`,
+              error: error instanceof Error ? error.message : 'Failed to process image',
+              isCompleted: true, // Mark as completed so the UI can show the error state
+              displayImages: completedImages > 0 // Show images if we have any
+            };
+          }
+          return job;
+        });
+        
+        // If the job has some completed images, still call handleJobComplete
+        const currentJob = updatedJobs.find(j => j.id === jobId);
+        if (currentJob) {
+          const completedImageData = currentJob.generatedImages
+            .filter(img => img !== null) as { url: string, seed: string | null, pipeline_id: string | null }[];
+          
+          if (completedImageData.length > 0) {
+            const completedImageUrls = completedImageData.map(img => img.url);
+            const lastImage = completedImageData[completedImageData.length - 1];
+            
+            handleJobComplete(completedImageUrls, {
+              jobId,
+              jobPrompt,
+              jobStyle,
+              jobRatio,
+              jobLoraScale,
+              pipeline_id: lastImage?.pipeline_id || pipeline_id,
+              seed: lastImage?.seed || responseSeed
+            });
+          }
+        }
+        
+        return updatedJobs;
+      });
       
       toast.error(`Error: ${error instanceof Error ? error.message : 'Failed to process image'}`);
     }

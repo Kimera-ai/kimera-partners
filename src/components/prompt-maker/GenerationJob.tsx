@@ -1,5 +1,5 @@
 
-import { Clock, Loader2, Share2, Check } from "lucide-react";
+import { Clock, Loader2, Share2, Check, AlertTriangle } from "lucide-react";
 import React, { forwardRef, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -76,7 +76,11 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
       }
     };
 
-    const shouldShowImages = validImages.length > 0 && (job.displayImages || job.error);
+    // Show images if we have valid images AND the job is either:
+    // 1. Marked for display
+    // 2. Has an error but has some valid images
+    // 3. Is completed
+    const shouldShowImages = validImages.length > 0 && (job.displayImages || job.error || job.isCompleted);
 
     return (
       <Card ref={ref} className={`p-4 bg-card/40 backdrop-blur border ${job.error ? 'border-red-500/20' : 'border-white/5'} shadow-md mb-4`}>
@@ -85,7 +89,7 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
             {!job.isCompleted ? (
               <Loader2 className="h-4 w-4 text-primary animate-spin" />
             ) : job.error ? (
-              <div className="h-4 w-4 rounded-full bg-red-500"></div>
+              <AlertTriangle className="h-4 w-4 text-red-500" />
             ) : (
               <div className="h-4 w-4 rounded-full bg-green-500"></div>
             )}
@@ -104,6 +108,18 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
           </div>
         </div>
         
+        {job.error && job.completedImages === 0 && (
+          <div className="mt-2 text-sm text-red-400 bg-red-950/20 p-3 rounded-lg">
+            <p className="flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4" />
+              {job.error}
+            </p>
+            <p className="mt-1 text-xs text-red-300/70">
+              Try again with a different prompt or settings.
+            </p>
+          </div>
+        )}
+        
         {shouldShowImages && (
           <div className={`grid ${getGridClass(validImages.length)} gap-3 mt-3`}>
             {validImages.map((imageData, index) => (
@@ -116,6 +132,11 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
                   src={imageData.url} 
                   alt={`Generated ${index}`} 
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    // Handle image loading error
+                    console.error(`Failed to load image at ${imageData.url}`);
+                    e.currentTarget.src = 'https://placehold.co/600x800/191223/404040?text=Image+Failed+to+Load';
+                  }}
                 />
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                   <button 
@@ -149,6 +170,18 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
                 </div>
               </div>
             ))}
+          </div>
+        )}
+        
+        {job.error && job.completedImages > 0 && (
+          <div className="mt-3 text-sm text-amber-400 bg-amber-950/20 p-2.5 rounded-lg">
+            <p className="flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4" />
+              {job.error}
+            </p>
+            <p className="mt-1 text-xs text-amber-300/70">
+              Some images were successfully generated.
+            </p>
           </div>
         )}
       </Card>
