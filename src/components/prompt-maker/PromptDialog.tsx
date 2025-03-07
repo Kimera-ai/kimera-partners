@@ -79,14 +79,14 @@ export const PromptDialog = ({
         }
       }}
     >
-      <DialogContent className="sm:max-w-lg bg-card/95 backdrop-blur border-white/10">
+      <DialogContent className="sm:max-w-3xl bg-card/95 backdrop-blur border-white/10 h-auto max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Image Details</DialogTitle>
         </DialogHeader>
         
         {selectedGeneration && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="aspect-[3/4] rounded-md overflow-hidden">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-hidden">
+            <div className="aspect-[3/4] rounded-md overflow-hidden h-auto flex-shrink-0">
               <img 
                 src={selectedGeneration.image_url} 
                 alt="Selected generation" 
@@ -94,58 +94,68 @@ export const PromptDialog = ({
               />
             </div>
             
-            <div className="space-y-3 max-h-[50vh] overflow-y-auto pr-2">
-              <div>
-                <h4 className="text-sm font-medium text-muted-foreground">Prompt</h4>
-                <p className="text-sm">{selectedGeneration.prompt}</p>
+            <div className="space-y-3 overflow-y-auto pr-2 flex-grow">
+              <div className="space-y-2">
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground">Prompt</h4>
+                  <p className="text-sm">{selectedGeneration.prompt}</p>
+                </div>
+                
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground">Style</h4>
+                  <p className="text-sm">{selectedGeneration.style || "Not specified"}</p>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-x-2">
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground">Ratio</h4>
+                    <p className="text-sm">{selectedGeneration.ratio || "Not specified"}</p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground">Lora Scale</h4>
+                    <p className="text-sm">{selectedGeneration.lora_scale || "Not specified"}</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-x-2">
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground">Seed</h4>
+                    <p className="text-sm">{selectedGeneration.seed || (selectedGeneration.seed === 0 ? "0" : "Random (-1)")}</p>
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground">Pipeline ID</h4>
+                    <p className="text-sm truncate" title={selectedGeneration.pipeline_id || "Not specified"}>
+                      {selectedGeneration.pipeline_id || "Not specified"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-x-2">
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground">Mode</h4>
+                    <p className="text-sm">
+                      {selectedGeneration.pipeline_id === "FYpcEIUj" 
+                        ? "With Reference" 
+                        : selectedGeneration.pipeline_id === "803a4MBY" 
+                          ? "No Reference" 
+                          : "Unknown"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground">Created At</h4>
+                    <p className="text-sm">
+                      {selectedGeneration.created_at 
+                        ? new Date(selectedGeneration.created_at).toLocaleString() 
+                        : "Not available"}
+                    </p>
+                  </div>
+                </div>
               </div>
               
-              <div>
-                <h4 className="text-sm font-medium text-muted-foreground">Style</h4>
-                <p className="text-sm">{selectedGeneration.style || "Not specified"}</p>
-              </div>
-              
-              <div>
-                <h4 className="text-sm font-medium text-muted-foreground">Ratio</h4>
-                <p className="text-sm">{selectedGeneration.ratio || "Not specified"}</p>
-              </div>
-              
-              <div>
-                <h4 className="text-sm font-medium text-muted-foreground">Lora Scale</h4>
-                <p className="text-sm">{selectedGeneration.lora_scale || "Not specified"}</p>
-              </div>
-
-              <div>
-                <h4 className="text-sm font-medium text-muted-foreground">Seed</h4>
-                <p className="text-sm">{selectedGeneration.seed || (selectedGeneration.seed === 0 ? "0" : "Random (-1)")}</p>
-              </div>
-
-              <div>
-                <h4 className="text-sm font-medium text-muted-foreground">Pipeline ID</h4>
-                <p className="text-sm">{selectedGeneration.pipeline_id || "Not specified"}</p>
-              </div>
-
-              <div>
-                <h4 className="text-sm font-medium text-muted-foreground">Mode</h4>
-                <p className="text-sm">
-                  {selectedGeneration.pipeline_id === "FYpcEIUj" 
-                    ? "With Reference" 
-                    : selectedGeneration.pipeline_id === "803a4MBY" 
-                      ? "No Reference" 
-                      : "Unknown"}
-                </p>
-              </div>
-
-              <div>
-                <h4 className="text-sm font-medium text-muted-foreground">Created At</h4>
-                <p className="text-sm">
-                  {selectedGeneration.created_at 
-                    ? new Date(selectedGeneration.created_at).toLocaleString() 
-                    : "Not available"}
-                </p>
-              </div>
-              
-              <div className="flex gap-2 mt-2">
+              <div className="flex gap-2 pt-2">
                 <Button 
                   className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600" 
                   onClick={() => handleDownload(selectedGeneration.image_url)}
@@ -175,3 +185,4 @@ export const PromptDialog = ({
     </Dialog>
   );
 };
+
