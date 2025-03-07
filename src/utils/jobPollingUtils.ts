@@ -38,6 +38,9 @@ export const pollJobStatus = (
   let lastProgressTime = Date.now();
   let lastStatus = '';
   
+  // Define extractedSeed at a higher scope so it's available throughout the function
+  let extractedSeed: string | null = null;
+  
   const pollJob = async () => {
     try {
       console.log(`Polling job status for ID: ${apiJobId}, attempt ${pollingAttempts + 1}`);
@@ -80,7 +83,7 @@ export const pollJobStatus = (
         
         // Get the response's pipeline_id and seed
         const responsePipelineId = data.pipeline_id;
-        const extractedSeed = data.data?.seed !== undefined ? String(data.data.seed) : (seed !== undefined ? String(seed) : null);
+        extractedSeed = data.data?.seed !== undefined ? String(data.data.seed) : (seed !== undefined ? String(seed) : null);
         
         setGenerationJobs(prevJobs => {
           const updatedJobs = prevJobs.map(job => {
