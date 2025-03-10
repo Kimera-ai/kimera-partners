@@ -1,4 +1,3 @@
-
 import { toast } from "sonner";
 import { GenerationJobType } from "@/components/prompt-maker/GenerationJob";
 
@@ -33,16 +32,16 @@ export const pollJobStatus = (
   const { apiJobId, imageIndex, jobId, jobPrompt, jobStyle, jobRatio, jobLoraScale, pipeline_id, seed } = config;
   let pollingIntervalId: number;
   let pollingAttempts = 0;
-  const MAX_POLLING_ATTEMPTS = 60; // 5 minutes at 5-second intervals
-  const MAX_TIME_WITHOUT_PROGRESS = 24; // 2 minutes without progress (24 * 5 seconds = 2 minutes)
+  const MAX_POLLING_ATTEMPTS = 90; // 7.5 minutes at 5-second intervals
+  const MAX_TIME_WITHOUT_PROGRESS = 36; // 3 minutes without progress (36 * 5 seconds = 3 minutes)
   let lastProgressTime = Date.now();
   let lastStatus = '';
   
   // Define extractedSeed at a higher scope so it's available throughout the function
   let extractedSeed: string | null = null;
   
-  // Set a timeout for the entire polling operation (2 minutes = 120000ms)
-  const GLOBAL_TIMEOUT = 120000; 
+  // Set a timeout for the entire polling operation (3 minutes = 180000ms)
+  const GLOBAL_TIMEOUT = 180000; 
   const timeoutId = setTimeout(() => {
     // If we reach this point, the polling is taking too long
     console.warn(`Global timeout reached for image ${imageIndex} in job ${jobId}`);
@@ -89,7 +88,7 @@ export const pollJobStatus = (
               status: updatedStatus,
               isCompleted: true,
               displayImages: true,
-              error: `Some images could not be generated (timeout after 2 minutes)`
+              error: `Some images could not be generated (timeout after 3 minutes)`
             };
           } else {
             // If no images completed at all, mark as error
@@ -97,7 +96,7 @@ export const pollJobStatus = (
               ...job,
               status: "Error: Generation timed out",
               isCompleted: true,
-              error: "Image generation timed out after 2 minutes"
+              error: "Image generation timed out after 3 minutes"
             };
           }
         }
@@ -105,7 +104,7 @@ export const pollJobStatus = (
       });
     });
     
-    toast.error(`Generation took too long and was stopped after 2 minutes`);
+    toast.error(`Generation took too long and was stopped after 3 minutes`);
     
   }, GLOBAL_TIMEOUT);
   
@@ -335,4 +334,3 @@ export const pollJobStatus = (
     clearTimeout(timeoutId);
   };
 };
-
