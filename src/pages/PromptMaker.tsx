@@ -1,5 +1,5 @@
 
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { useSession } from "@/hooks/useSession";
 import { useImageUpload } from "@/hooks/useImageUpload";
@@ -15,7 +15,7 @@ import { MainContainer } from "@/components/prompt-maker/MainContainer";
 import { PageHeader } from "@/components/prompt-maker/PageHeader";
 import { JobsContainer } from "@/components/prompt-maker/JobsContainer";
 import { Sidebar } from "@/components/prompt-maker/Sidebar";
-import { GeneratedImageData } from "@/components/prompt-maker/GenerationJob";
+import { GeneratedImageData } from '@/components/prompt-maker/GenerationJob';
 
 const PromptMaker = () => {
   const { session } = useSession();
@@ -86,12 +86,12 @@ const PromptMaker = () => {
   useScrollToLatestJob(latestJobRef, jobRefs, generationJobs);
   const { handleDownload } = useImageDownloader();
 
-  const handleImageClick = (generation: any) => {
+  const handleImageClick = useCallback((generation: any) => {
     setSelectedGeneration(generation);
     setShowPromptDialog(true);
-  };
+  }, []);
 
-  const handleGeneratedImageClick = (imageData: GeneratedImageData) => {
+  const handleGeneratedImageClick = useCallback((imageData: GeneratedImageData) => {
     const generationData = {
       image_url: imageData.url,
       prompt: prompt,
@@ -104,27 +104,27 @@ const PromptMaker = () => {
     };
     
     handleImageClick(generationData);
-  };
+  }, [prompt, style, ratio, loraScale, handleImageClick]);
 
   // Memoize sidebar props to prevent re-rendering issues
   const sidebarProps = useMemo(() => ({
     workflow,
+    setWorkflow,
     ratio,
+    setRatio,
     style,
+    setStyle,
     loraScale,
+    setLoraScale,
     seed,
+    setSeed,
     numberOfImages,
+    setNumberOfImages,
     imagePreview,
     isUploading,
     handleImageUpload,
     removeImage,
-    CREDITS_PER_GENERATION,
-    setWorkflow,
-    setRatio,
-    setStyle,
-    setLoraScale,
-    setSeed,
-    setNumberOfImages
+    CREDITS_PER_GENERATION
   }), [
     workflow, 
     ratio, 
@@ -165,8 +165,8 @@ const PromptMaker = () => {
             setNumberOfImages={sidebarProps.setNumberOfImages}
             imagePreview={sidebarProps.imagePreview}
             isUploading={sidebarProps.isUploading}
-            handleImageUpload={handleImageUpload}
-            removeImage={removeImage}
+            handleImageUpload={sidebarProps.handleImageUpload}
+            removeImage={sidebarProps.removeImage}
             CREDITS_PER_GENERATION={sidebarProps.CREDITS_PER_GENERATION}
           />
         }

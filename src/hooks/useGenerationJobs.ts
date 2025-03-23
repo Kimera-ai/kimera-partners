@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { GenerationJobType } from '@/components/prompt-maker/GenerationJob';
 import { pollJobStatus } from '@/utils/jobPollingUtils';
@@ -12,6 +12,7 @@ export const useGenerationJobs = (session: any) => {
   const [generationJobs, setGenerationJobs] = useState<GenerationJobType[]>([]);
   const [jobIdCounter, setJobIdCounter] = useState(0);
   const latestJobRef = useRef<string | null>(null);
+  const jobCompletedRef = useRef<{images: string[], config: any} | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -39,12 +40,39 @@ export const useGenerationJobs = (session: any) => {
     };
   }, []);
 
+  // Effect to handle job completion toasts outside of render
+  useEffect(() => {
+    if (jobCompletedRef.current) {
+      const { images, config } = jobCompletedRef.current;
+      
+      // Show toast outside of render phase
+      toast({
+        title: "Success",
+        description: `Job completed! All ${config.isVideo ? 'videos' : 'images'} have been generated successfully!`,
+        duration: 3000
+      });
+      
+      // Process storage after render is complete
+      const processStorage = async () => {
+        const stored = await storeGeneratedImages(session, images, config);
+        if (stored) {
+          fetchPreviousGens();
+        }
+      };
+      
+      processStorage();
+      
+      // Reset the ref
+      jobCompletedRef.current = null;
+    }
+  }, [toast, session]);
+
   const fetchPreviousGens = async () => {
     const generations = await fetchPreviousGenerations();
     setPreviousGenerations(generations);
   };
 
-  const handleJobComplete = async (
+  const handleJobComplete = useCallback(async (
     completedImages: string[], 
     jobConfig: {
       jobId: string;
@@ -69,20 +97,15 @@ export const useGenerationJobs = (session: any) => {
       )
     );
     
-    toast({
-      title: "Success",
-      description: `Job completed! All ${jobConfig.isVideo ? 'videos' : 'images'} have been generated successfully!`,
-      duration: 3000
-    });
+    // Store completion info in ref for the effect to handle
+    jobCompletedRef.current = {
+      images: completedImages,
+      config: jobConfig
+    };
     
-    // Store all generated images in the database
-    const stored = await storeGeneratedImages(session, completedImages, jobConfig);
-    if (stored) {
-      fetchPreviousGens();
-    }
-  };
+  }, []);
 
-  const startNewJob = (numImagesToGenerate: number, isVideo: boolean = false) => {
+  const startNewJob = useCallback((numImagesToGenerate: number, isVideo: boolean = false) => {
     const { job: newJob, newJobId } = createNewJob(numImagesToGenerate, jobIdCounter, isVideo);
     
     // Add the new job to the beginning of the list
@@ -93,18 +116,18 @@ export const useGenerationJobs = (session: any) => {
     latestJobRef.current = newJobId;
     
     return newJobId;
-  };
+  }, [jobIdCounter]);
 
-  const updateJobStatus = (jobId: string, status: string) => {
+  const updateJobStatus = useCallback((jobId: string, status: string) => {
     setGenerationJobs(prev => 
       prev.map(job => 
         job.id === jobId ? { ...job, status } : job
       )
     );
-  };
+  }, []);
 
   // Update this function to match the expected interface
-  const startJobPolling = (config: {
+  const startJobPolling = useCallback((config: {
     apiJobId: string;
     imageIndex: number;
     jobId: string;
@@ -121,7 +144,7 @@ export const useGenerationJobs = (session: any) => {
       setGenerationJobs,
       handleJobComplete
     );
-  };
+  }, [handleJobComplete]);
 
   return {
     generatedImages,
