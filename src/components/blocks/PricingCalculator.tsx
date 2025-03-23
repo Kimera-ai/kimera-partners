@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -34,7 +35,7 @@ const imageFeatures: Feature[] = [
 ];
 
 const videoFeatures: Feature[] = [
-  { name: "AI Video Generation (5 seconds)", credits: 36, quantity: 0 },
+  { name: "AI Video Generation (5 seconds)", credits: 72, quantity: 0 },
   { name: "Video Template Generation (10 seconds)", credits: 36, quantity: 0 },
   { name: "Basic transition video", credits: 4, quantity: 0 },
 ];

@@ -1,11 +1,10 @@
-
 import { useState } from 'react';
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { GenerationJobType } from '@/components/prompt-maker/GenerationJob';
 
 const CREDITS_PER_GENERATION = 14;
-const VIDEO_CREDITS_PER_GENERATION = 36;
+const VIDEO_CREDITS_PER_GENERATION = 72;
 
 export const useImageGeneration = (
   session: any,
@@ -38,7 +37,6 @@ export const useImageGeneration = (
   const [numberOfImages, setNumberOfImages] = useState("1");
   const [isImprovingPrompt, setIsImprovingPrompt] = useState(false);
   
-  // Calculate credits needed based on workflow type
   const getCreditsPerGeneration = () => {
     return workflow === "video" ? VIDEO_CREDITS_PER_GENERATION : CREDITS_PER_GENERATION;
   };
