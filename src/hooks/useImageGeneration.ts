@@ -12,7 +12,7 @@ export const useImageGeneration = (
   isLoadingCredits: boolean,
   updateUserCredits: (creditsToDeduct: number) => Promise<boolean>,
   setCredits: (creditsFn: ((prev: number | null) => number | null)) => void,
-  startNewJob: (numImagesToGenerate: number, isVideo?: boolean) => string,
+  startNewJob: (numImagesToGenerate: number, ratio: string, isVideo?: boolean) => string,
   updateJobStatus: (jobId: string, status: string) => void,
   pollJobStatus: (config: {
     apiJobId: string;
