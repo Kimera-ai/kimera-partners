@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { GenerationJobType } from '@/components/prompt-maker/GenerationJob';
 
 const CREDITS_PER_GENERATION = 14;
+const VIDEO_CREDITS_PER_GENERATION = 36;
 
 export const useImageGeneration = (
   session: any,
@@ -35,6 +36,11 @@ export const useImageGeneration = (
   const [seed, setSeed] = useState("random");
   const [numberOfImages, setNumberOfImages] = useState("1");
   const [isImprovingPrompt, setIsImprovingPrompt] = useState(false);
+  
+  // Calculate credits needed based on workflow type
+  const getCreditsPerGeneration = () => {
+    return workflow === "video" ? VIDEO_CREDITS_PER_GENERATION : CREDITS_PER_GENERATION;
+  };
 
   const handleImprovePrompt = async () => {
     if (!prompt) {
@@ -77,7 +83,8 @@ export const useImageGeneration = (
     }
     
     const numImages = parseInt(numberOfImages);
-    const totalCost = CREDITS_PER_GENERATION * numImages;
+    const creditsPerGeneration = getCreditsPerGeneration();
+    const totalCost = creditsPerGeneration * numImages;
     
     if (credits === null || isLoadingCredits) {
       toast.info("Please wait while we check your available credits.", {
@@ -93,8 +100,11 @@ export const useImageGeneration = (
       return;
     }
 
-    if ((workflow === 'with-reference' || workflow === 'cartoon') && !uploadedImageUrl) {
-      toast.error(`Please upload an image when using the ${workflow === 'with-reference' ? 'Face Gen' : 'Reference Mode'} workflow.`, {
+    if ((workflow === 'with-reference' || workflow === 'cartoon' || workflow === 'video') && !uploadedImageUrl) {
+      toast.error(`Please upload an image when using the ${
+        workflow === 'with-reference' ? 'Face Gen' : 
+        workflow === 'video' ? 'Video Generator' : 'Reference Mode'
+      } workflow.`, {
         duration: 5000
       });
       return;
@@ -105,7 +115,7 @@ export const useImageGeneration = (
       
       const numImagesToGenerate = parseInt(numberOfImages);
       
-      updateJobStatus(jobId, `Preparing to generate ${numImagesToGenerate} images...`);
+      updateJobStatus(jobId, `Preparing to generate ${numImagesToGenerate} ${workflow === 'video' ? 'videos' : 'images'}...`);
       
       const defaultImageUrl = "https://www.jeann.online/cdn-cgi/image/format=jpeg/https://kimera-media.s3.eu-north-1.amazonaws.com/623b36fe-ac7f-4c56-a124-cddb942a38e5_event/623b36fe-ac7f-4c56-a124-cddb942a38e5_source.jpeg";
       
@@ -115,6 +125,8 @@ export const useImageGeneration = (
             return "FYpcEIUj";
           case "cartoon":
             return "803a4MBY";
+          case "video":
+            return "wkE3eiap";
           case "no-reference":
           default:
             return "803a4MBY";
@@ -155,7 +167,7 @@ export const useImageGeneration = (
           }
         };
         
-        console.log(`Request for image ${i+1} with seed:`, seedValue);
+        console.log(`Request for ${currentWorkflow === 'video' ? 'video' : 'image'} ${i+1} with seed:`, seedValue);
         console.log("API Request body:", JSON.stringify(requestBody, null, 2));
         
         generateRequests.push(fetch('https://api.kimera.ai/v1/pipeline/run', {
@@ -176,10 +188,10 @@ export const useImageGeneration = (
           try {
             const errorData = await responses[i].json();
             console.error(`Pipeline error response for request ${i+1}:`, errorData);
-            responseErrors.push(`Image ${i+1}: ${errorData.message || 'Unknown error'}`);
+            responseErrors.push(`${workflow === 'video' ? 'Video' : 'Image'} ${i+1}: ${errorData.message || 'Unknown error'}`);
           } catch (e) {
             console.error(`Failed to parse error response for request ${i+1}:`, e);
-            responseErrors.push(`Image ${i+1}: HTTP error ${responses[i].status}`);
+            responseErrors.push(`${workflow === 'video' ? 'Video' : 'Image'} ${i+1}: HTTP error ${responses[i].status}`);
           }
         }
       }
@@ -193,7 +205,7 @@ export const useImageGeneration = (
           duration: 5000
         });
         
-        updateJobStatus(jobId, `Processing ${responses.length - responseErrors.length} of ${numImagesToGenerate} images...`);
+        updateJobStatus(jobId, `Processing ${responses.length - responseErrors.length} of ${numImagesToGenerate} ${workflow === 'video' ? 'videos' : 'images'}...`);
       }
       
       const successfulResponses = responses.filter(r => r.ok);
@@ -207,7 +219,7 @@ export const useImageGeneration = (
         throw new Error("Failed to start any generation jobs");
       }
       
-      updateJobStatus(jobId, `Processing ${apiJobIds.length} images...`);
+      updateJobStatus(jobId, `Processing ${apiJobIds.length} ${workflow === 'video' ? 'videos' : 'images'}...`);
       
       apiJobIds.forEach((apiJobId, index) => {
         pollJobStatus({
@@ -223,7 +235,7 @@ export const useImageGeneration = (
         });
       });
       
-      const actualCost = CREDITS_PER_GENERATION * apiJobIds.length;
+      const actualCost = creditsPerGeneration * apiJobIds.length;
       const creditUpdateSuccess = await updateUserCredits(actualCost);
       
       if (!creditUpdateSuccess) {
@@ -259,6 +271,6 @@ export const useImageGeneration = (
     setIsImprovingPrompt,
     handleImprovePrompt,
     handleGenerate,
-    CREDITS_PER_GENERATION
+    CREDITS_PER_GENERATION: getCreditsPerGeneration()
   };
 };

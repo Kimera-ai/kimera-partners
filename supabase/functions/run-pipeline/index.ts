@@ -4,6 +4,7 @@ import { corsHeaders } from "../_shared/cors.ts";
 
 const KIMERA_API_KEY = "1712edc40e3eb72c858332fe7500bf33e885324f8c1cd52b8cded2cdfd724cee";
 const PIPELINE_ID = "803a4MBY";
+const VIDEO_PIPELINE_ID = "wkE3eiap";
 
 serve(async (req) => {
   // Handle CORS
@@ -12,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { imageUrl, prompt, ratio = "2:3", loraScale = 0.5, style = "Cinematic", seed = -1 } = await req.json();
+    const { imageUrl, prompt, ratio = "2:3", loraScale = 0.5, style = "Cinematic", seed = -1, isVideo = false } = await req.json();
 
     if (!imageUrl || !prompt) {
       return new Response(
@@ -20,6 +21,9 @@ serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    // Select the appropriate pipeline ID
+    const selectedPipelineId = isVideo ? VIDEO_PIPELINE_ID : PIPELINE_ID;
 
     // Make request to Kimera AI API
     const response = await fetch('https://api.kimera.ai/v1/pipeline/run', {
@@ -29,7 +33,7 @@ serve(async (req) => {
         'x-api-key': KIMERA_API_KEY
       },
       body: JSON.stringify({
-        pipeline_id: PIPELINE_ID,
+        pipeline_id: selectedPipelineId,
         imageUrl,
         ratio,
         prompt,
@@ -45,7 +49,7 @@ serve(async (req) => {
 
     // Ensure pipeline_id is included in the response
     if (!data.pipeline_id) {
-      data.pipeline_id = PIPELINE_ID;
+      data.pipeline_id = selectedPipelineId;
     }
 
     // Ensure seed is included in the response

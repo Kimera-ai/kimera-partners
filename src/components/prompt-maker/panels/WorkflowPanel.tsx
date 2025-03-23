@@ -29,7 +29,8 @@ export const WorkflowPanel = ({ workflow, setWorkflow, imagePreview, isUploading
                 <p className="text-sm">Select generation mode: <br />
                 • <strong>Image Generator:</strong> Create images from prompt (no image required)<br />
                 • <strong>Face Gen:</strong> Generate faces based on an uploaded reference image<br />
-                • <strong>Reference Mode:</strong> Use your image as reference for creating new images</p>
+                • <strong>Reference Mode:</strong> Use your image as reference for creating new images<br />
+                • <strong>Video Generator:</strong> Create videos from an image and prompt</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -45,6 +46,7 @@ export const WorkflowPanel = ({ workflow, setWorkflow, imagePreview, isUploading
             <SelectItem value="no-reference">Image Generator (No Image)</SelectItem>
             <SelectItem value="with-reference">Face Gen (With Image)</SelectItem>
             <SelectItem value="cartoon">Reference Mode (With Image)</SelectItem>
+            <SelectItem value="video">Video Generator (With Image)</SelectItem>
           </SelectContent>
         </Select>
       </div>
