@@ -76,8 +76,29 @@ export const pollJobStatus = async (
       if (data.status === 'completed') {
         clearInterval(statusInterval);
         
-        // Get the generated image URL
-        const imageUrl = data.result?.images?.[0] || data.result?.url || null;
+        // Get the generated image URL - handle different result structures for video vs image
+        let imageUrl = null;
+        
+        if (isVideo) {
+          // For video response
+          console.log("Video job completed. Result:", data.result);
+          
+          // Check all possible paths where the URL might be
+          imageUrl = data.result?.url ||                      // Direct URL property
+                    data.result ||                           // Result might be the URL directly
+                    (typeof data.result === 'string' ? data.result : null); // Result is a string
+                    
+          // Extract URL from quotes if needed
+          if (typeof imageUrl === 'string' && imageUrl.includes('"')) {
+            imageUrl = imageUrl.replace(/"/g, '');
+          }
+          
+          console.log(`Extracted video URL: ${imageUrl}`);
+        } else {
+          // For image response
+          imageUrl = data.result?.images?.[0] || null;
+          console.log(`Extracted image URL: ${imageUrl}`);
+        }
         
         if (imageUrl) {
           // Update the specific image in the job
@@ -141,7 +162,7 @@ export const pollJobStatus = async (
             return prevJobs;
           });
         } else {
-          console.error(`Job ${apiJobId} completed but no image URL found:`, data);
+          console.error(`Job ${apiJobId} completed but no ${isVideo ? 'video' : 'image'} URL found:`, data);
           
           setGenerationJobs(prev => 
             prev.map(job => 
