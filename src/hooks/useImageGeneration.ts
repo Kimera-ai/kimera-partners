@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -161,7 +162,7 @@ export const useImageGeneration = (
           case "cartoon":
             return "803a4MBY";
           case "video":
-            return "wkE3eiap";
+            return "wkE3eiap"; // Using the correct video pipeline ID
           case "no-reference":
           default:
             return "803a4MBY";
