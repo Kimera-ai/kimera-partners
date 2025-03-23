@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Download, Share2, Check, Copy } from "lucide-react";
+import { Download, Share2, Check, Copy, Video } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface PromptDialogProps {
@@ -20,6 +20,14 @@ export const PromptDialog = ({
 }: PromptDialogProps) => {
   const { toast } = useToast();
   const [isCopied, setIsCopied] = useState(false);
+  
+  // Helper function to check if URL is a video
+  const isVideoUrl = (url: string | undefined) => {
+    if (!url) return false;
+    return /\.(mp4|webm|mov)($|\?)/.test(url.toLowerCase());
+  };
+  
+  const isVideo = selectedGeneration ? isVideoUrl(selectedGeneration.image_url) : false;
   
   // Reset pointer events when dialog opens/closes
   useEffect(() => {
@@ -54,11 +62,11 @@ export const PromptDialog = ({
       
       toast({
         title: "Link copied!",
-        description: "Image link has been copied to clipboard",
+        description: `${isVideo ? "Video" : "Image"} link has been copied to clipboard`,
         duration: 3000
       });
     } catch (error) {
-      console.error('Error sharing image:', error);
+      console.error('Error sharing content:', error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -81,17 +89,30 @@ export const PromptDialog = ({
     >
       <DialogContent className="sm:max-w-3xl bg-card/95 backdrop-blur border-white/10 h-auto max-h-[90vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>Image Details</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            {isVideo && <Video className="h-4 w-4" />}
+            {isVideo ? "Video" : "Image"} Details
+          </DialogTitle>
         </DialogHeader>
         
         {selectedGeneration && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-hidden">
-            <div className="aspect-[3/4] rounded-md overflow-hidden h-auto flex-shrink-0">
-              <img 
-                src={selectedGeneration.image_url} 
-                alt="Selected generation" 
-                className="w-full h-full object-cover"
-              />
+            <div className="aspect-[3/4] rounded-md overflow-hidden h-auto flex-shrink-0 bg-black/30">
+              {isVideo ? (
+                <video 
+                  src={selectedGeneration.image_url} 
+                  className="w-full h-full object-contain"
+                  controls
+                  autoPlay
+                  loop
+                />
+              ) : (
+                <img 
+                  src={selectedGeneration.image_url} 
+                  alt="Selected generation" 
+                  className="w-full h-full object-cover"
+                />
+              )}
             </div>
             
             <div className="space-y-3 overflow-y-auto pr-2 flex-grow">
@@ -185,4 +206,3 @@ export const PromptDialog = ({
     </Dialog>
   );
 };
-

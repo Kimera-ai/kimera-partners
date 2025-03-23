@@ -15,6 +15,7 @@ export const useGenerationJobs = (session: any) => {
   const jobCompletedRef = useRef<{images: string[], config: any} | null>(null);
   const { toast } = useToast();
 
+  // Fetch previous generations on session change
   useEffect(() => {
     if (session?.user) {
       fetchPreviousGens();

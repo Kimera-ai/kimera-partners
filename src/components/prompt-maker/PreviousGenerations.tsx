@@ -8,7 +8,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
-import { Play } from "lucide-react";
+import { Play, Video } from "lucide-react";
 
 interface PreviousGenerationsProps {
   previousGenerations: any[];
@@ -52,11 +52,6 @@ export const PreviousGenerations = ({
     // Try to create a thumbnail URL by replacing video extension with jpg
     const baseUrl = url.replace(/\.[^/.]+$/, '');
     return `${baseUrl}.jpg`;
-  };
-
-  const toggleVideoPlayback = (videoUrl: string, event: React.MouseEvent) => {
-    event.stopPropagation();
-    setPlayingVideo(playingVideo === videoUrl ? null : videoUrl);
   };
   
   return (
@@ -126,56 +121,38 @@ export const PreviousGenerations = ({
             {previousGenerations.map((generation, index) => {
               const isVideo = isVideoUrl(generation.image_url);
               const thumbnailUrl = getThumbnailUrl(generation.image_url);
-              const isPlaying = playingVideo === generation.image_url;
               
               return (
                 <div 
                   key={index} 
                   className="relative aspect-[3/4] rounded-md overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all bg-black/20"
                   onClick={() => {
-                    if (!isPlaying) {
-                      handleImageClick(generation);
-                      setIsHistoryOpen(false);
-                      resetPointerEvents();
-                    }
+                    handleImageClick(generation);
+                    setIsHistoryOpen(false);
+                    resetPointerEvents();
                   }}
                 >
-                  {isVideo && isPlaying ? (
-                    <video 
-                      src={generation.image_url} 
-                      className="h-full w-full object-cover"
-                      autoPlay 
-                      loop 
-                      controls
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                  ) : (
-                    <>
-                      <img 
-                        src={thumbnailUrl} 
-                        alt={`Generated ${index}`} 
-                        className="h-full w-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.src = 'https://placehold.co/600x800/191223/404040?text=Media';
-                        }}
-                      />
-                      
-                      {isVideo && (
-                        <div 
-                          className="absolute inset-0 flex items-center justify-center"
-                          onClick={(e) => toggleVideoPlayback(generation.image_url, e)}
-                        >
-                          <button className="bg-black/60 hover:bg-black/80 text-white p-3 rounded-full transition-colors">
-                            <Play className="h-5 w-5" />
-                          </button>
-                        </div>
-                      )}
-                    </>
+                  <img 
+                    src={thumbnailUrl} 
+                    alt={`Generated ${index}`} 
+                    className="h-full w-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = 'https://placehold.co/600x800/191223/404040?text=Media';
+                    }}
+                  />
+                  
+                  {isVideo && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="bg-black/60 text-white p-3 rounded-full">
+                        <Play className="h-5 w-5" />
+                      </div>
+                    </div>
                   )}
                   
                   {isVideo && (
-                    <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
-                      Video
+                    <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                      <Video className="h-3 w-3" />
+                      <span>Video</span>
                     </div>
                   )}
                 </div>
