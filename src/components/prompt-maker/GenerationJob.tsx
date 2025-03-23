@@ -151,7 +151,7 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
                         src={imageData.url} 
                         className="w-full h-full object-cover" 
                         autoPlay 
-                        loop 
+                        loop
                         controls
                         onClick={(e) => e.stopPropagation()}
                       />

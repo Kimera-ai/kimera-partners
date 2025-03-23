@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import { Video } from "@/types/marketing";
@@ -17,6 +18,7 @@ export const VideoCard = ({ video }: { video: Video }) => {
               src={video.downloadUrl}
               controls
               autoPlay
+              loop
               className="w-full h-full object-cover"
               onPause={() => setIsPlaying(false)}
             />
