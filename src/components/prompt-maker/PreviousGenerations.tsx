@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { ChevronRight, Play, Video } from "lucide-react";
+import { ChevronRight, Play, Pause, Video } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -32,17 +32,6 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     } catch {
       return "Unknown date";
     }
-  };
-
-  // Create a fallback image URL for video thumbnails
-  const getVideoThumbnail = (videoUrl: string) => {
-    // Try to create a thumbnail URL by replacing .mp4 with .jpg or .png
-    if (videoUrl.endsWith('.mp4')) {
-      // First try jpg extension
-      return videoUrl.replace('.mp4', '.jpg');
-    }
-    // If not a .mp4 file or thumbnail fetch fails, onError will use the placeholder
-    return videoUrl;
   };
   
   const toggleVideoPlayback = (videoUrl: string, event: React.MouseEvent) => {
@@ -86,42 +75,23 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
                     >
                       {isVideo ? (
                         <>
-                          {playingVideo === generation.image_url ? (
-                            <video 
-                              src={generation.image_url} 
-                              className="w-full h-full object-cover" 
-                              autoPlay 
-                              loop 
-                              muted
-                              onClick={e => e.stopPropagation()} 
-                            />
-                          ) : (
-                            <>
-                              <video
-                                src={generation.image_url}
-                                className="w-full h-full object-cover"
-                                autoPlay
-                                loop
-                                muted
-                                playsInline
-                                onError={() => {
-                                  console.error(`Failed to load video at ${generation.image_url}`);
-                                }}
-                              />
-                              <div className="absolute top-2 right-2 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded-full flex items-center gap-1">
-                                <Video className="h-3 w-3" />
-                                <span>Video</span>
-                              </div>
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <button 
-                                  className="bg-black/60 hover:bg-black/80 text-white p-3 rounded-full transition-colors" 
-                                  onClick={e => toggleVideoPlayback(generation.image_url, e)}
-                                >
-                                  <Play className="h-5 w-5" />
-                                </button>
-                              </div>
-                            </>
-                          )}
+                          <video 
+                            src={generation.image_url} 
+                            className="w-full h-full object-cover" 
+                            autoPlay 
+                            loop 
+                            muted
+                            playsInline
+                            onClick={(e) => e.stopPropagation()} 
+                            onError={() => {
+                              console.error(`Failed to load video at ${generation.image_url}`);
+                            }}
+                          />
+                          <div className="absolute top-2 right-2 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded-full flex items-center gap-1">
+                            <Video className="h-3 w-3" />
+                            <span>Video</span>
+                          </div>
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         </>
                       ) : (
                         <img 

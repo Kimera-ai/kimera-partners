@@ -1,5 +1,5 @@
 
-import { Clock, Loader2, Share2, Check, AlertTriangle, Play } from "lucide-react";
+import { Clock, Loader2, Share2, Check, AlertTriangle, Play, Pause } from "lucide-react";
 import React, { forwardRef, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -134,41 +134,18 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
                 onClick={() => onImageClick && onImageClick(imageData)}
               >
                 {imageData.isVideo ? (
-                  <>
-                    {playingVideo === imageData.url ? (
-                      <video 
-                        src={imageData.url} 
-                        className="w-full h-full object-cover" 
-                        autoPlay 
-                        loop
-                        muted
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    ) : (
-                      <>
-                        <video
-                          src={imageData.url}
-                          className="w-full h-full object-cover"
-                          autoPlay
-                          loop
-                          muted
-                          playsInline
-                          onClick={(e) => e.stopPropagation()}
-                          onError={() => {
-                            console.error(`Failed to load video at ${imageData.url}`);
-                          }}
-                        />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <button 
-                            className="bg-black/60 hover:bg-black/80 text-white p-4 rounded-full transition-colors"
-                            onClick={(e) => toggleVideoPlayback(imageData.url, e)}
-                          >
-                            <Play className="h-6 w-6" />
-                          </button>
-                        </div>
-                      </>
-                    )}
-                  </>
+                  <video 
+                    src={imageData.url} 
+                    className="w-full h-full object-cover" 
+                    autoPlay 
+                    loop
+                    muted
+                    playsInline
+                    onClick={(e) => e.stopPropagation()}
+                    onError={() => {
+                      console.error(`Failed to load video at ${imageData.url}`);
+                    }}
+                  />
                 ) : (
                   <img 
                     src={imageData.url} 
@@ -213,9 +190,13 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
                     <button 
                       className="bg-white/10 hover:bg-white/20 text-white p-1 rounded-full transition-colors"
                       onClick={(e) => toggleVideoPlayback(imageData.url, e)}
-                      title={playingVideo === imageData.url ? "Pause video" : "Play video"}
+                      title="Toggle video playback"
                     >
-                      <Play size={20} />
+                      {playingVideo === imageData.url ? (
+                        <Pause size={20} />
+                      ) : (
+                        <Play size={20} />
+                      )}
                     </button>
                   )}
                 </div>
