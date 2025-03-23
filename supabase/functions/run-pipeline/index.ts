@@ -25,15 +25,20 @@ serve(async (req) => {
     // Select the appropriate pipeline ID
     const selectedPipelineId = isVideo ? VIDEO_PIPELINE_ID : PIPELINE_ID;
 
-    // Make request to Kimera AI API
-    const response = await fetch('https://api.kimera.ai/v1/pipeline/run', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': KIMERA_API_KEY
-      },
-      body: JSON.stringify({
-        pipeline_id: selectedPipelineId,
+    // Create request body based on whether it's a video or image generation
+    let requestBody;
+    
+    if (isVideo) {
+      // For video, only send the required fields: pipeline_id, imageUrl, and prompt
+      requestBody = {
+        pipeline_id: VIDEO_PIPELINE_ID,
+        imageUrl,
+        prompt
+      };
+    } else {
+      // For image, include all the additional parameters
+      requestBody = {
+        pipeline_id: PIPELINE_ID,
         imageUrl,
         ratio,
         prompt,
@@ -42,7 +47,19 @@ serve(async (req) => {
           style: style,
           seed: seed
         }
-      })
+      };
+    }
+
+    console.log(`Making ${isVideo ? 'video' : 'image'} generation request with:`, JSON.stringify(requestBody));
+
+    // Make request to Kimera AI API
+    const response = await fetch('https://api.kimera.ai/v1/pipeline/run', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': KIMERA_API_KEY
+      },
+      body: JSON.stringify(requestBody)
     });
 
     const data = await response.json();
@@ -62,6 +79,7 @@ serve(async (req) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
+    console.error('Error in run-pipeline function:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
