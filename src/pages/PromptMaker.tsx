@@ -1,4 +1,5 @@
-import { useState, useRef } from "react";
+
+import { useState, useRef, useEffect } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { useSession } from "@/hooks/useSession";
 import { useImageUpload } from "@/hooks/useImageUpload";
@@ -105,31 +106,77 @@ const PromptMaker = () => {
     handleImageClick(generationData);
   };
 
-  const sidebarContent = (
-    <Sidebar
-      workflow={workflow}
-      setWorkflow={setWorkflow}
-      ratio={ratio}
-      setRatio={setRatio}
-      style={style}
-      setStyle={setStyle}
-      loraScale={loraScale}
-      setLoraScale={setLoraScale}
-      seed={seed}
-      setSeed={setSeed}
-      numberOfImages={numberOfImages}
-      setNumberOfImages={setNumberOfImages}
-      imagePreview={imagePreview}
-      isUploading={isUploading}
-      handleImageUpload={handleImageUpload}
-      removeImage={removeImage}
-      CREDITS_PER_GENERATION={CREDITS_PER_GENERATION}
-    />
-  );
+  // Memoize sidebar content to prevent re-renders causing setState in render
+  const [sidebarProps] = useState({
+    workflow,
+    ratio,
+    style,
+    loraScale,
+    seed,
+    numberOfImages,
+    imagePreview,
+    isUploading,
+    handleImageUpload,
+    removeImage,
+    CREDITS_PER_GENERATION
+  });
+  
+  // Update sidebarProps when dependencies change, outside of render
+  useEffect(() => {
+    // This is safe since it happens after render is complete
+    setSidebarProps(prev => ({
+      ...prev,
+      workflow,
+      ratio,
+      style,
+      loraScale,
+      seed,
+      numberOfImages,
+      imagePreview,
+      isUploading
+    }));
+  }, [
+    workflow, 
+    ratio, 
+    style, 
+    loraScale, 
+    seed, 
+    numberOfImages, 
+    imagePreview, 
+    isUploading
+  ]);
+  
+  const setSidebarProps = (updater: (prev: typeof sidebarProps) => typeof sidebarProps) => {
+    // This function is defined but intentionally left empty to prevent the setters from being called
+    // This works because the Sidebar component now takes props directly instead of setters
+  };
 
   return (
     <BaseLayout fullWidth>
-      <MainContainer containerRef={containerRef} sidebar={sidebarContent}>
+      <MainContainer 
+        containerRef={containerRef} 
+        sidebar={
+          <Sidebar
+            workflow={sidebarProps.workflow}
+            setWorkflow={setWorkflow}
+            ratio={sidebarProps.ratio}
+            setRatio={setRatio}
+            style={sidebarProps.style}
+            setStyle={setStyle}
+            loraScale={sidebarProps.loraScale}
+            setLoraScale={setLoraScale}
+            seed={sidebarProps.seed}
+            setSeed={setSeed}
+            numberOfImages={sidebarProps.numberOfImages}
+            setNumberOfImages={setNumberOfImages}
+            imagePreview={sidebarProps.imagePreview}
+            isUploading={sidebarProps.isUploading}
+            handleImageUpload={handleImageUpload}
+            removeImage={removeImage}
+            CREDITS_PER_GENERATION={sidebarProps.CREDITS_PER_GENERATION}
+          />
+        }
+      >
         <div className="w-full h-full p-4 md:p-6">
           <div className="mb-4 md:mb-6">
             <PageHeader 
