@@ -67,10 +67,10 @@ export const useGenerationJobs = (session: any) => {
     }
   }, [toast, session]);
 
-  const fetchPreviousGens = async () => {
+  const fetchPreviousGens = useCallback(async () => {
     const generations = await fetchPreviousGenerations();
     setPreviousGenerations(generations);
-  };
+  }, []);
 
   const handleJobComplete = useCallback(async (
     completedImages: string[], 

@@ -1,4 +1,5 @@
-import React from "react";
+
+import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import {
   Drawer,
@@ -7,6 +8,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
+import { Play } from "lucide-react";
 
 interface PreviousGenerationsProps {
   previousGenerations: any[];
@@ -21,6 +23,8 @@ export const PreviousGenerations = ({
   isHistoryOpen,
   setIsHistoryOpen
 }: PreviousGenerationsProps) => {
+  const [playingVideo, setPlayingVideo] = useState<string | null>(null);
+  
   if (previousGenerations.length === 0) return null;
   
   const getGridClass = (imageCount: number) => {
@@ -36,6 +40,25 @@ export const PreviousGenerations = ({
     }, 300);
   };
   
+  // Check if an URL is a video (ends with common video extensions)
+  const isVideoUrl = (url: string) => {
+    return /\.(mp4|webm|mov)($|\?)/.test(url.toLowerCase());
+  };
+
+  // Get a valid thumbnail for videos or return the original URL for images
+  const getThumbnailUrl = (url: string) => {
+    if (!isVideoUrl(url)) return url;
+    
+    // Try to create a thumbnail URL by replacing video extension with jpg
+    const baseUrl = url.replace(/\.[^/.]+$/, '');
+    return `${baseUrl}.jpg`;
+  };
+
+  const toggleVideoPlayback = (videoUrl: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    setPlayingVideo(playingVideo === videoUrl ? null : videoUrl);
+  };
+  
   return (
     <Drawer 
       open={isHistoryOpen} 
@@ -43,6 +66,7 @@ export const PreviousGenerations = ({
         setIsHistoryOpen(open);
         if (!open) {
           resetPointerEvents();
+          setPlayingVideo(null); // Stop any playing videos when drawer closes
         }
       }}
       direction="right"
@@ -99,23 +123,64 @@ export const PreviousGenerations = ({
           </div>
           
           <div className={`grid ${getGridClass(previousGenerations.length)} gap-4`}>
-            {previousGenerations.map((generation, index) => (
-              <div 
-                key={index} 
-                className="relative aspect-[3/4] rounded-md overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all"
-                onClick={() => {
-                  handleImageClick(generation);
-                  setIsHistoryOpen(false);
-                  resetPointerEvents();
-                }}
-              >
-                <img 
-                  src={generation.image_url} 
-                  alt={`Generated ${index}`} 
-                  className="h-full w-full object-cover"
-                />
-              </div>
-            ))}
+            {previousGenerations.map((generation, index) => {
+              const isVideo = isVideoUrl(generation.image_url);
+              const thumbnailUrl = getThumbnailUrl(generation.image_url);
+              const isPlaying = playingVideo === generation.image_url;
+              
+              return (
+                <div 
+                  key={index} 
+                  className="relative aspect-[3/4] rounded-md overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all bg-black/20"
+                  onClick={() => {
+                    if (!isPlaying) {
+                      handleImageClick(generation);
+                      setIsHistoryOpen(false);
+                      resetPointerEvents();
+                    }
+                  }}
+                >
+                  {isVideo && isPlaying ? (
+                    <video 
+                      src={generation.image_url} 
+                      className="h-full w-full object-cover"
+                      autoPlay 
+                      loop 
+                      controls
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  ) : (
+                    <>
+                      <img 
+                        src={thumbnailUrl} 
+                        alt={`Generated ${index}`} 
+                        className="h-full w-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = 'https://placehold.co/600x800/191223/404040?text=Media';
+                        }}
+                      />
+                      
+                      {isVideo && (
+                        <div 
+                          className="absolute inset-0 flex items-center justify-center"
+                          onClick={(e) => toggleVideoPlayback(generation.image_url, e)}
+                        >
+                          <button className="bg-black/60 hover:bg-black/80 text-white p-3 rounded-full transition-colors">
+                            <Play className="h-5 w-5" />
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  )}
+                  
+                  {isVideo && (
+                    <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
+                      Video
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </DrawerContent>
