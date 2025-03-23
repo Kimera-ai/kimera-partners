@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronRight, Play, Pause, Video } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
@@ -10,13 +10,15 @@ interface PreviousGenerationsProps {
   handleImageClick: (generation: any) => void;
   isHistoryOpen: boolean;
   setIsHistoryOpen: (open: boolean) => void;
+  refreshTrigger?: number; // Add refresh trigger prop
 }
 
 export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
   previousGenerations,
   handleImageClick,
   isHistoryOpen,
-  setIsHistoryOpen
+  setIsHistoryOpen,
+  refreshTrigger
 }) => {
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
 
@@ -38,6 +40,13 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     event.stopPropagation();
     setPlayingVideo(playingVideo === videoUrl ? null : videoUrl);
   };
+  
+  // Reset playing video when the sheet is closed
+  useEffect(() => {
+    if (!isHistoryOpen) {
+      setPlayingVideo(null);
+    }
+  }, [isHistoryOpen]);
   
   return (
     <Sheet open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>

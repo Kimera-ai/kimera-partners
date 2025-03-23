@@ -43,6 +43,7 @@ export const fetchPreviousGenerations = async () => {
       return [];
     }
     
+    console.log('Fetched generations count:', data?.length || 0);
     return data || [];
   } catch (error) {
     console.error('Error in fetchPreviousGenerations:', error);
@@ -63,10 +64,19 @@ export const storeGeneratedImages = async (
     isVideo?: boolean;
   }
 ) => {
-  if (!session?.user) return false;
+  if (!session?.user) {
+    console.log("No user session, skipping storage");
+    return false;
+  }
+  
+  if (!generatedImages || generatedImages.length === 0) {
+    console.error("No images to store");
+    return false;
+  }
   
   try {
     const userId = session.user.id;
+    console.log(`Storing ${generatedImages.length} images for user ${userId}`);
     
     // Prepare batch insert data - convert all values to the expected types
     const insertData = generatedImages.map(imageUrl => ({
@@ -84,16 +94,20 @@ export const storeGeneratedImages = async (
       // Note: We removed is_video as it's not in the database schema
     }));
     
+    console.log("Inserting data:", insertData.length, "rows");
+    
     // Use the existing generated_images table
-    const { error } = await supabase
+    const { error, data } = await supabase
       .from('generated_images')
-      .insert(insertData);
+      .insert(insertData)
+      .select();
     
     if (error) {
       console.error('Error storing generated images:', error);
       return false;
     }
     
+    console.log('Successfully stored images:', data?.length || 0);
     return true;
   } catch (error) {
     console.error('Error in storeGeneratedImages:', error);

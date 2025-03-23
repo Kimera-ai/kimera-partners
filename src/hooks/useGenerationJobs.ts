@@ -18,6 +18,7 @@ export const useGenerationJobs = (session: any) => {
   // Fetch previous generations on session change using useCallback to avoid recreation
   const fetchPreviousGens = useCallback(async () => {
     const generations = await fetchPreviousGenerations();
+    console.log("Fetched previous generations:", generations.length);
     setPreviousGenerations(generations);
   }, []);
 
@@ -61,9 +62,13 @@ export const useGenerationJobs = (session: any) => {
       
       // Process storage after render is complete
       const processStorage = async () => {
+        console.log("Storing generated images:", images.length);
         const stored = await storeGeneratedImages(session, images, config);
         if (stored) {
-          fetchPreviousGens();
+          console.log("Images stored, refreshing history");
+          await fetchPreviousGens();
+        } else {
+          console.error("Failed to store images");
         }
       };
       
@@ -98,6 +103,9 @@ export const useGenerationJobs = (session: any) => {
           : job
       )
     );
+    
+    // Log job completion for debugging
+    console.log(`Job ${jobConfig.jobId}: completed=true, validImages=${completedImages.length}, isVideo=${jobConfig.isVideo || false}`);
     
     // Store completion info in ref for the effect to handle
     jobCompletedRef.current = {

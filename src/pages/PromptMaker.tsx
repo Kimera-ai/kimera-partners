@@ -22,6 +22,7 @@ const PromptMaker = () => {
   const [selectedGeneration, setSelectedGeneration] = useState<any | null>(null);
   const [showPromptDialog, setShowPromptDialog] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [historyRefreshTrigger, setHistoryRefreshTrigger] = useState(0); // Add refresh trigger state
   const jobRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const containerRef = useRef<HTMLDivElement | null>(null);
   
@@ -49,8 +50,17 @@ const PromptMaker = () => {
     pollJobStatus,
     startNewJob,
     updateJobStatus,
-    latestJobRef
+    latestJobRef,
+    fetchPreviousGenerations
   } = useGenerationJobs(session);
+
+  // Trigger history refresh when jobs are completed
+  useEffect(() => {
+    if (generationJobs.some(job => job.isCompleted)) {
+      fetchPreviousGenerations();
+      setHistoryRefreshTrigger(prev => prev + 1);
+    }
+  }, [generationJobs, fetchPreviousGenerations]);
   
   const {
     workflow,
@@ -228,6 +238,7 @@ const PromptMaker = () => {
         handleImageClick={handleImageClick}
         isHistoryOpen={isHistoryOpen}
         setIsHistoryOpen={setIsHistoryOpen}
+        refreshTrigger={historyRefreshTrigger}
       />
 
       <PromptDialog 
