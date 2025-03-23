@@ -1,10 +1,8 @@
-
 import React, { useState, useEffect } from "react";
 import { ChevronRight, Play, Pause, Video } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-
 interface PreviousGenerationsProps {
   previousGenerations: any[];
   handleImageClick: (generation: any) => void;
@@ -12,7 +10,6 @@ interface PreviousGenerationsProps {
   setIsHistoryOpen: (open: boolean) => void;
   refreshTrigger?: number; // Add refresh trigger prop
 }
-
 export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
   previousGenerations,
   handleImageClick,
@@ -27,7 +24,6 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     if (!url) return false;
     return /\.(mp4|webm|mov)($|\?)/.test(url.toLowerCase());
   };
-  
   const formatDate = (dateString: string) => {
     try {
       return new Date(dateString).toLocaleString();
@@ -35,23 +31,20 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
       return "Unknown date";
     }
   };
-  
   const toggleVideoPlayback = (videoUrl: string, event: React.MouseEvent) => {
     event.stopPropagation();
     setPlayingVideo(playingVideo === videoUrl ? null : videoUrl);
   };
-  
+
   // Reset playing video when the sheet is closed
   useEffect(() => {
     if (!isHistoryOpen) {
       setPlayingVideo(null);
     }
   }, [isHistoryOpen]);
-  
-  return (
-    <Sheet open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
+  return <Sheet open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
       <SheetTrigger asChild>
-        <Button variant="outline" size="sm" className="fixed right-0 top-1/2 -translate-y-1/2 bg-card/30 backdrop-blur-md border-l border-t border-b border-white/10 hover:bg-card/50 rounded-r-none py-8 px-2 z-10">
+        <Button variant="outline" size="sm" className="fixed right-0 top-1/2 -translate-y-1/2 bg-card/30 backdrop-blur-md border-l border-t border-b border-white/10 hover:bg-card/50 rounded-r-none z-10 px-0 py-[54px] mx-0 my-[236px]">
           <div className="flex flex-col items-center">
             <span className="whitespace-nowrap rotate-90 text-sm">History</span>
           </div>
@@ -65,50 +58,25 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
             <p className="text-sm text-muted-foreground">Your previous image and video generations</p>
           </div>
           
-          {previousGenerations.length === 0 ? (
-            <div className="flex-1 flex items-center justify-center p-6">
+          {previousGenerations.length === 0 ? <div className="flex-1 flex items-center justify-center p-6">
               <div className="text-center">
                 <p className="text-muted-foreground">No previous generations found</p>
               </div>
-            </div>
-          ) : (
-            <div className="flex-1 overflow-y-auto scrollbar-none">
+            </div> : <div className="flex-1 overflow-y-auto scrollbar-none">
               <div className="p-3 grid grid-cols-2 gap-3">
                 {previousGenerations.map((generation, index) => {
-                  const isVideo = isVideoUrl(generation.image_url);
-                  return (
-                    <div 
-                      key={index} 
-                      className="relative group rounded-md overflow-hidden bg-black cursor-pointer aspect-[3/4]" 
-                      onClick={() => handleImageClick(generation)}
-                    >
-                      {isVideo ? (
-                        <>
-                          <video 
-                            src={generation.image_url} 
-                            className="w-full h-full object-cover" 
-                            autoPlay 
-                            loop 
-                            muted
-                            playsInline
-                            onClick={(e) => e.stopPropagation()} 
-                            onError={() => {
-                              console.error(`Failed to load video at ${generation.image_url}`);
-                            }}
-                          />
+              const isVideo = isVideoUrl(generation.image_url);
+              return <div key={index} className="relative group rounded-md overflow-hidden bg-black cursor-pointer aspect-[3/4]" onClick={() => handleImageClick(generation)}>
+                      {isVideo ? <>
+                          <video src={generation.image_url} className="w-full h-full object-cover" autoPlay loop muted playsInline onClick={e => e.stopPropagation()} onError={() => {
+                    console.error(`Failed to load video at ${generation.image_url}`);
+                  }} />
                           <div className="absolute top-2 right-2 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded-full flex items-center gap-1">
                             <Video className="h-3 w-3" />
                             <span>Video</span>
                           </div>
                           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        </>
-                      ) : (
-                        <img 
-                          src={generation.image_url} 
-                          alt={`Generated ${index}`} 
-                          className="w-full h-full object-cover" 
-                        />
-                      )}
+                        </> : <img src={generation.image_url} alt={`Generated ${index}`} className="w-full h-full object-cover" />}
                       
                       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2 text-xs text-white">
                         <div className="line-clamp-2 mb-1">
@@ -118,12 +86,10 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
                           {formatDate(generation.created_at)}
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    </div>;
+            })}
               </div>
-            </div>
-          )}
+            </div>}
           
           <div className="p-3 border-t border-white/10">
             <Button variant="outline" className="w-full border-white/10" onClick={() => setIsHistoryOpen(false)}>
@@ -132,6 +98,5 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
           </div>
         </div>
       </SheetContent>
-    </Sheet>
-  );
+    </Sheet>;
 };
