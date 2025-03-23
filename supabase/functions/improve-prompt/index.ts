@@ -46,10 +46,12 @@ Core Functions:
 - When creating a person, always use a medium shot with them looking at the camera—unless specified otherwise.`;
     }
 
-    // If we have an image URL and this is a video workflow, analyze the image
+    // Create messages array for API call
     let messages = [];
     
     if (workflow === 'video' && imageUrl) {
+      console.log("Processing video workflow with image:", imageUrl);
+      
       messages = [
         {
           role: 'system',
@@ -64,7 +66,9 @@ Core Functions:
             },
             {
               type: "image_url",
-              image_url: imageUrl
+              image_url: {
+                url: imageUrl
+              }
             }
           ]
         }
@@ -82,6 +86,8 @@ Core Functions:
       ];
     }
 
+    console.log("Sending to OpenAI with messages:", JSON.stringify(messages));
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -96,7 +102,19 @@ Core Functions:
     });
 
     const data = await response.json();
+    
+    if (!response.ok) {
+      console.error("OpenAI API error:", data);
+      throw new Error(data.error?.message || "Error from OpenAI API");
+    }
+    
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      console.error("Unexpected API response format:", data);
+      throw new Error("Unexpected response format from OpenAI API");
+    }
+    
     const improvedPrompt = data.choices[0].message.content;
+    console.log("Generated improved prompt:", improvedPrompt);
 
     return new Response(JSON.stringify({ improvedPrompt }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

@@ -51,8 +51,21 @@ export const useImageGeneration = (
       return;
     }
     
+    if (!prompt && workflow !== 'video') {
+      toast.warning("Please enter a basic prompt to improve", {
+        duration: 3000
+      });
+      return;
+    }
+    
     try {
       setIsImprovingPrompt(true);
+      
+      console.log("Calling improve-prompt with:", { 
+        prompt, 
+        workflow, 
+        imageUrl: uploadedImageUrl 
+      });
       
       const { data, error } = await supabase.functions.invoke('improve-prompt', {
         body: { 
@@ -62,7 +75,12 @@ export const useImageGeneration = (
         }
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error("Error from improve-prompt function:", error);
+        throw error;
+      }
+      
+      console.log("Improve prompt response:", data);
       
       if (data?.improvedPrompt) {
         setPrompt(data.improvedPrompt);
@@ -74,10 +92,17 @@ export const useImageGeneration = (
         toast.success(successMessage, {
           duration: 5000
         });
+      } else {
+        throw new Error("No improved prompt returned from the API");
       }
     } catch (error) {
       console.error('Error improving prompt:', error);
-      toast.error("Failed to improve the prompt. Please try again.", {
+      
+      const errorMessage = workflow === 'video'
+        ? "Failed to analyze the image. Please try again or use a different image."
+        : "Failed to improve the prompt. Please try again.";
+        
+      toast.error(errorMessage, {
         duration: 5000
       });
     } finally {

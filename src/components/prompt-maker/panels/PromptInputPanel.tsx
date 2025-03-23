@@ -57,9 +57,29 @@ export const PromptInputPanel = ({
   // Get appropriate enhance tooltip text based on workflow
   const getEnhanceTooltipText = () => {
     if (workflow === 'video') {
-      return "Analyze image and enhance prompt with cinematic details";
+      return imagePreview 
+        ? "Analyze image and enhance prompt with cinematic details" 
+        : "Upload an image first to analyze for video generation";
     }
     return "Enhance prompt with AI";
+  };
+
+  // Get enhance button classes based on state
+  const getEnhanceButtonClasses = () => {
+    const baseClasses = "h-8 w-8 rounded-md flex items-center justify-center transition-colors";
+    
+    if (isImprovingPrompt || isProcessing) {
+      return `${baseClasses} opacity-50 cursor-not-allowed bg-[#242038] border border-purple-500/30`;
+    }
+    
+    if (workflow === 'video') {
+      if (!imagePreview) {
+        return `${baseClasses} opacity-50 cursor-not-allowed bg-[#242038] border border-purple-500/30`;
+      }
+      return `${baseClasses} cursor-pointer bg-gradient-to-r from-purple-600 to-amber-500 hover:opacity-90`;
+    }
+    
+    return `${baseClasses} cursor-pointer bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90`;
   };
 
   const getPromptPlaceholder = () => {
@@ -140,13 +160,7 @@ export const PromptInputPanel = ({
             <TooltipTrigger asChild>
               <button
                 type="button"
-                className={`h-8 w-8 rounded-md flex items-center justify-center ${
-                  isImprovingPrompt || isProcessing || (workflow === 'video' && !imagePreview) ? 
-                  'opacity-50 cursor-not-allowed bg-[#242038] border border-purple-500/30' : 
-                  workflow === 'video' ? 
-                  'cursor-pointer bg-gradient-to-r from-purple-600 to-amber-500 hover:opacity-90' :
-                  'cursor-pointer bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90'
-                } transition-colors`}
+                className={getEnhanceButtonClasses()}
                 onClick={handleImprovePrompt}
                 disabled={isImprovingPrompt || isProcessing || (workflow === 'video' && !imagePreview)}
               >
