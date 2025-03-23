@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Download, Share2, Check, Copy, Video } from "lucide-react";
+import { Download, Share2, Check, Video } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface PromptDialogProps {
@@ -46,7 +46,7 @@ export const PromptDialog = ({
   const handleShare = async () => {
     try {
       if (!selectedGeneration?.image_url) {
-        throw new Error('No valid image URL to share');
+        throw new Error('No valid URL to share');
       }
       
       // Copy the URL to clipboard
@@ -161,7 +161,9 @@ export const PromptDialog = ({
                         ? "With Reference" 
                         : selectedGeneration.pipeline_id === "803a4MBY" 
                           ? "No Reference" 
-                          : "Unknown"}
+                          : selectedGeneration.pipeline_id === "1bPwBZEg"
+                            ? "Video Generation"
+                            : "Unknown"}
                     </p>
                   </div>
 
@@ -179,7 +181,7 @@ export const PromptDialog = ({
               <div className="flex gap-2 pt-2">
                 <Button 
                   className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600" 
-                  onClick={() => handleDownload(selectedGeneration.image_url)}
+                  onClick={() => selectedGeneration.image_url && handleDownload(selectedGeneration.image_url)}
                 >
                   <Download className="h-4 w-4 mr-2" /> Download
                 </Button>
