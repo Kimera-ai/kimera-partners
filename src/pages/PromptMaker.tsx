@@ -1,5 +1,5 @@
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { useSession } from "@/hooks/useSession";
 import { useImageUpload } from "@/hooks/useImageUpload";
@@ -106,8 +106,8 @@ const PromptMaker = () => {
     handleImageClick(generationData);
   };
 
-  // Memoize sidebar content to prevent re-renders causing setState in render
-  const [sidebarProps] = useState({
+  // Memoize sidebar props to prevent re-rendering issues
+  const sidebarProps = useMemo(() => ({
     workflow,
     ratio,
     style,
@@ -118,24 +118,14 @@ const PromptMaker = () => {
     isUploading,
     handleImageUpload,
     removeImage,
-    CREDITS_PER_GENERATION
-  });
-  
-  // Update sidebarProps when dependencies change, outside of render
-  useEffect(() => {
-    // This is safe since it happens after render is complete
-    setSidebarProps(prev => ({
-      ...prev,
-      workflow,
-      ratio,
-      style,
-      loraScale,
-      seed,
-      numberOfImages,
-      imagePreview,
-      isUploading
-    }));
-  }, [
+    CREDITS_PER_GENERATION,
+    setWorkflow,
+    setRatio,
+    setStyle,
+    setLoraScale,
+    setSeed,
+    setNumberOfImages
+  }), [
     workflow, 
     ratio, 
     style, 
@@ -143,13 +133,17 @@ const PromptMaker = () => {
     seed, 
     numberOfImages, 
     imagePreview, 
-    isUploading
+    isUploading,
+    CREDITS_PER_GENERATION,
+    setWorkflow,
+    setRatio,
+    setStyle,
+    setLoraScale,
+    setSeed,
+    setNumberOfImages,
+    handleImageUpload,
+    removeImage
   ]);
-  
-  const setSidebarProps = (updater: (prev: typeof sidebarProps) => typeof sidebarProps) => {
-    // This function is defined but intentionally left empty to prevent the setters from being called
-    // This works because the Sidebar component now takes props directly instead of setters
-  };
 
   return (
     <BaseLayout fullWidth>
@@ -158,17 +152,17 @@ const PromptMaker = () => {
         sidebar={
           <Sidebar
             workflow={sidebarProps.workflow}
-            setWorkflow={setWorkflow}
+            setWorkflow={sidebarProps.setWorkflow}
             ratio={sidebarProps.ratio}
-            setRatio={setRatio}
+            setRatio={sidebarProps.setRatio}
             style={sidebarProps.style}
-            setStyle={setStyle}
+            setStyle={sidebarProps.setStyle}
             loraScale={sidebarProps.loraScale}
-            setLoraScale={setLoraScale}
+            setLoraScale={sidebarProps.setLoraScale}
             seed={sidebarProps.seed}
-            setSeed={setSeed}
+            setSeed={sidebarProps.setSeed}
             numberOfImages={sidebarProps.numberOfImages}
-            setNumberOfImages={setNumberOfImages}
+            setNumberOfImages={sidebarProps.setNumberOfImages}
             imagePreview={sidebarProps.imagePreview}
             isUploading={sidebarProps.isUploading}
             handleImageUpload={handleImageUpload}
