@@ -1,5 +1,6 @@
+
 import React, { useState } from "react";
-import { ChevronRight, Clock, Play, Video } from "lucide-react";
+import { ChevronRight, Play, Video } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -48,8 +49,7 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
       <SheetTrigger asChild>
         <Button variant="outline" size="sm" className="fixed right-0 top-1/2 -translate-y-1/2 bg-card/30 backdrop-blur-md border-l border-t border-b border-white/10 hover:bg-card/50 rounded-r-none py-8 px-2 z-10">
           <div className="flex flex-col items-center">
-            <Clock className="h-4 w-4 mb-1" />
-            <span className="text-xs whitespace-nowrap rotate-90">1</span>
+            <span className="text-xs whitespace-nowrap rotate-90">History</span>
           </div>
           <ChevronRight className="h-4 w-4 absolute -right-1 opacity-60" />
         </Button>
