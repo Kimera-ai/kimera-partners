@@ -1,10 +1,9 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { corsHeaders } from "../_shared/cors.ts";
 
 const KIMERA_API_KEY = "1712edc40e3eb72c858332fe7500bf33e885324f8c1cd52b8cded2cdfd724cee";
 const PIPELINE_ID = "803a4MBY";
-const VIDEO_PIPELINE_ID = "wkE3eiap";
+const VIDEO_PIPELINE_ID = "1bPwBZEg";
 
 serve(async (req) => {
   // Handle CORS
