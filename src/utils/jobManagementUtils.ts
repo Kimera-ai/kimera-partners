@@ -1,101 +1,99 @@
 
-import { GenerationJobType } from '@/components/prompt-maker/GenerationJob';
 import { supabase } from "@/integrations/supabase/client";
+import { GenerationJobType } from "@/components/prompt-maker/GenerationJob";
 
 export const formatTime = (milliseconds: number) => {
-  const seconds = Math.floor(milliseconds / 1000);
-  const ms = milliseconds % 1000;
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  return `${mins}:${secs.toString().padStart(2, '0')}.${ms.toString().padStart(3, '0')}`;
+  const totalSeconds = Math.floor(milliseconds / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 };
 
-export const createNewJob = (
-  numImagesToGenerate: number, 
-  jobIdCounter: number
-): { job: GenerationJobType, newJobId: string } => {
-  const jobId = `job-${jobIdCounter}`;
+export const createNewJob = (numImagesToGenerate: number, jobIdCounter: number, isVideo: boolean = false) => {
+  const newJobId = `job-${jobIdCounter}`;
+  const emptyImageArray = Array(numImagesToGenerate).fill(null);
   
-  // Create a new generation job with the correct number of images
-  const newJob: GenerationJobType = {
-    id: jobId,
-    status: "Starting pipeline...",
+  const job: GenerationJobType = {
+    id: newJobId,
+    status: "Starting...",
     completedImages: 0,
     totalImages: numImagesToGenerate,
-    generatedImages: new Array(numImagesToGenerate).fill(null),
+    generatedImages: emptyImageArray,
     isCompleted: false,
-    displayImages: false, // Initially set to false, will be set to true when all images are complete
+    displayImages: false,
     startTime: Date.now(),
-    elapsedTime: 0
+    elapsedTime: 0,
+    isVideo: isVideo
   };
   
-  return { job: newJob, newJobId: jobId };
+  return { job, newJobId };
+};
+
+export const fetchPreviousGenerations = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('user_generations')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(20);
+    
+    if (error) {
+      console.error('Error fetching previous generations:', error);
+      return [];
+    }
+    
+    return data || [];
+  } catch (error) {
+    console.error('Error in fetchPreviousGenerations:', error);
+    return [];
+  }
 };
 
 export const storeGeneratedImages = async (
-  session: any,
-  completedImages: string[],
+  session: any, 
+  generatedImages: string[], 
   jobConfig: {
-    jobId: string;
     jobPrompt: string;
     jobStyle: string;
     jobRatio: string;
     jobLoraScale: string;
     pipeline_id?: string;
     seed?: number | string;
+    isVideo?: boolean;
   }
 ) => {
-  const { jobPrompt, jobStyle, jobRatio, jobLoraScale, pipeline_id, seed } = jobConfig;
+  if (!session?.user) return false;
   
   try {
-    console.log("Storing generated images with data:", { 
-      images: completedImages.length,
-      prompt: jobPrompt,
-      style: jobStyle,
-      ratio: jobRatio,
-      lora_scale: jobLoraScale,
-      pipeline_id,
-      seed
-    });
+    const userId = session.user.id;
     
-    // Convert any seed value to string before storing
-    const seedString = seed !== undefined ? String(seed) : null;
+    // Prepare batch insert data
+    const insertData = generatedImages.map(imageUrl => ({
+      user_id: userId,
+      image_url: imageUrl,
+      prompt: jobConfig.jobPrompt,
+      style: jobConfig.jobStyle,
+      ratio: jobConfig.jobRatio,
+      lora_scale: jobConfig.jobLoraScale,
+      pipeline_id: jobConfig.pipeline_id,
+      seed: typeof jobConfig.seed === 'number' ? jobConfig.seed : 
+            jobConfig.seed === 'random' ? -1 : parseInt(jobConfig.seed as string) || -1,
+      is_video: jobConfig.isVideo || false
+    }));
     
-    await Promise.all(completedImages.map(imageUrl => 
-      supabase.from('generated_images').insert({
-        user_id: session?.user?.id,
-        image_url: imageUrl,
-        prompt: jobPrompt,
-        style: jobStyle,
-        ratio: jobRatio,
-        lora_scale: jobLoraScale,
-        pipeline_id: pipeline_id || null,
-        seed: seedString
-      })
-    ));
+    // Insert all images at once
+    const { error } = await supabase
+      .from('user_generations')
+      .insert(insertData);
+    
+    if (error) {
+      console.error('Error storing generated images:', error);
+      return false;
+    }
+    
     return true;
   } catch (error) {
-    console.error('Error storing generations:', error);
+    console.error('Error in storeGeneratedImages:', error);
     return false;
-  }
-};
-
-export const fetchPreviousGenerations = async () => {
-  try {
-    const { data, error } = await supabase
-      .from('generated_images')
-      .select('*')
-      .order('created_at', { ascending: false });
-    
-    if (error) throw error;
-    
-    const uniqueGenerations = data?.filter((gen, index, self) => 
-      index === self.findIndex(g => g.image_url === gen.image_url)
-    ) || [];
-    
-    return uniqueGenerations;
-  } catch (error) {
-    console.error('Error fetching previous generations:', error);
-    return [];
   }
 };

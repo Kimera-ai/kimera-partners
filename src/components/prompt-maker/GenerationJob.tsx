@@ -1,5 +1,5 @@
 
-import { Clock, Loader2, Share2, Check, AlertTriangle } from "lucide-react";
+import { Clock, Loader2, Share2, Check, AlertTriangle, Play } from "lucide-react";
 import React, { forwardRef, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -8,6 +8,7 @@ export interface GeneratedImageData {
   url: string;
   seed: string | null;
   pipeline_id: string | null;
+  isVideo?: boolean;
 }
 
 export interface GenerationJobType {
@@ -21,6 +22,7 @@ export interface GenerationJobType {
   startTime: number;
   elapsedTime: number;
   error?: string | null;
+  isVideo?: boolean;
 }
 
 interface GenerationJobProps {
@@ -35,8 +37,9 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
     const validImages = job.generatedImages.filter(img => img !== null) as GeneratedImageData[];
     const { toast } = useToast();
     const [copiedImageUrl, setCopiedImageUrl] = useState<string | null>(null);
+    const [playingVideo, setPlayingVideo] = useState<string | null>(null);
     
-    console.log(`Job ${job.id}: completed=${job.isCompleted}, validImages=${validImages.length}`);
+    console.log(`Job ${job.id}: completed=${job.isCompleted}, validImages=${validImages.length}, isVideo=${job.isVideo}`);
     
     const getGridClass = (imageCount: number) => {
       switch (imageCount) {
@@ -62,7 +65,7 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
         
         toast({
           title: "Link copied!",
-          description: "Image link has been copied to clipboard",
+          description: job.isVideo ? "Video link has been copied to clipboard" : "Image link has been copied to clipboard",
           duration: 3000
         });
       } catch (error) {
@@ -76,8 +79,12 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
       }
     };
 
+    const toggleVideoPlayback = (videoUrl: string, event: React.MouseEvent) => {
+      event.stopPropagation();
+      setPlayingVideo(playingVideo === videoUrl ? null : videoUrl);
+    };
+
     // Always show images if we have valid images, regardless of job completion status
-    // This is key to fixing the issue where some images don't display
     const shouldShowImages = validImages.length > 0;
 
     return (
@@ -95,7 +102,7 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
               {job.status}
               {job.totalImages > 0 && !job.error && (
                 <span className="text-muted-foreground ml-1 text-sm">
-                  ({job.completedImages}/{job.totalImages} images)
+                  ({job.completedImages}/{job.totalImages} {job.isVideo ? "videos" : "images"})
                 </span>
               )}
             </div>
@@ -126,16 +133,50 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
                 className="relative group rounded-md overflow-hidden bg-black aspect-[3/4] cursor-pointer"
                 onClick={() => onImageClick && onImageClick(imageData)}
               >
-                <img 
-                  src={imageData.url} 
-                  alt={`Generated ${index}`} 
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    // Handle image loading error
-                    console.error(`Failed to load image at ${imageData.url}`);
-                    e.currentTarget.src = 'https://placehold.co/600x800/191223/404040?text=Image+Failed+to+Load';
-                  }}
-                />
+                {imageData.isVideo ? (
+                  <>
+                    {playingVideo === imageData.url ? (
+                      <video 
+                        src={imageData.url} 
+                        className="w-full h-full object-cover" 
+                        autoPlay 
+                        loop 
+                        controls
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    ) : (
+                      <>
+                        <img 
+                          src={imageData.url.replace(/\.[^/.]+$/, ".jpg") || imageData.url} 
+                          alt={`Generated Video ${index}`} 
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            console.error(`Failed to load video thumbnail at ${imageData.url}`);
+                            e.currentTarget.src = 'https://placehold.co/600x800/191223/404040?text=Video+Thumbnail+Not+Available';
+                          }}
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <button 
+                            className="bg-black/60 hover:bg-black/80 text-white p-4 rounded-full transition-colors"
+                            onClick={(e) => toggleVideoPlayback(imageData.url, e)}
+                          >
+                            <Play className="h-6 w-6" />
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <img 
+                    src={imageData.url} 
+                    alt={`Generated ${index}`} 
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      console.error(`Failed to load image at ${imageData.url}`);
+                      e.currentTarget.src = 'https://placehold.co/600x800/191223/404040?text=Image+Failed+to+Load';
+                    }}
+                  />
+                )}
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                   <button 
                     className="bg-white/10 hover:bg-white/20 text-white p-1 rounded-full transition-colors"
@@ -143,7 +184,7 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
                       e.stopPropagation();
                       handleDownload(imageData.url);
                     }}
-                    title="Download image"
+                    title={`Download ${imageData.isVideo ? 'video' : 'image'}`}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -157,7 +198,7 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
                       e.stopPropagation();
                       handleShare(imageData.url);
                     }}
-                    title="Copy image link"
+                    title={`Copy ${imageData.isVideo ? 'video' : 'image'} link`}
                   >
                     {copiedImageUrl === imageData.url ? (
                       <Check size={20} />
@@ -165,10 +206,19 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
                       <Share2 size={20} />
                     )}
                   </button>
+                  {imageData.isVideo && (
+                    <button 
+                      className="bg-white/10 hover:bg-white/20 text-white p-1 rounded-full transition-colors"
+                      onClick={(e) => toggleVideoPlayback(imageData.url, e)}
+                      title={playingVideo === imageData.url ? "Pause video" : "Play video"}
+                    >
+                      <Play size={20} />
+                    </button>
+                  )}
                 </div>
                 {job.error && job.isCompleted && (
                   <div className="absolute bottom-0 left-0 right-0 bg-amber-500/20 text-amber-200 text-xs py-1 px-2">
-                    Image {index + 1} generated successfully
+                    {imageData.isVideo ? "Video" : "Image"} {index + 1} generated successfully
                   </div>
                 )}
               </div>
@@ -183,7 +233,7 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
               {job.error}
             </p>
             <p className="mt-1 text-xs text-amber-300/70">
-              {job.completedImages} of {job.totalImages} images were successfully generated.
+              {job.completedImages} of {job.totalImages} {job.isVideo ? "videos were" : "images were"} successfully generated.
             </p>
           </div>
         )}

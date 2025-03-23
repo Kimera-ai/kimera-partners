@@ -13,7 +13,7 @@ export const useImageGeneration = (
   isLoadingCredits: boolean,
   updateUserCredits: (creditsToDeduct: number) => Promise<boolean>,
   setCredits: (creditsFn: ((prev: number | null) => number | null)) => void,
-  startNewJob: (numImagesToGenerate: number) => string,
+  startNewJob: (numImagesToGenerate: number, isVideo?: boolean) => string,
   updateJobStatus: (jobId: string, status: string) => void,
   pollJobStatus: (config: {
     apiJobId: string;
@@ -25,6 +25,7 @@ export const useImageGeneration = (
     jobLoraScale: string;
     pipeline_id?: string;
     seed?: number | string;
+    isVideo?: boolean;
   }) => void,
   uploadedImageUrl: string | null
 ) => {
@@ -95,6 +96,7 @@ export const useImageGeneration = (
     const numImages = parseInt(numberOfImages);
     const creditsPerGeneration = getCreditsPerGeneration();
     const totalCost = creditsPerGeneration * numImages;
+    const isVideoGeneration = workflow === 'video';
     
     if (credits === null || isLoadingCredits) {
       toast.info("Please wait while we check your available credits.", {
@@ -104,7 +106,7 @@ export const useImageGeneration = (
     }
     
     if (credits < totalCost) {
-      toast.error(`You need ${totalCost} credits to generate ${numImages} ${numImages === 1 ? 'image' : 'images'}, but you only have ${credits}. Please contact support@kimera.ai to purchase more credits.`, {
+      toast.error(`You need ${totalCost} credits to generate ${numImages} ${isVideoGeneration ? 'video' : 'image'}${numImages === 1 ? '' : 's'}, but you only have ${credits}. Please contact support@kimera.ai to purchase more credits.`, {
         duration: 8000
       });
       return;
@@ -121,11 +123,11 @@ export const useImageGeneration = (
     }
 
     try {
-      const jobId = startNewJob(numImages);
+      const jobId = startNewJob(numImages, isVideoGeneration);
       
       const numImagesToGenerate = parseInt(numberOfImages);
       
-      updateJobStatus(jobId, `Preparing to generate ${numImagesToGenerate} ${workflow === 'video' ? 'videos' : 'images'}...`);
+      updateJobStatus(jobId, `Preparing to generate ${numImagesToGenerate} ${isVideoGeneration ? 'videos' : 'images'}...`);
       
       const defaultImageUrl = "https://www.jeann.online/cdn-cgi/image/format=jpeg/https://kimera-media.s3.eu-north-1.amazonaws.com/623b36fe-ac7f-4c56-a124-cddb942a38e5_event/623b36fe-ac7f-4c56-a124-cddb942a38e5_source.jpeg";
       
@@ -177,7 +179,7 @@ export const useImageGeneration = (
           }
         };
         
-        console.log(`Request for ${currentWorkflow === 'video' ? 'video' : 'image'} ${i+1} with seed:`, seedValue);
+        console.log(`Request for ${isVideoGeneration ? 'video' : 'image'} ${i+1} with seed:`, seedValue);
         console.log("API Request body:", JSON.stringify(requestBody, null, 2));
         
         generateRequests.push(fetch('https://api.kimera.ai/v1/pipeline/run', {
@@ -198,10 +200,10 @@ export const useImageGeneration = (
           try {
             const errorData = await responses[i].json();
             console.error(`Pipeline error response for request ${i+1}:`, errorData);
-            responseErrors.push(`${workflow === 'video' ? 'Video' : 'Image'} ${i+1}: ${errorData.message || 'Unknown error'}`);
+            responseErrors.push(`${isVideoGeneration ? 'Video' : 'Image'} ${i+1}: ${errorData.message || 'Unknown error'}`);
           } catch (e) {
             console.error(`Failed to parse error response for request ${i+1}:`, e);
-            responseErrors.push(`${workflow === 'video' ? 'Video' : 'Image'} ${i+1}: HTTP error ${responses[i].status}`);
+            responseErrors.push(`${isVideoGeneration ? 'Video' : 'Image'} ${i+1}: HTTP error ${responses[i].status}`);
           }
         }
       }
@@ -215,7 +217,7 @@ export const useImageGeneration = (
           duration: 5000
         });
         
-        updateJobStatus(jobId, `Processing ${responses.length - responseErrors.length} of ${numImagesToGenerate} ${workflow === 'video' ? 'videos' : 'images'}...`);
+        updateJobStatus(jobId, `Processing ${responses.length - responseErrors.length} of ${numImagesToGenerate} ${isVideoGeneration ? 'videos' : 'images'}...`);
       }
       
       const successfulResponses = responses.filter(r => r.ok);
@@ -229,7 +231,7 @@ export const useImageGeneration = (
         throw new Error("Failed to start any generation jobs");
       }
       
-      updateJobStatus(jobId, `Processing ${apiJobIds.length} ${workflow === 'video' ? 'videos' : 'images'}...`);
+      updateJobStatus(jobId, `Processing ${apiJobIds.length} ${isVideoGeneration ? 'videos' : 'images'}...`);
       
       apiJobIds.forEach((apiJobId, index) => {
         pollJobStatus({
@@ -241,7 +243,8 @@ export const useImageGeneration = (
           jobRatio: currentRatio,
           jobLoraScale: currentLoraScale,
           pipeline_id: pipelineId,
-          seed: currentSeed === "random" ? -1 : parseInt(currentSeed)
+          seed: currentSeed === "random" ? -1 : parseInt(currentSeed),
+          isVideo: isVideoGeneration
         });
       });
       

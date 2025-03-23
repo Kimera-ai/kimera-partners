@@ -54,6 +54,7 @@ export const useGenerationJobs = (session: any) => {
       jobLoraScale: string;
       pipeline_id?: string;
       seed?: number | string;
+      isVideo?: boolean;
     }
   ) => {
     // Add all images to the generatedImages collection at once
@@ -70,7 +71,7 @@ export const useGenerationJobs = (session: any) => {
     
     toast({
       title: "Success",
-      description: `Job completed! All images have been generated successfully!`,
+      description: `Job completed! All ${jobConfig.isVideo ? 'videos' : 'images'} have been generated successfully!`,
       duration: 3000
     });
     
@@ -81,8 +82,8 @@ export const useGenerationJobs = (session: any) => {
     }
   };
 
-  const startNewJob = (numImagesToGenerate: number) => {
-    const { job: newJob, newJobId } = createNewJob(numImagesToGenerate, jobIdCounter);
+  const startNewJob = (numImagesToGenerate: number, isVideo: boolean = false) => {
+    const { job: newJob, newJobId } = createNewJob(numImagesToGenerate, jobIdCounter, isVideo);
     
     // Add the new job to the beginning of the list
     setGenerationJobs(prev => [newJob, ...prev]);
@@ -113,6 +114,7 @@ export const useGenerationJobs = (session: any) => {
     jobLoraScale: string;
     pipeline_id?: string;
     seed?: number | string;
+    isVideo?: boolean;
   }) => {
     pollJobStatus(
       config,
