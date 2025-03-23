@@ -101,7 +101,7 @@ export const PromptDialog = ({
               {isVideo ? (
                 <video 
                   src={selectedGeneration.image_url} 
-                  className="w-full h-full object-contain"
+                  className="w-full h-auto max-h-[600px] object-contain"
                   controls
                   autoPlay
                   loop

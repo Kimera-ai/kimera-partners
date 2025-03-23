@@ -15,12 +15,18 @@ export const useGenerationJobs = (session: any) => {
   const jobCompletedRef = useRef<{images: string[], config: any} | null>(null);
   const { toast } = useToast();
 
-  // Fetch previous generations on session change
+  // Fetch previous generations on session change using useCallback to avoid recreation
+  const fetchPreviousGens = useCallback(async () => {
+    const generations = await fetchPreviousGenerations();
+    setPreviousGenerations(generations);
+  }, []);
+
+  // Fetch generations when session changes
   useEffect(() => {
     if (session?.user) {
       fetchPreviousGens();
     }
-  }, [session?.user]);
+  }, [session?.user, fetchPreviousGens]);
 
   // Add timer effect to update elapsed time for all jobs
   useEffect(() => {
@@ -66,12 +72,7 @@ export const useGenerationJobs = (session: any) => {
       // Reset the ref
       jobCompletedRef.current = null;
     }
-  }, [toast, session]);
-
-  const fetchPreviousGens = useCallback(async () => {
-    const generations = await fetchPreviousGenerations();
-    setPreviousGenerations(generations);
-  }, []);
+  }, [toast, session, fetchPreviousGens]);
 
   const handleJobComplete = useCallback(async (
     completedImages: string[], 
