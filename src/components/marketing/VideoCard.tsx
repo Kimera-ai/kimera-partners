@@ -29,7 +29,14 @@ export const VideoCard = ({ video }: { video: Video }) => {
                 <video
                   src={video.downloadUrl}
                   className="w-full h-full object-cover cursor-pointer"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
                   onClick={() => setIsPlaying(true)}
+                  onError={() => {
+                    console.error(`Failed to load video at ${video.downloadUrl}`);
+                  }}
                 />
               ) : (
                 <img 

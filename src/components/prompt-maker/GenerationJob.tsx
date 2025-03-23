@@ -86,17 +86,6 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
 
     // Always show images if we have valid images, regardless of job completion status
     const shouldShowImages = validImages.length > 0;
-    
-    // Create a fallback image URL for video thumbnails
-    const getVideoThumbnail = (videoUrl: string) => {
-      // Try to create a thumbnail URL by replacing .mp4 with .jpg or .png
-      if (videoUrl.endsWith('.mp4')) {
-        // First try jpg extension
-        return videoUrl.replace('.mp4', '.jpg');
-      }
-      // If not a .mp4 file or thumbnail fetch fails, onError will use the placeholder
-      return videoUrl;
-    };
 
     return (
       <Card ref={ref} className={`p-4 bg-card/40 backdrop-blur border ${job.error ? 'border-red-500/20' : 'border-white/5'} shadow-md mb-4`}>
@@ -157,14 +146,16 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
                       />
                     ) : (
                       <>
-                        <img 
-                          src={getVideoThumbnail(imageData.url)}
-                          alt={`Generated Video ${index}`} 
+                        <video
+                          src={imageData.url}
                           className="w-full h-full object-cover"
-                          onError={(e) => {
-                            console.error(`Failed to load video thumbnail at ${imageData.url}`);
-                            // Fallback to a placeholder image
-                            e.currentTarget.src = 'https://placehold.co/600x800/191223/404040?text=Video';
+                          autoPlay
+                          loop
+                          muted
+                          playsInline
+                          onClick={(e) => e.stopPropagation()}
+                          onError={() => {
+                            console.error(`Failed to load video at ${imageData.url}`);
                           }}
                         />
                         <div className="absolute inset-0 flex items-center justify-center">

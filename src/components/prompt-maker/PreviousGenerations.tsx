@@ -89,7 +89,7 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
                           {playingVideo === generation.image_url ? (
                             <video 
                               src={generation.image_url} 
-                              className="w-full h-auto max-h-[600px] object-contain" 
+                              className="w-full h-full object-cover" 
                               autoPlay 
                               loop 
                               muted
@@ -97,14 +97,16 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
                             />
                           ) : (
                             <>
-                              <img 
-                                src={getVideoThumbnail(generation.image_url)} 
-                                alt={`Generated video ${index}`} 
-                                className="w-full h-full object-cover" 
-                                onError={e => {
-                                  console.error(`Failed to load video thumbnail for ${generation.image_url}`);
-                                  e.currentTarget.src = 'https://placehold.co/600x800/191223/404040?text=Video';
-                                }} 
+                              <video
+                                src={generation.image_url}
+                                className="w-full h-full object-cover"
+                                autoPlay
+                                loop
+                                muted
+                                playsInline
+                                onError={() => {
+                                  console.error(`Failed to load video at ${generation.image_url}`);
+                                }}
                               />
                               <div className="absolute top-2 right-2 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded-full flex items-center gap-1">
                                 <Video className="h-3 w-3" />
