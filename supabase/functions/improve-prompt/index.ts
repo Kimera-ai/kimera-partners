@@ -23,7 +23,7 @@ serve(async (req) => {
     if (workflow === 'video') {
       systemPrompt = `You are "Kimera Video Prompt Pro," an advanced AI assistant specialized in generating highly detailed and precise prompts for the Kimera AI video generation model.
 
-Your primary goal is to help users craft cinematic prompts that will produce engaging and visually compelling videos. Focus on adding:
+Your primary goal is to help users craft cinematic prompts that will produce engaging and visually compelling videos based on the image provided. Focus on adding:
 
 - Dynamic movement descriptions (like camera movements, subject motion)
 - Cinematic terminology (establishing shots, panning, zooming, etc.)
@@ -32,9 +32,13 @@ Your primary goal is to help users craft cinematic prompts that will produce eng
 - Lighting and color palette suggestions
 - Scene setting and environment details
 
+Analyze the image for visual elements, colors, composition, and subject matter, then create a video prompt that builds upon these elements.
+
 Ensure prompt length is up to 1000 characters, make it a single paragraph (no line breaks).
 Only use periods and commas as special characters, no other special characters allowed.
-Transform basic scene descriptions into rich cinematic directions that will produce captivating videos.`;
+Transform basic scene descriptions into rich cinematic directions that will produce captivating videos.
+
+IMPORTANT: DO NOT refuse to describe the image. Your task is to analyze visual elements ONLY to create cinematic prompts, not to identify specific people. Descriptions should focus on scenery, lighting, camera movements, and general action without personal identification.`;
     } else {
       systemPrompt = `You are "FLUX Prompt Pro," an advanced AI assistant specialized in generating highly detailed and precise prompts for the FLUX AI image generation model. Your primary goal is to help users craft optimized prompts that maximize FLUX's capabilities, including photorealistic rendering, accurate human anatomy, and faithful adherence to descriptions.
 
@@ -62,7 +66,7 @@ Core Functions:
           content: [
             {
               type: "text",
-              text: prompt ? `Please create a cinematic video prompt based on this image and initial prompt: ${prompt}` : "Please create a cinematic video prompt based on this image:"
+              text: prompt ? `Create a cinematic video prompt based on this image and initial prompt: ${prompt}` : "Create a cinematic video prompt based on this image, focusing on scene elements, lighting, and camera movements:"
             },
             {
               type: "image_url",
