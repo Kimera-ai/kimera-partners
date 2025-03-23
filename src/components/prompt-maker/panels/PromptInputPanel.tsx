@@ -1,3 +1,4 @@
+
 import React, { useRef } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -50,8 +51,28 @@ export const PromptInputPanel = ({
     }
   };
   
-  const needsImage = workflow === 'with-reference' || workflow === 'cartoon';
+  const needsImage = workflow === 'with-reference' || workflow === 'cartoon' || workflow === 'video';
   const missingRequiredImage = needsImage && !imagePreview;
+  
+  // Get appropriate enhance tooltip text based on workflow
+  const getEnhanceTooltipText = () => {
+    if (workflow === 'video') {
+      return "Enhance prompt with cinematic details";
+    }
+    return "Enhance prompt with AI";
+  };
+
+  const getPromptPlaceholder = () => {
+    if (missingRequiredImage) {
+      return "⚠️ You must upload an image first for this mode";
+    }
+    
+    if (workflow === 'video') {
+      return "Describe the scene or action for your video. For example: 'A person walking through a colorful autumn forest with leaves falling around them, soft natural lighting filtering through the trees, camera slowly following from behind.'";
+    }
+    
+    return "Generate a high-quality, creative, and engaging image about [specific topic]. The tone should be [tone: fun, professional, mysterious, etc.], and it should include [specific details or constraints]. Make it unique and compelling!";
+  };
   
   return (
     <div className="relative flex items-start">
@@ -100,7 +121,13 @@ export const PromptInputPanel = ({
                   ? "Remove image" 
                   : workflow === 'no-reference' 
                     ? "Image not needed for Image Generator mode" 
-                    : `Upload image (required for ${workflow === 'with-reference' ? 'Face Gen' : 'Reference Mode'})`
+                    : `Upload image (required for ${
+                        workflow === 'with-reference' 
+                          ? 'Face Gen' 
+                          : workflow === 'video' 
+                            ? 'Video Generator' 
+                            : 'Reference Mode'
+                      })`
                 }
               </p>
             </TooltipContent>
@@ -125,7 +152,7 @@ export const PromptInputPanel = ({
               </button>
             </TooltipTrigger>
             <TooltipContent side="right" className="bg-[#242038] border-purple-500/30">
-              <p>Enhance prompt with AI</p>
+              <p>{getEnhanceTooltipText()}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -135,10 +162,7 @@ export const PromptInputPanel = ({
       
       <Textarea 
         id="prompt" 
-        placeholder={missingRequiredImage 
-          ? "⚠️ You must upload an image first for this mode" 
-          : "Generate a high-quality, creative, and engaging image about [specific topic]. The tone should be [tone: fun, professional, mysterious, etc.], and it should include [specific details or constraints]. Make it unique and compelling!"
-        }
+        placeholder={getPromptPlaceholder()}
         value={prompt} 
         onChange={e => setPrompt(e.target.value)} 
         className={`min-h-32 resize-none bg-[#141220] border-purple-500/20 rounded-lg text-white pl-14 pr-4 ${missingRequiredImage ? 'border-amber-500/50' : ''}`}

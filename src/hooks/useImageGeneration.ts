@@ -53,14 +53,22 @@ export const useImageGeneration = (
       setIsImprovingPrompt(true);
       
       const { data, error } = await supabase.functions.invoke('improve-prompt', {
-        body: { prompt }
+        body: { 
+          prompt,
+          workflow 
+        }
       });
       
       if (error) throw error;
       
       if (data?.improvedPrompt) {
         setPrompt(data.improvedPrompt);
-        toast.success("Your prompt has been enhanced with more details.", {
+        
+        const successMessage = workflow === 'video' 
+          ? "Your prompt has been enhanced with cinematic details."
+          : "Your prompt has been enhanced with more details.";
+          
+        toast.success(successMessage, {
           duration: 5000
         });
       }
