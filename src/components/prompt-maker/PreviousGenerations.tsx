@@ -92,7 +92,7 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
                               className="w-full h-auto max-h-[600px] object-contain" 
                               autoPlay 
                               loop 
-                              controls 
+                              muted
                               onClick={e => e.stopPropagation()} 
                             />
                           ) : (

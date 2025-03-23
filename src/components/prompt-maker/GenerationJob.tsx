@@ -152,7 +152,7 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
                         className="w-full h-full object-cover" 
                         autoPlay 
                         loop
-                        controls
+                        muted
                         onClick={(e) => e.stopPropagation()}
                       />
                     ) : (

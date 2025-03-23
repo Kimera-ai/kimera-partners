@@ -105,6 +105,7 @@ export const PromptDialog = ({
                   controls
                   autoPlay
                   loop
+                  muted
                 />
               ) : (
                 <img 
@@ -161,7 +162,7 @@ export const PromptDialog = ({
                         ? "With Reference" 
                         : selectedGeneration.pipeline_id === "803a4MBY" 
                           ? "No Reference" 
-                          : selectedGeneration.pipeline_id === "1bPwBZEg"
+                          : selectedGeneration.pipeline_id === "wkE3eiap"
                             ? "Video Generation"
                             : "Unknown"}
                     </p>

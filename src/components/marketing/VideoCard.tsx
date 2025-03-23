@@ -19,6 +19,7 @@ export const VideoCard = ({ video }: { video: Video }) => {
               controls
               autoPlay
               loop
+              muted
               className="w-full h-full object-cover"
               onPause={() => setIsPlaying(false)}
             />
