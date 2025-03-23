@@ -43,19 +43,21 @@ export const useImageGeneration = (
   };
 
   const handleImprovePrompt = async () => {
-    if (!prompt) {
-      toast.error("Please enter a prompt to improve", {
+    if (workflow === 'video' && !uploadedImageUrl) {
+      toast.error("Please upload an image for Video Generator mode first", {
         duration: 5000
       });
       return;
     }
+    
     try {
       setIsImprovingPrompt(true);
       
       const { data, error } = await supabase.functions.invoke('improve-prompt', {
         body: { 
           prompt,
-          workflow 
+          workflow,
+          imageUrl: uploadedImageUrl
         }
       });
       
@@ -65,7 +67,7 @@ export const useImageGeneration = (
         setPrompt(data.improvedPrompt);
         
         const successMessage = workflow === 'video' 
-          ? "Your prompt has been enhanced with cinematic details."
+          ? "Your prompt has been enhanced with cinematic details based on your image."
           : "Your prompt has been enhanced with more details.";
           
         toast.success(successMessage, {

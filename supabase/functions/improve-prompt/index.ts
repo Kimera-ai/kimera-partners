@@ -15,7 +15,7 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt, workflow } = await req.json();
+    const { prompt, workflow, imageUrl } = await req.json();
 
     // Define system prompts based on workflow type
     let systemPrompt = '';
@@ -46,6 +46,42 @@ Core Functions:
 - When creating a person, always use a medium shot with them looking at the camera—unless specified otherwise.`;
     }
 
+    // If we have an image URL and this is a video workflow, analyze the image
+    let messages = [];
+    
+    if (workflow === 'video' && imageUrl) {
+      messages = [
+        {
+          role: 'system',
+          content: systemPrompt
+        },
+        {
+          role: 'user',
+          content: [
+            {
+              type: "text",
+              text: prompt ? `Please create a cinematic video prompt based on this image and initial prompt: ${prompt}` : "Please create a cinematic video prompt based on this image:"
+            },
+            {
+              type: "image_url",
+              image_url: imageUrl
+            }
+          ]
+        }
+      ];
+    } else {
+      messages = [
+        {
+          role: 'system',
+          content: systemPrompt
+        },
+        {
+          role: 'user',
+          content: `Please improve this prompt: ${prompt}`
+        }
+      ];
+    }
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -53,17 +89,8 @@ Core Functions:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: systemPrompt
-          },
-          {
-            role: 'user',
-            content: `Please improve this prompt: ${prompt}`
-          }
-        ],
+        model: workflow === 'video' && imageUrl ? 'gpt-4o' : 'gpt-4o-mini',
+        messages: messages,
         temperature: 0.7,
       }),
     });

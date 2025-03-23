@@ -57,7 +57,7 @@ export const PromptInputPanel = ({
   // Get appropriate enhance tooltip text based on workflow
   const getEnhanceTooltipText = () => {
     if (workflow === 'video') {
-      return "Enhance prompt with cinematic details";
+      return "Analyze image and enhance prompt with cinematic details";
     }
     return "Enhance prompt with AI";
   };
@@ -140,9 +140,15 @@ export const PromptInputPanel = ({
             <TooltipTrigger asChild>
               <button
                 type="button"
-                className={`h-8 w-8 rounded-md flex items-center justify-center ${isImprovingPrompt || isProcessing || !prompt ? 'opacity-50 cursor-not-allowed bg-[#242038] border border-purple-500/30' : 'cursor-pointer bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90'} transition-colors`}
+                className={`h-8 w-8 rounded-md flex items-center justify-center ${
+                  isImprovingPrompt || isProcessing || (workflow === 'video' && !imagePreview) ? 
+                  'opacity-50 cursor-not-allowed bg-[#242038] border border-purple-500/30' : 
+                  workflow === 'video' ? 
+                  'cursor-pointer bg-gradient-to-r from-purple-600 to-amber-500 hover:opacity-90' :
+                  'cursor-pointer bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90'
+                } transition-colors`}
                 onClick={handleImprovePrompt}
-                disabled={isImprovingPrompt || isProcessing || !prompt}
+                disabled={isImprovingPrompt || isProcessing || (workflow === 'video' && !imagePreview)}
               >
                 {isImprovingPrompt ? (
                   <Loader2 className="h-4 w-4 animate-spin text-white" />
