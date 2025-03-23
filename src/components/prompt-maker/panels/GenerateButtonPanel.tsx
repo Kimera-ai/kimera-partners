@@ -34,7 +34,7 @@ export const GenerateButtonPanel = ({
     if ((workflow === 'with-reference' || workflow === 'cartoon' || workflow === 'video') && !uploadedImageUrl) return "Upload an image";
     if (credits !== null && credits < CREDITS_PER_GENERATION) return "Insufficient Credits";
     if (isLoadingCredits) return "Loading Credits...";
-    return workflow === 'video' ? `Generate Video` : `Generate`;
+    return workflow === 'video' ? `Generate Video (${totalCost} credits)` : `Generate`;
   };
 
   return (
@@ -50,7 +50,7 @@ export const GenerateButtonPanel = ({
       <span className="text-white text-sm">
         {getButtonText()}
       </span>
-      {!isButtonDisabled && (
+      {!isButtonDisabled && workflow !== 'video' && (
         <span className="ml-1 bg-white/20 text-white text-xs px-1.5 py-0.5 rounded-full">
           {totalCost}
         </span>

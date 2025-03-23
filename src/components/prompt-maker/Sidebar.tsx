@@ -1,4 +1,3 @@
-
 import React from "react";
 import { WorkflowPanel } from "./panels/WorkflowPanel";
 import { RatioAndImagesPanel } from "./panels/RatioAndImagesPanel";
@@ -81,7 +80,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="bg-[#1D1A27] rounded-lg border border-purple-500/20">
         <StylePanel 
           style={style} 
-          setStyle={setStyle} 
+          setStyle={setStyle}
+          workflow={workflow} 
         />
       </div>
       
@@ -109,7 +109,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   </div>
                 </TooltipTrigger>
                 <TooltipContent side="right" className="bg-[#242038] border-purple-500/30 text-white">
-                  <p>Fine-tune your generation with advanced parameters like LoRA Scale and Seed</p>
+                  <p>{workflow === "video" ? "Advanced settings are not applicable for video generation" : "Fine-tune your generation with advanced parameters like LoRA Scale and Seed"}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -120,7 +120,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
               loraScale={loraScale} 
               setLoraScale={setLoraScale} 
               seed={seed} 
-              setSeed={setSeed} 
+              setSeed={setSeed}
+              workflow={workflow}
             />
           </div>
         </div>

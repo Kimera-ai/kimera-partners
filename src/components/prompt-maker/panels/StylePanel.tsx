@@ -6,11 +6,13 @@ import { GenerationSettings } from "../types";
 import { ChevronDown, HelpCircle } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-type StylePanelProps = Pick<GenerationSettings, "style" | "setStyle">;
+type StylePanelProps = Pick<GenerationSettings, "style" | "setStyle" | "workflow">;
 
-export const StylePanel = ({ style, setStyle }: StylePanelProps) => {
+export const StylePanel = ({ style, setStyle, workflow }: StylePanelProps) => {
+  const isVideoWorkflow = workflow === "video";
+  
   return (
-    <div className="p-3">
+    <div className={`p-3 ${isVideoWorkflow ? "opacity-50" : ""}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-white/10">
@@ -25,7 +27,7 @@ export const StylePanel = ({ style, setStyle }: StylePanelProps) => {
                 <HelpCircle size={14} className="text-white/60" />
               </TooltipTrigger>
               <TooltipContent side="right" className="bg-[#242038] border-purple-500/30 max-w-xs text-white">
-                <p>Select visual style for your images: Cinematic, Animated, Digital Art, etc. Each style influences the final look of your generation.</p>
+                <p>{isVideoWorkflow ? "Style settings are not applicable for video generation" : "Select visual style for your images: Cinematic, Animated, Digital Art, etc. Each style influences the final look of your generation."}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -33,9 +35,13 @@ export const StylePanel = ({ style, setStyle }: StylePanelProps) => {
         <ChevronDown className="w-4 h-4 text-white/60" />
       </div>
       <div className="mt-2">
-        <Select value={style} onValueChange={setStyle}>
+        <Select 
+          value={style} 
+          onValueChange={setStyle} 
+          disabled={isVideoWorkflow}
+        >
           <SelectTrigger id="style" className="w-full bg-[#141220] border-white/10 text-white">
-            <SelectValue placeholder="Select style" />
+            <SelectValue placeholder={isVideoWorkflow ? "Not applicable for videos" : "Select style"} />
           </SelectTrigger>
           <SelectContent className="bg-[#1D1A27] border-white/10 text-white">
             <SelectItem value="Cinematic">Cinematic</SelectItem>
