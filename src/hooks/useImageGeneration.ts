@@ -146,7 +146,7 @@ export const useImageGeneration = (
     }
 
     try {
-      const jobId = startNewJob(numImages, isVideoGeneration);
+      const jobId = startNewJob(numImages, ratio, isVideoGeneration);
       
       const numImagesToGenerate = parseInt(numberOfImages);
       

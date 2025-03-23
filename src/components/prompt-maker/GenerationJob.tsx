@@ -23,6 +23,7 @@ export interface GenerationJobType {
   elapsedTime: number;
   error?: string | null;
   isVideo?: boolean;
+  ratio?: string; // Add ratio to job type
 }
 
 interface GenerationJobProps {
@@ -48,6 +49,22 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
         case 3: return "grid-cols-1 sm:grid-cols-3";
         default: return "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4";
       }
+    };
+
+    // Calculate optimal image dimensions based on ratio
+    const getImageStyle = (ratio: string = "2:3") => {
+      const [width, height] = ratio.split(":").map(Number);
+      const aspectRatio = width / height;
+      
+      // Set max height to 500px
+      const maxHeight = 500;
+      const calculatedWidth = maxHeight * aspectRatio;
+      
+      return {
+        maxHeight: `${maxHeight}px`,
+        maxWidth: `${calculatedWidth}px`,
+        aspectRatio: String(aspectRatio)
+      };
     };
 
     const handleShare = async (imageUrl: string) => {
@@ -130,7 +147,8 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
             {validImages.map((imageData, index) => (
               <div 
                 key={index} 
-                className="relative group rounded-md overflow-hidden bg-black aspect-[3/4] cursor-pointer"
+                className="relative group rounded-md overflow-hidden bg-black cursor-pointer mx-auto"
+                style={getImageStyle(job.ratio)}
                 onClick={() => onImageClick && onImageClick(imageData)}
               >
                 {imageData.isVideo ? (

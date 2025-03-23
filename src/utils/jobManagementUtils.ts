@@ -9,7 +9,7 @@ export const formatTime = (milliseconds: number) => {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 };
 
-export const createNewJob = (numImagesToGenerate: number, jobIdCounter: number, isVideo: boolean = false) => {
+export const createNewJob = (numImagesToGenerate: number, jobIdCounter: number, ratio: string, isVideo: boolean = false) => {
   const newJobId = `job-${jobIdCounter}`;
   const emptyImageArray = Array(numImagesToGenerate).fill(null);
   
@@ -23,7 +23,8 @@ export const createNewJob = (numImagesToGenerate: number, jobIdCounter: number, 
     displayImages: false,
     startTime: Date.now(),
     elapsedTime: 0,
-    isVideo: isVideo
+    isVideo: isVideo,
+    ratio: ratio  // Add the ratio to the job
   };
   
   return { job, newJobId };

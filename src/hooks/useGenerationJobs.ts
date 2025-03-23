@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { GenerationJobType } from '@/components/prompt-maker/GenerationJob';
@@ -115,8 +114,8 @@ export const useGenerationJobs = (session: any) => {
     
   }, []);
 
-  const startNewJob = useCallback((numImagesToGenerate: number, isVideo: boolean = false) => {
-    const { job: newJob, newJobId } = createNewJob(numImagesToGenerate, jobIdCounter, isVideo);
+  const startNewJob = useCallback((numImagesToGenerate: number, ratio: string, isVideo: boolean = false) => {
+    const { job: newJob, newJobId } = createNewJob(numImagesToGenerate, jobIdCounter, ratio, isVideo);
     
     // Add the new job to the beginning of the list
     setGenerationJobs(prev => [newJob, ...prev]);
