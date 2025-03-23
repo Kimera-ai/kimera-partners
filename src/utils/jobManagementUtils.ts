@@ -31,13 +31,12 @@ export const createNewJob = (numImagesToGenerate: number, jobIdCounter: number, 
 
 export const fetchPreviousGenerations = async () => {
   try {
-    // Use a raw query instead of the typed query to work around the TypeScript error
-    // This is a temporary solution until the Supabase schema is updated
+    // Use the existing generated_images table instead of user_generations
     const { data, error } = await supabase
-      .from('user_generations')
+      .from('generated_images')
       .select('*')
       .order('created_at', { ascending: false })
-      .limit(20) as any;
+      .limit(20);
     
     if (error) {
       console.error('Error fetching previous generations:', error);
@@ -83,10 +82,10 @@ export const storeGeneratedImages = async (
       is_video: jobConfig.isVideo || false
     }));
     
-    // Use a raw query instead of the typed query to work around the TypeScript error
+    // Use the existing generated_images table instead of user_generations
     const { error } = await supabase
-      .from('user_generations')
-      .insert(insertData) as any;
+      .from('generated_images')
+      .insert(insertData);
     
     if (error) {
       console.error('Error storing generated images:', error);
