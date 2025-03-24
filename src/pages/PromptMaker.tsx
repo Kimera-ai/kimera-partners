@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { useSession } from "@/hooks/useSession";
@@ -22,7 +21,7 @@ const PromptMaker = () => {
   const [selectedGeneration, setSelectedGeneration] = useState<any | null>(null);
   const [showPromptDialog, setShowPromptDialog] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
-  const [historyRefreshTrigger, setHistoryRefreshTrigger] = useState(0); // Add refresh trigger state
+  const [historyRefreshTrigger, setHistoryRefreshTrigger] = useState(0);
   const jobRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const containerRef = useRef<HTMLDivElement | null>(null);
   
@@ -54,7 +53,6 @@ const PromptMaker = () => {
     fetchPreviousGenerations
   } = useGenerationJobs(session);
 
-  // Trigger history refresh when jobs are completed
   useEffect(() => {
     if (generationJobs.some(job => job.isCompleted)) {
       fetchPreviousGenerations();
@@ -116,7 +114,6 @@ const PromptMaker = () => {
     handleImageClick(generationData);
   }, [prompt, style, ratio, loraScale, handleImageClick]);
 
-  // Memoize sidebar props to prevent re-rendering issues
   const sidebarProps = useMemo(() => ({
     workflow,
     setWorkflow,
@@ -184,7 +181,7 @@ const PromptMaker = () => {
         <div className="w-full h-full p-4 md:p-6">
           <div className="mb-4 md:mb-6">
             <PageHeader 
-              title="Kimera Image Generation"
+              title="Kimera Creation Tool"
               credits={credits}
               isLoadingCredits={isLoadingCredits}
               CREDITS_PER_GENERATION={CREDITS_PER_GENERATION}
