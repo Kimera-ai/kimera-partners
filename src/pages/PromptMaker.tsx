@@ -68,7 +68,21 @@ const PromptMaker = () => {
     if (hasCompletedJobs) {
       console.log("Jobs changed, refreshing history");
       fetchPreviousGenerations();
+      // Trigger multiple refreshes with delays
       setHistoryRefreshTrigger(prev => prev + 1);
+      
+      // Additional refreshes after delays
+      setTimeout(() => {
+        console.log("Delayed history refresh (2s)");
+        fetchPreviousGenerations();
+        setHistoryRefreshTrigger(prev => prev + 1);
+      }, 2000);
+      
+      setTimeout(() => {
+        console.log("Delayed history refresh (5s)");
+        fetchPreviousGenerations();
+        setHistoryRefreshTrigger(prev => prev + 1);
+      }, 5000);
     }
   }, [generationJobs, fetchPreviousGenerations]);
 
@@ -79,7 +93,7 @@ const PromptMaker = () => {
         console.log("Periodic history refresh");
         fetchPreviousGenerations();
         setHistoryRefreshTrigger(prev => prev + 1);
-      }, 15000); // Refresh every 15 seconds (decreased from 30 seconds)
+      }, 10000); // Refresh every 10 seconds (decreased from 15 seconds)
       
       return () => clearInterval(refreshInterval);
     }
@@ -91,6 +105,13 @@ const PromptMaker = () => {
       console.log("History panel opened, refreshing history");
       fetchPreviousGenerations();
       setHistoryRefreshTrigger(prev => prev + 1);
+      
+      // Force an additional refresh after a short delay
+      setTimeout(() => {
+        console.log("Forced refresh after history panel open");
+        fetchPreviousGenerations();
+        setHistoryRefreshTrigger(prev => prev + 1);
+      }, 500);
     }
   }, [isHistoryOpen, session?.user, fetchPreviousGenerations]);
 

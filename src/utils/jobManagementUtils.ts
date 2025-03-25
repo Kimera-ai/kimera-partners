@@ -84,6 +84,11 @@ export const storeGeneratedImages = async (
   try {
     const userId = session.user.id;
     console.log(`Storing ${generatedImages.length} ${jobConfig.isVideo ? 'videos' : 'images'} for user ${userId}`);
+    console.log("Storage config:", { 
+      isVideo: jobConfig.isVideo,
+      pipeline: jobConfig.pipeline_id,
+      urls: generatedImages.map(url => url.substring(0, 50) + '...')
+    });
     
     // Prepare batch insert data
     const insertData = generatedImages.map(imageUrl => ({
@@ -97,7 +102,7 @@ export const storeGeneratedImages = async (
       seed: typeof jobConfig.seed === 'number' ? 
             jobConfig.seed.toString() : 
             jobConfig.seed === 'random' ? '-1' : jobConfig.seed,
-      is_video: jobConfig.isVideo // Make sure is_video flag is set
+      is_video: Boolean(jobConfig.isVideo) // Ensure is_video is a boolean
     }));
     
     console.log("Inserting data:", JSON.stringify(insertData));

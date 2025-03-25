@@ -32,6 +32,8 @@ export const pollJobStatus = async (
     isVideo = false
   } = config;
   
+  console.log(`Starting job polling for ${apiJobId}, isVideo=${isVideo}`);
+  
   let lastStatus = '';
   let statusInterval: number;
   
@@ -66,7 +68,6 @@ export const pollJobStatus = async (
       }
       
       const data = await response.json();
-      console.log(`Job status for ${apiJobId}:`, data);
       
       if (data.status !== lastStatus) {
         lastStatus = data.status;
@@ -74,6 +75,7 @@ export const pollJobStatus = async (
       }
       
       if (data.status === 'completed') {
+        console.log(`Job ${apiJobId} completed. Full response:`, JSON.stringify(data));
         clearInterval(statusInterval);
         
         // Get the generated image URL - handle different result structures for video vs image
@@ -129,6 +131,16 @@ export const pollJobStatus = async (
         }
         
         if (imageUrl) {
+          // Double check the isVideo flag is correct based on URL
+          const urlSuggestsVideo = /\.(mp4|webm|mov)($|\?)/.test(imageUrl.toLowerCase());
+          if (urlSuggestsVideo !== isVideo) {
+            console.warn(`Possible isVideo mismatch: passed isVideo=${isVideo}, but URL suggests video=${urlSuggestsVideo}`);
+            // Trust the URL extension over the passed flag
+            // isVideo = urlSuggestsVideo;
+          }
+          
+          console.log(`Updating job with extracted URL and isVideo=${isVideo}`);
+          
           // Update the specific image in the job
           setGenerationJobs(prev => 
             prev.map(job => {
@@ -138,7 +150,7 @@ export const pollJobStatus = async (
                   url: imageUrl, 
                   seed: seed !== null ? seed.toString() : null,
                   pipeline_id: pipeline_id || null,
-                  isVideo: isVideo
+                  isVideo: Boolean(isVideo)
                 };
                 
                 const completedImagesCount = updatedGeneratedImages.filter(img => img !== null).length;
@@ -165,7 +177,7 @@ export const pollJobStatus = async (
                 url: imageUrl, 
                 seed: seed !== null ? seed.toString() : null,
                 pipeline_id: pipeline_id || null,
-                isVideo: isVideo
+                isVideo: Boolean(isVideo)
               };
               
               const allImagesCompleted = updatedGeneratedImages.every(img => img !== null);
@@ -174,6 +186,18 @@ export const pollJobStatus = async (
                 const imageUrls = updatedGeneratedImages
                   .filter(img => img !== null)
                   .map(img => (img as any).url);
+                
+                // Log the complete job configuration before passing it
+                console.log("Job completed, config for storage:", {
+                  jobId,
+                  jobPrompt,
+                  jobStyle,
+                  jobRatio,
+                  jobLoraScale,
+                  pipeline_id,
+                  seed,
+                  isVideo
+                });
                 
                 handleJobComplete(imageUrls, {
                   jobId,

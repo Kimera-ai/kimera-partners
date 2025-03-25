@@ -92,7 +92,7 @@ serve(async (req) => {
     }
     
     // Explicitly include isVideo in the response
-    data.isVideo = isVideo;
+    data.isVideo = Boolean(isVideo);
     console.log(`Final response with isVideo=${isVideo}:`, JSON.stringify(data));
 
     return new Response(

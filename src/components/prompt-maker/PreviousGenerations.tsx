@@ -54,7 +54,13 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     if (previousGenerations.length > 0) {
       console.log("Sample generation:", previousGenerations[0]);
       // Check for is_video flag on first item
-      console.log("is_video flag exists:", previousGenerations[0].is_video !== undefined);
+      const hasIsVideo = previousGenerations.some(gen => gen.is_video !== undefined);
+      console.log("is_video flag exists on generations:", hasIsVideo);
+      
+      // Log all items to check for video flag
+      previousGenerations.forEach((gen, index) => {
+        console.log(`Generation ${index}: is_video=${gen.is_video}, url=${gen.image_url?.substring(0, 30)}...`);
+      });
     }
   }, [previousGenerations]);
 
@@ -85,8 +91,8 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
             <div className="flex-1 overflow-y-auto scrollbar-none">
               <div className="p-3 grid grid-cols-2 gap-3">
                 {previousGenerations.map((generation, index) => {
-                  const isVideo = isVideoUrl(generation.image_url, generation.is_video);
-                  console.log(`Item ${index}: isVideo=${isVideo}, url=${generation.image_url.substring(0, 50)}...`);
+                  const isVideo = Boolean(generation.is_video) || isVideoUrl(generation.image_url);
+                  console.log(`Item ${index}: isVideo=${isVideo}, is_video=${generation.is_video}, url=${generation.image_url?.substring(0, 50)}...`);
                   
                   return (
                     <div 
