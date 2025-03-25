@@ -124,7 +124,7 @@ export const storeGeneratedImages = async (
         seed: typeof jobConfig.seed === 'number' ? 
               jobConfig.seed.toString() : 
               jobConfig.seed === 'random' ? '-1' : jobConfig.seed,
-        is_video: isVideo // Store as true/false boolean
+        is_video: isVideo // Now properly stored with our new column
       };
     });
     

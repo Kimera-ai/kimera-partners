@@ -97,11 +97,11 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
               <div className="p-3 grid grid-cols-2 gap-3">
                 {previousGenerations.map((generation, index) => {
                   // Determine if it's a video using both flag and URL
-                  const hasVideoFlag = generation.is_video === true || generation.is_video === 'true' || generation.is_video === 1;
+                  const isVideoFlag = generation.is_video === true || generation.is_video === 'true' || generation.is_video === 1;
                   const urlSuggestsVideo = isVideoUrl(generation.image_url);
-                  const isVideo = hasVideoFlag || urlSuggestsVideo;
+                  const isVideo = isVideoFlag || urlSuggestsVideo;
                   
-                  console.log(`Rendering item ${index}: hasVideoFlag=${hasVideoFlag}, urlSuggestsVideo=${urlSuggestsVideo}, final isVideo=${isVideo}`);
+                  console.log(`Rendering item ${index}: isVideoFlag=${isVideoFlag}, urlSuggestsVideo=${urlSuggestsVideo}, final isVideo=${isVideo}`);
                   
                   return (
                     <div 

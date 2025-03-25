@@ -21,13 +21,13 @@ export const PromptDialog = ({
   const { toast } = useToast();
   const [isCopied, setIsCopied] = useState(false);
   
-  // Helper function to check if URL is a video
-  const isVideoUrl = (url: string | undefined) => {
-    if (!url) return false;
-    return /\.(mp4|webm|mov)($|\?)/.test(url.toLowerCase());
-  };
-  
-  const isVideo = selectedGeneration ? isVideoUrl(selectedGeneration.image_url) : false;
+  // Helper function to check if URL is a video or if is_video flag is set
+  const isVideo = selectedGeneration ? 
+    (selectedGeneration.is_video === true || 
+     selectedGeneration.is_video === 'true' || 
+     selectedGeneration.is_video === 1 || 
+     /\.(mp4|webm|mov)($|\?)/.test(selectedGeneration.image_url?.toLowerCase())) 
+    : false;
   
   // Reset pointer events when dialog opens/closes
   useEffect(() => {
@@ -75,6 +75,17 @@ export const PromptDialog = ({
       });
     }
   };
+  
+  // Log for debugging
+  useEffect(() => {
+    if (selectedGeneration) {
+      console.log("Dialog showing generation:", {
+        url: selectedGeneration.image_url,
+        is_video: selectedGeneration.is_video,
+        isVideo: isVideo
+      });
+    }
+  }, [selectedGeneration, isVideo]);
   
   return (
     <Dialog 
@@ -156,15 +167,9 @@ export const PromptDialog = ({
 
                 <div className="grid grid-cols-2 gap-x-2">
                   <div>
-                    <h4 className="text-sm font-medium text-muted-foreground">Mode</h4>
+                    <h4 className="text-sm font-medium text-muted-foreground">Type</h4>
                     <p className="text-sm">
-                      {selectedGeneration.pipeline_id === "FYpcEIUj" 
-                        ? "With Reference" 
-                        : selectedGeneration.pipeline_id === "803a4MBY" 
-                          ? "No Reference" 
-                          : selectedGeneration.pipeline_id === "wkE3eiap"
-                            ? "Video Generation"
-                            : "Unknown"}
+                      {isVideo ? "Video" : "Image"}
                     </p>
                   </div>
 

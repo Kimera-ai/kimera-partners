@@ -68,6 +68,7 @@ export type Database = {
           created_at: string
           id: string
           image_url: string
+          is_video: boolean | null
           lora_scale: string | null
           pipeline_id: string | null
           prompt: string | null
@@ -81,6 +82,7 @@ export type Database = {
           created_at?: string
           id?: string
           image_url: string
+          is_video?: boolean | null
           lora_scale?: string | null
           pipeline_id?: string | null
           prompt?: string | null
@@ -94,6 +96,7 @@ export type Database = {
           created_at?: string
           id?: string
           image_url?: string
+          is_video?: boolean | null
           lora_scale?: string | null
           pipeline_id?: string | null
           prompt?: string | null
