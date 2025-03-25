@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Loader2 } from "lucide-react";
 import { CreditInfo, GenerationState } from "../types";
 
 interface GenerateButtonPanelProps extends CreditInfo, GenerationState {
@@ -8,6 +8,7 @@ interface GenerateButtonPanelProps extends CreditInfo, GenerationState {
   workflow: string;
   uploadedImageUrl: string | null;
   numberOfImages: string;
+  isGenerating?: boolean;
 }
 
 export const GenerateButtonPanel = ({
@@ -19,9 +20,11 @@ export const GenerateButtonPanel = ({
   isLoadingCredits,
   isProcessing,
   handleGenerate,
-  numberOfImages
+  numberOfImages,
+  isGenerating
 }: GenerateButtonPanelProps) => {
   const isButtonDisabled = isUploading || 
+    isGenerating ||
     ((workflow === 'with-reference' || workflow === 'cartoon' || workflow === 'video') && !uploadedImageUrl) || 
     (credits !== null && credits < CREDITS_PER_GENERATION) || 
     isLoadingCredits;
@@ -30,6 +33,7 @@ export const GenerateButtonPanel = ({
   const totalCost = CREDITS_PER_GENERATION * numImages;
 
   const getButtonText = () => {
+    if (isGenerating) return "Generating...";
     if (isUploading) return "Uploading...";
     if ((workflow === 'with-reference' || workflow === 'cartoon' || workflow === 'video') && !uploadedImageUrl) return "Upload an image";
     if (credits !== null && credits < CREDITS_PER_GENERATION) return "Insufficient Credits";
@@ -46,11 +50,15 @@ export const GenerateButtonPanel = ({
       onClick={handleGenerate}
       type="button"
     >
-      <Sparkles className="w-4 h-4 text-white" />
+      {isGenerating ? (
+        <Loader2 className="w-4 h-4 text-white animate-spin" />
+      ) : (
+        <Sparkles className="w-4 h-4 text-white" />
+      )}
       <span className="text-white text-sm">
         {getButtonText()}
       </span>
-      {!isButtonDisabled && workflow !== 'video' && (
+      {!isButtonDisabled && workflow !== 'video' && !isGenerating && (
         <span className="ml-1 bg-white/20 text-white text-xs px-1.5 py-0.5 rounded-full">
           {totalCost}
         </span>

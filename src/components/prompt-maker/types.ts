@@ -1,3 +1,4 @@
+
 export interface PromptSettings {
   prompt: string;
   setPrompt: (prompt: string) => void;
@@ -36,6 +37,7 @@ export interface CreditInfo {
 
 export interface GenerationState {
   isProcessing: boolean;
+  isGenerating?: boolean;
   handleGenerate: () => Promise<void>;
 }
 

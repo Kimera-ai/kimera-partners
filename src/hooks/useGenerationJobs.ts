@@ -13,39 +13,44 @@ export const useGenerationJobs = (session: any) => {
   const [jobIdCounter, setJobIdCounter] = useState(0);
   const [isRefreshingHistory, setIsRefreshingHistory] = useState(false);
   const latestJobRef = useRef<string | null>(null);
-  const jobCompletedRef = useRef<{images: string[], config: any} | null>(null);
   const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const jobsCompletedRef = useRef<boolean>(false);
   const { toast } = useToast();
 
-  // Enhanced fetch function with better error handling
+  // Optimized fetch function with debouncing
   const fetchPreviousGens = useCallback(async () => {
     if (isRefreshingHistory) return Promise.resolve([]);
     
     setIsRefreshingHistory(true);
-    console.log("HISTORY FETCH: Starting fetch of previous generations");
     
     try {
       const generations = await fetchPreviousGenerations();
-      console.log("HISTORY FETCH: Completed with", generations.length, "items");
       setPreviousGenerations(generations);
       return generations;
     } catch (error) {
       console.error("HISTORY FETCH ERROR:", error);
-      throw error;
+      return [];
     } finally {
       setIsRefreshingHistory(false);
     }
   }, [isRefreshingHistory]);
 
+  // Initial load only once when session is available
   useEffect(() => {
     if (session?.user) {
       fetchPreviousGens();
     }
   }, [session?.user, fetchPreviousGens]);
 
+  // Timer for job elapsed time - using RAF for better performance
   useEffect(() => {
-    const timer = setInterval(() => {
+    let rafId: number;
+    const updateJobTimes = () => {
       setGenerationJobs(prevJobs => {
+        // Check if any jobs need updating to avoid unnecessary renders
+        const needsUpdate = prevJobs.some(job => !job.isCompleted);
+        if (!needsUpdate) return prevJobs;
+        
         return prevJobs.map(job => {
           if (!job.isCompleted) {
             return { ...job, elapsedTime: Date.now() - job.startTime };
@@ -53,72 +58,18 @@ export const useGenerationJobs = (session: any) => {
           return job;
         });
       });
-    }, 10);
+      
+      rafId = requestAnimationFrame(updateJobTimes);
+    };
+    
+    rafId = requestAnimationFrame(updateJobTimes);
     
     return () => {
-      clearInterval(timer);
+      cancelAnimationFrame(rafId);
     };
   }, []);
 
-  // Controlled refresh logic when a job completes
-  useEffect(() => {
-    if (jobCompletedRef.current) {
-      const { images, config } = jobCompletedRef.current;
-      
-      toast({
-        title: "Success",
-        description: `Job completed! All ${config.isVideo ? 'videos' : 'images'} have been generated successfully!`,
-        duration: 3000
-      });
-      
-      const processStorage = async () => {
-        console.log("JOB COMPLETE: Storage processing started");
-        console.log("JOB COMPLETE: Storing", images.length, "items with config:", JSON.stringify(config));
-        
-        try {
-          const stored = await storeGeneratedImages(session, images, config);
-          console.log("JOB COMPLETE: Storage result:", stored);
-          
-          if (stored) {
-            console.log("JOB COMPLETE: Images stored, refreshing history");
-            
-            // Clear any existing refresh timeouts
-            if (refreshTimeoutRef.current) {
-              clearTimeout(refreshTimeoutRef.current);
-            }
-            
-            // Single immediate refresh
-            await fetchPreviousGens();
-            
-            // Schedule just one delayed refresh after storage completes (3s)
-            refreshTimeoutRef.current = setTimeout(async () => {
-              console.log("JOB COMPLETE: Final delayed refresh");
-              await fetchPreviousGens();
-              refreshTimeoutRef.current = null;
-            }, 3000);
-          } else {
-            console.error("JOB COMPLETE: Failed to store images");
-            toast({
-              title: "Warning",
-              description: "Generated items may not have been saved to history. Please check and try again.",
-              duration: 5000
-            });
-          }
-        } catch (error) {
-          console.error("JOB COMPLETE ERROR: Storage failed with exception:", error);
-          toast({
-            title: "Error",
-            description: "Failed to save items to history. Please try again or check console for details.",
-            duration: 5000
-          });
-        }
-      };
-      
-      processStorage();
-      jobCompletedRef.current = null;
-    }
-  }, [toast, session, fetchPreviousGens]);
-
+  // Handle job completion and storage
   const handleJobComplete = useCallback(async (
     completedImages: string[], 
     jobConfig: {
@@ -127,6 +78,7 @@ export const useGenerationJobs = (session: any) => {
       jobStyle: string;
       jobRatio: string;
       jobLoraScale: string;
+      jobWorkflow?: string;
       pipeline_id?: string;
       seed?: number | string;
       isVideo?: boolean;
@@ -142,17 +94,44 @@ export const useGenerationJobs = (session: any) => {
       )
     );
     
-    console.log(`JOB COMPLETE: Job ${jobConfig.jobId} with ${completedImages.length} valid images, isVideo=${jobConfig.isVideo || false}`);
+    // Store results
+    await storeGeneratedImages(session, completedImages, jobConfig);
     
-    // Copy the data to avoid reference issues
-    jobCompletedRef.current = {
-      images: [...completedImages],
-      config: {...jobConfig}
-    };
+    // Flag for refresh
+    jobsCompletedRef.current = true;
     
-    // Trigger a single immediate refresh
+    // Perform a single refresh
     await fetchPreviousGens();
-  }, [fetchPreviousGens]);
+  }, [fetchPreviousGens, session]);
+
+  // Check for job completion and refresh only when needed
+  useEffect(() => {
+    if (jobsCompletedRef.current) {
+      toast({
+        title: "Success",
+        description: "Generation completed successfully!",
+        duration: 3000
+      });
+      
+      // Clear any existing refresh timeouts
+      if (refreshTimeoutRef.current) {
+        clearTimeout(refreshTimeoutRef.current);
+      }
+      
+      // Schedule a single delayed refresh after 2 seconds
+      refreshTimeoutRef.current = setTimeout(async () => {
+        await fetchPreviousGens();
+        refreshTimeoutRef.current = null;
+        jobsCompletedRef.current = false;
+      }, 2000);
+    }
+    
+    return () => {
+      if (refreshTimeoutRef.current) {
+        clearTimeout(refreshTimeoutRef.current);
+      }
+    };
+  }, [fetchPreviousGens, toast]);
 
   const startNewJob = useCallback((numImagesToGenerate: number, ratio: string = "2:3", isVideo: boolean = false) => {
     const { job: newJob, newJobId } = createNewJob(numImagesToGenerate, jobIdCounter, ratio, isVideo);
@@ -181,6 +160,7 @@ export const useGenerationJobs = (session: any) => {
     jobStyle: string;
     jobRatio: string;
     jobLoraScale: string;
+    jobWorkflow?: string;
     pipeline_id?: string;
     seed?: number | string;
     isVideo?: boolean;
@@ -192,10 +172,9 @@ export const useGenerationJobs = (session: any) => {
     );
   }, [handleJobComplete]);
 
-  // Simpler manual refresh function with debouncing
-  const manualRefreshHistory = useCallback(async (): Promise<void> => {
+  // Optimized manual refresh with debouncing
+  const manualRefreshHistory = useCallback(async () => {
     if (isRefreshingHistory) {
-      console.log("Manual refresh already in progress, skipping");
       return Promise.resolve();
     }
     
@@ -205,27 +184,8 @@ export const useGenerationJobs = (session: any) => {
       duration: 2000
     });
     
-    try {
-      await fetchPreviousGens();
-      
-      // Clear any existing refresh timeouts
-      if (refreshTimeoutRef.current) {
-        clearTimeout(refreshTimeoutRef.current);
-      }
-      
-      // Just do one delayed refresh for better UX
-      return new Promise<void>((resolve) => {
-        refreshTimeoutRef.current = setTimeout(async () => {
-          console.log("MANUAL REFRESH: Final delayed refresh");
-          await fetchPreviousGens();
-          refreshTimeoutRef.current = null;
-          resolve();
-        }, 2000);
-      });
-    } catch (error) {
-      console.error("MANUAL REFRESH ERROR:", error);
-      return Promise.resolve();
-    }
+    await fetchPreviousGens();
+    return Promise.resolve();
   }, [isRefreshingHistory, fetchPreviousGens, toast]);
 
   return {

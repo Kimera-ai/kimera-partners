@@ -12,6 +12,7 @@ interface ControlPanelProps extends
   CreditInfo {
     isUploading: boolean;
     isProcessing: boolean;
+    isGenerating?: boolean;
     CREDITS_PER_GENERATION: number;
 }
 
@@ -37,6 +38,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   numberOfImages,
   setNumberOfImages,
   isProcessing,
+  isGenerating,
   handleGenerate,
   credits,
   isLoadingCredits,
@@ -62,7 +64,6 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
         />
         
         <div className="flex justify-between items-center mt-3">
-          {/* Hiding Classic Mode and Flow State buttons */}
           <div className="flex-1"></div>
           
           {/* Generate button */}
@@ -74,6 +75,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
             isLoadingCredits={isLoadingCredits}
             CREDITS_PER_GENERATION={CREDITS_PER_GENERATION}
             isProcessing={isProcessing}
+            isGenerating={isGenerating}
             handleGenerate={handleGenerate}
             numberOfImages={numberOfImages}
           />
