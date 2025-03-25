@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { useSession } from "@/hooks/useSession";
@@ -58,7 +59,7 @@ const PromptMaker = () => {
     manualRefreshHistory
   } = useGenerationJobs(session);
 
-  // Simplified initial history fetch
+  // Initial history fetch
   useEffect(() => {
     if (session?.user) {
       console.log("PROMPTMAKER: Initial fetch of previous generations");
@@ -66,19 +67,29 @@ const PromptMaker = () => {
     }
   }, [session?.user, fetchPreviousGenerations]);
 
-  // Simpler history refresh on job completion
+  // History refresh on job completion
   useEffect(() => {
     const completedJobs = generationJobs.filter(job => job.isCompleted);
     if (completedJobs.length > 0) {
       console.log(`PROMPTMAKER: ${completedJobs.length} job(s) completed, refreshing history`);
       setHistoryRefreshTrigger(prev => prev + 1);
+      
+      // Force refresh history after generation
+      if (!isRefreshingHistory) {
+        const now = Date.now();
+        if (now - lastRefreshTimeRef.current > 2000) {
+          console.log("PROMPTMAKER: Forcing history refresh after job completion");
+          fetchPreviousGenerations();
+          lastRefreshTimeRef.current = now;
+        }
+      }
     }
-  }, [generationJobs]);
+  }, [generationJobs, fetchPreviousGenerations, isRefreshingHistory]);
 
-  // History panel open handler
+  // History panel open handler with forced refresh
   useEffect(() => {
     if (isHistoryOpen && session?.user) {
-      console.log("PROMPTMAKER: History panel opened, refreshing history");
+      console.log("PROMPTMAKER: History panel opened, force refreshing history");
       fetchPreviousGenerations();
       setHistoryRefreshTrigger(prev => prev + 1);
     }
@@ -115,25 +126,38 @@ const PromptMaker = () => {
     uploadedImageUrl
   );
 
-  // Simplified generation handling with fewer refreshes
+  // Enhanced generation handling with multiple history refreshes
   const wrappedHandleGenerate = useCallback(async (): Promise<void> => {
     generationStartTimeRef.current = Date.now();
     console.log("PROMPTMAKER: Generation started at", new Date().toISOString());
     
-    // Single pre-generation refresh
+    // Pre-generation refresh
     await fetchPreviousGenerations();
     
     // Start generation
-    handleGenerate();
+    await handleGenerate();
     
-    // Only do a single delayed refresh 5 seconds after generation starts
-    return new Promise<void>(resolve => {
+    // Schedule multiple post-generation refreshes
+    const scheduleRefreshes = () => {
       setTimeout(async () => {
-        console.log("PROMPTMAKER: Post-generation refresh");
+        console.log("PROMPTMAKER: First post-generation refresh (5s)");
         await fetchPreviousGenerations();
-        resolve();
+        
+        setTimeout(async () => {
+          console.log("PROMPTMAKER: Second post-generation refresh (10s)");
+          await fetchPreviousGenerations();
+          
+          setTimeout(async () => {
+            console.log("PROMPTMAKER: Final post-generation refresh (20s)");
+            await fetchPreviousGenerations();
+          }, 10000);
+        }, 5000);
       }, 5000);
-    });
+    };
+    
+    scheduleRefreshes();
+    
+    return Promise.resolve();
   }, [fetchPreviousGenerations, handleGenerate]);
 
   useScrollToLatestJob(latestJobRef, jobRefs, generationJobs);
@@ -160,7 +184,7 @@ const PromptMaker = () => {
     handleImageClick(generationData);
   }, [prompt, style, ratio, loraScale, handleImageClick]);
 
-  // Simpler completed images handling
+  // Improved completed images handling
   useEffect(() => {
     if (generatedImages.length > 0 && generationStartTimeRef.current) {
       const generationTime = Date.now() - generationStartTimeRef.current;
@@ -220,25 +244,7 @@ const PromptMaker = () => {
       <MainContainer 
         containerRef={containerRef} 
         sidebar={
-          <Sidebar
-            workflow={workflow}
-            setWorkflow={setWorkflow}
-            ratio={ratio}
-            setRatio={setRatio}
-            style={style}
-            setStyle={setStyle}
-            loraScale={loraScale}
-            setLoraScale={setLoraScale}
-            seed={seed}
-            setSeed={setSeed}
-            numberOfImages={numberOfImages}
-            setNumberOfImages={setNumberOfImages}
-            imagePreview={imagePreview}
-            isUploading={isUploading}
-            handleImageUpload={handleImageUpload}
-            removeImage={removeImage}
-            CREDITS_PER_GENERATION={CREDITS_PER_GENERATION}
-          />
+          <Sidebar {...sidebarProps} />
         }
       >
         <div className="w-full h-full p-4 md:p-6">

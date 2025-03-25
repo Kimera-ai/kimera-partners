@@ -27,13 +27,16 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
   const [internalRefreshing, setInternalRefreshing] = useState(false);
   const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(null);
   const [lastRefreshTime, setLastRefreshTime] = useState<number>(0);
+  const [emptyHistoryShown, setEmptyHistoryShown] = useState<boolean>(false);
 
   // Reset video playback when panel closes
   useEffect(() => {
     if (!isHistoryOpen) {
       setPlayingVideo(null);
+    } else {
+      console.log(`History panel opened, found ${previousGenerations.length} items`);
     }
-  }, [isHistoryOpen]);
+  }, [isHistoryOpen, previousGenerations.length]);
 
   // Reset video playback on refresh
   useEffect(() => {
@@ -56,6 +59,19 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     }
   }, [isHistoryOpen, isRefreshingHistory, manualRefreshHistory, lastRefreshTime]);
 
+  // Show empty history message only after initial load and certain time
+  useEffect(() => {
+    if (isHistoryOpen && previousGenerations.length === 0 && !isRefreshingHistory) {
+      const timer = setTimeout(() => {
+        setEmptyHistoryShown(true);
+      }, 1500);
+      
+      return () => clearTimeout(timer);
+    } else if (previousGenerations.length > 0) {
+      setEmptyHistoryShown(false);
+    }
+  }, [isHistoryOpen, previousGenerations.length, isRefreshingHistory]);
+
   // Debounced refresh handler to prevent rapid clicking
   const handleManualRefresh = useCallback(async () => {
     if (!isHistoryOpen || internalRefreshing || isRefreshingHistory) return;
@@ -71,6 +87,9 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     try {
       await manualRefreshHistory();
       setLastRefreshTime(Date.now());
+    } catch (error) {
+      console.error("Manual refresh error:", error);
+      toast.error("Failed to refresh history");
     } finally {
       // Use a short debounce to prevent rapid re-clicks
       const timer = setTimeout(() => {
@@ -97,7 +116,7 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
       
       if (previousGenerations.length > 0) {
         // Log sample of the first generation to inspect structure
-        console.log("Sample generation:", previousGenerations[0]);
+        console.log("Sample generation:", JSON.stringify(previousGenerations[0]));
         
         const videoCount = previousGenerations.filter(gen => 
           gen.is_video === true || 
@@ -172,11 +191,21 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
           {previousGenerations.length === 0 ? (
             <div className="flex-1 flex items-center justify-center p-6">
               <div className="text-center">
-                <p className="text-muted-foreground">No previous generations found</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {isRefreshingHistory ? "Loading history..." : "Try generating some images or refreshing"}
+                <p className="text-muted-foreground">
+                  {isRefreshingHistory 
+                    ? "Loading history..." 
+                    : emptyHistoryShown
+                      ? "No previous generations found"
+                      : "Checking for generations..."}
                 </p>
-                {isHistoryOpen && (
+                
+                <p className="text-xs text-muted-foreground mt-1">
+                  {emptyHistoryShown
+                    ? "Try generating some images or videos first"
+                    : "Loading your previous generations"}
+                </p>
+                
+                {isHistoryOpen && emptyHistoryShown && (
                   <Button 
                     variant="outline" 
                     size="sm" 
@@ -216,7 +245,7 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
                             playsInline 
                             onClick={e => e.stopPropagation()} 
                             onError={(e) => {
-                              console.error(`Failed to load video at ${generation.image_url}`, e);
+                              console.error(`Failed to load video at ${generation.image_url}`);
                               (e.target as HTMLVideoElement).style.display = 'none';
                               const fallbackImg = document.createElement('img');
                               fallbackImg.src = 'https://placehold.co/600x800/191223/404040?text=Video+Failed+to+Load';

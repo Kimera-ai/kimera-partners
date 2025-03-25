@@ -35,14 +35,13 @@ export const fetchPreviousGenerations = async () => {
     // Force cache-busting with unique timestamp
     const timestamp = new Date().getTime();
     
-    console.log(`Fetching previous generations with cache-buster: ${timestamp}`);
+    console.log(`Fetching previous generations with timestamp: ${timestamp}`);
     
     const { data, error } = await supabase
       .from('generated_images')
       .select('*')
       .order('created_at', { ascending: false })
-      .limit(100)
-      .filter('updated_at', 'gte', new Date(Date.now() - 3600000).toISOString()); // Last hour as minimum
+      .limit(100);
     
     if (error) {
       console.error('Error fetching previous generations:', error);
@@ -50,6 +49,12 @@ export const fetchPreviousGenerations = async () => {
     }
     
     console.log(`Fetched ${data?.length || 0} previous generations`);
+    
+    // Verify the data structure
+    if (data && data.length > 0) {
+      console.log('Sample generation data:', JSON.stringify(data[0]));
+    }
+    
     return data || [];
   } catch (error) {
     console.error('Error in fetchPreviousGenerations:', error);
@@ -88,15 +93,14 @@ export const storeGeneratedImages = async (
     const userId = session.user.id;
     const isVideo = Boolean(jobConfig.isVideo);
     
-    console.log(`Storing ${generatedImages.length} ${isVideo ? 'videos' : 'images'} with workflow: ${jobConfig.jobWorkflow || 'unknown'}`);
-    console.log('Storage data:', JSON.stringify({
-      userId, 
+    console.log(`Storing ${generatedImages.length} ${isVideo ? 'videos' : 'images'} with user ID: ${userId}`);
+    console.log('Storage config:', {
       prompt: jobConfig.jobPrompt,
       style: jobConfig.jobStyle,
       ratio: jobConfig.jobRatio,
       workflow: jobConfig.jobWorkflow,
       isVideo
-    }));
+    });
     
     // Prepare batch insert data
     const insertData = [];
@@ -104,8 +108,11 @@ export const storeGeneratedImages = async (
     for (let i = 0; i < generatedImages.length; i++) {
       const imageUrl = generatedImages[i];
       if (!imageUrl) {
+        console.warn(`Skipping null image URL at index ${i}`);
         continue;
       }
+      
+      console.log(`Processing image ${i + 1}/${generatedImages.length}: ${imageUrl.substring(0, 50)}...`);
       
       const item = {
         user_id: userId,
@@ -131,18 +138,38 @@ export const storeGeneratedImages = async (
       return false;
     }
     
-    // Batch insert for better performance
-    console.log('Performing batch insert with data:', JSON.stringify(insertData));
-    const { error } = await supabase
+    // First attempt a single insert
+    console.log(`Attempting to insert ${insertData.length} images/videos...`);
+    const { error, data } = await supabase
       .from('generated_images')
-      .insert(insertData);
+      .insert(insertData)
+      .select();
     
     if (error) {
       console.error('Error storing generated images:', error);
-      return false;
+      
+      // Try inserting one by one if batch fails
+      console.log('Batch insert failed, trying one-by-one insertion...');
+      let successCount = 0;
+      
+      for (const item of insertData) {
+        const { error: singleError } = await supabase
+          .from('generated_images')
+          .insert([item])
+          .select();
+          
+        if (!singleError) {
+          successCount++;
+        } else {
+          console.error(`Error inserting individual item:`, singleError);
+        }
+      }
+      
+      console.log(`One-by-one insertion: ${successCount}/${insertData.length} successful`);
+      return successCount > 0;
     }
     
-    console.log('Successfully stored all images/videos in database');
+    console.log('Successfully stored all images/videos in database:', data);
     return true;
   } catch (error) {
     console.error('Error in storeGeneratedImages:', error);

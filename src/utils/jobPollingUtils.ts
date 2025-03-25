@@ -12,6 +12,7 @@ export const pollJobStatus = async (
     jobStyle: string;
     jobRatio: string;
     jobLoraScale: string;
+    jobWorkflow?: string;
     pipeline_id?: string;
     seed?: number | string;
     isVideo?: boolean;
@@ -27,15 +28,17 @@ export const pollJobStatus = async (
     jobStyle,
     jobRatio,
     jobLoraScale,
+    jobWorkflow,
     pipeline_id,
     seed,
     isVideo = false
   } = config;
   
-  console.log(`Starting job polling for ${apiJobId}, isVideo=${isVideo}`);
+  console.log(`Starting job polling for ${apiJobId}, isVideo=${isVideo}, workflow=${jobWorkflow || 'undefined'}`);
   
   let lastStatus = '';
   let statusInterval: number;
+  let errorCount = 0;
   
   const checkJobStatus = async () => {
     try {
@@ -135,11 +138,9 @@ export const pollJobStatus = async (
           const urlSuggestsVideo = /\.(mp4|webm|mov)($|\?)/.test(imageUrl.toLowerCase());
           if (urlSuggestsVideo !== isVideo) {
             console.warn(`Possible isVideo mismatch: passed isVideo=${isVideo}, but URL suggests video=${urlSuggestsVideo}`);
-            // Trust the URL extension over the passed flag
-            // isVideo = urlSuggestsVideo;
           }
           
-          console.log(`Updating job with extracted URL and isVideo=${isVideo}`);
+          console.log(`Updating job with extracted URL and isVideo=${isVideo}, workflow=${jobWorkflow || 'undefined'}`);
           
           // Update the specific image in the job
           setGenerationJobs(prev => 
@@ -168,7 +169,7 @@ export const pollJobStatus = async (
             })
           );
           
-          // If all images are completed, call the handleJobComplete callback
+          // Check if all images in this job are completed
           setGenerationJobs(prevJobs => {
             const job = prevJobs.find(j => j.id === jobId);
             if (job) {
@@ -187,28 +188,33 @@ export const pollJobStatus = async (
                   .filter(img => img !== null)
                   .map(img => (img as any).url);
                 
-                // Log the complete job configuration before passing it
-                console.log("Job completed, config for storage:", {
+                // Call handleJobComplete with completed URLs and job config
+                console.log("All images completed for job, passing to handleJobComplete:", {
                   jobId,
                   jobPrompt,
                   jobStyle,
                   jobRatio,
                   jobLoraScale,
+                  jobWorkflow,
                   pipeline_id,
                   seed,
                   isVideo
                 });
                 
-                handleJobComplete(imageUrls, {
-                  jobId,
-                  jobPrompt,
-                  jobStyle,
-                  jobRatio,
-                  jobLoraScale,
-                  pipeline_id,
-                  seed,
-                  isVideo
-                });
+                // Manually delay this slightly to ensure UI updates first
+                setTimeout(() => {
+                  handleJobComplete(imageUrls, {
+                    jobId,
+                    jobPrompt,
+                    jobStyle,
+                    jobRatio,
+                    jobLoraScale,
+                    jobWorkflow,
+                    pipeline_id,
+                    seed,
+                    isVideo
+                  });
+                }, 500);
               }
             }
             return prevJobs;
@@ -245,6 +251,7 @@ export const pollJobStatus = async (
       updateJobStatus(imageIndex, jobId, `Error checking status`, setGenerationJobs);
       
       // After 5 consecutive errors, stop polling
+      errorCount++;
       if (errorCount >= 5) {
         clearInterval(statusInterval);
         
@@ -258,13 +265,10 @@ export const pollJobStatus = async (
           )
         );
       }
-      
-      errorCount++;
     }
   };
   
   // Check immediately, then set up polling
-  let errorCount = 0;
   await checkJobStatus();
   statusInterval = setInterval(checkJobStatus, 2000) as unknown as number;
 };
