@@ -38,8 +38,7 @@ export const fetchPreviousGenerations = async () => {
       .from('generated_images')
       .select('*')
       .order('created_at', { ascending: false })
-      .limit(100)
-      .eq('dummy', `${timestamp}`); // This will be ignored but forces a fresh query
+      .limit(100);
     
     if (error) {
       console.error('Error fetching previous generations:', error);
@@ -54,19 +53,22 @@ export const fetchPreviousGenerations = async () => {
   }
 };
 
+// Define a proper interface for the job configuration to avoid excessive type instantiation
+interface JobConfig {
+  jobPrompt: string;
+  jobStyle: string;
+  jobRatio: string;
+  jobLoraScale: string;
+  jobWorkflow?: string;
+  pipeline_id?: string;
+  seed?: number | string;
+  isVideo?: boolean;
+}
+
 export const storeGeneratedImages = async (
   session: any, 
   generatedImages: string[], 
-  jobConfig: {
-    jobPrompt: string;
-    jobStyle: string;
-    jobRatio: string;
-    jobLoraScale: string;
-    jobWorkflow?: string;
-    pipeline_id?: string;
-    seed?: number | string;
-    isVideo?: boolean;
-  }
+  jobConfig: JobConfig
 ) => {
   if (!session?.user) {
     console.log("No user session, skipping storage");
