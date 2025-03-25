@@ -93,7 +93,7 @@ export const useGenerationJobs = (session: any) => {
       seed?: number | string;
       isVideo?: boolean;
     }
-  ) => {
+  ): Promise<boolean> => {
     console.log(`Job ${jobConfig.jobId} completed with ${completedImages.length} ${jobConfig.isVideo ? 'videos' : 'images'}`);
     
     setGeneratedImages(prev => [...prev, ...completedImages]);

@@ -1,4 +1,3 @@
-
 import { GenerationJobType } from "@/components/prompt-maker/GenerationJob";
 
 type SetJobsFn = React.Dispatch<React.SetStateAction<GenerationJobType[]>>;
@@ -18,7 +17,7 @@ export const pollJobStatus = async (
     isVideo?: boolean;
   },
   setGenerationJobs: SetJobsFn,
-  handleJobComplete: (completedImages: string[], jobConfig: any) => Promise<void>
+  handleJobComplete: (completedImages: string[], jobConfig: any) => Promise<boolean>
 ) => {
   const {
     apiJobId,
