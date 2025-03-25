@@ -32,18 +32,21 @@ export const createNewJob = (numImagesToGenerate: number, jobIdCounter: number, 
 
 export const fetchPreviousGenerations = async () => {
   try {
-    // Simple query, no cache busting to improve performance
+    // Add cache-busting parameter to ensure we get fresh data
+    const timestamp = new Date().getTime();
     const { data, error } = await supabase
       .from('generated_images')
       .select('*')
       .order('created_at', { ascending: false })
-      .limit(100);
+      .limit(100)
+      .eq('dummy', `${timestamp}`); // This will be ignored but forces a fresh query
     
     if (error) {
       console.error('Error fetching previous generations:', error);
       return [];
     }
     
+    console.log(`Fetched ${data?.length || 0} previous generations`);
     return data || [];
   } catch (error) {
     console.error('Error in fetchPreviousGenerations:', error);
@@ -79,6 +82,8 @@ export const storeGeneratedImages = async (
     const userId = session.user.id;
     const isVideo = Boolean(jobConfig.isVideo);
     
+    console.log(`Storing ${generatedImages.length} ${isVideo ? 'videos' : 'images'} with workflow: ${jobConfig.jobWorkflow || 'unknown'}`);
+    
     // Prepare batch insert data
     const insertData = [];
     
@@ -113,6 +118,7 @@ export const storeGeneratedImages = async (
     }
     
     // Batch insert for better performance
+    console.log('Performing batch insert with data:', JSON.stringify(insertData));
     const { error } = await supabase
       .from('generated_images')
       .insert(insertData);
@@ -122,6 +128,7 @@ export const storeGeneratedImages = async (
       return false;
     }
     
+    console.log('Successfully stored all images/videos in database');
     return true;
   } catch (error) {
     console.error('Error in storeGeneratedImages:', error);

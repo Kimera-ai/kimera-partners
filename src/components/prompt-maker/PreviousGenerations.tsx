@@ -27,20 +27,6 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
   const [internalRefreshing, setInternalRefreshing] = useState(false);
   const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(null);
 
-  const isVideoUrl = (url: string | undefined, isVideo?: boolean) => {
-    if (isVideo === true) return true;
-    if (!url) return false;
-    return /\.(mp4|webm|mov)($|\?)/.test(url.toLowerCase());
-  };
-
-  const formatDate = (dateString: string) => {
-    try {
-      return new Date(dateString).toLocaleString();
-    } catch {
-      return "Unknown date";
-    }
-  };
-
   // Reset video playback when panel closes
   useEffect(() => {
     if (!isHistoryOpen) {
@@ -52,6 +38,14 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
   useEffect(() => {
     setPlayingVideo(null);
   }, [refreshTrigger]);
+
+  // Auto-refresh when panel opens
+  useEffect(() => {
+    if (isHistoryOpen && !isRefreshingHistory) {
+      console.log("History panel opened, refreshing history");
+      manualRefreshHistory();
+    }
+  }, [isHistoryOpen, isRefreshingHistory, manualRefreshHistory]);
 
   // Debounced refresh handler to prevent rapid clicking
   const handleManualRefresh = useCallback(async () => {
@@ -86,22 +80,50 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     };
   }, [debounceTimer]);
 
-  // Log generations on panel open for debugging
+  // Log generations count for debugging
   useEffect(() => {
     if (isHistoryOpen) {
       console.log("HISTORY COMPONENT: Previous generations loaded:", previousGenerations.length);
+      
       if (previousGenerations.length > 0) {
-        const hasIsVideo = previousGenerations.some(gen => gen.is_video !== undefined);
-        console.log("HISTORY COMPONENT: is_video flag exists on generations:", hasIsVideo);
+        // Log sample of the first generation to inspect structure
+        console.log("Sample generation:", previousGenerations[0]);
         
         const videoCount = previousGenerations.filter(gen => 
           gen.is_video === true || 
           (gen.image_url && /\.(mp4|webm|mov)($|\?)/.test(gen.image_url.toLowerCase()))
         ).length;
+        
         console.log(`HISTORY COMPONENT: Found ${videoCount} videos in history`);
       }
     }
   }, [previousGenerations, isHistoryOpen]);
+
+  const isVideoUrl = useCallback((url: string | undefined, isVideo?: boolean) => {
+    if (isVideo === true) return true;
+    if (!url) return false;
+    return /\.(mp4|webm|mov)($|\?)/.test(url.toLowerCase());
+  }, []);
+
+  const formatDate = useCallback((dateString: string) => {
+    try {
+      return new Date(dateString).toLocaleString();
+    } catch {
+      return "Unknown date";
+    }
+  }, []);
+
+  const getWorkflowLabel = useCallback((workflow: string | undefined) => {
+    if (!workflow) return "Image Generator";
+    
+    switch(workflow) {
+      case "with-reference": return "Face Gen";
+      case "cartoon": return "Reference Mode";
+      case "video": return "Video Generator";
+      case "no-reference": 
+      default: return "Image Generator";
+    }
+  }, []);
 
   return (
     <Sheet open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
@@ -162,10 +184,11 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
                   const isVideoFlag = generation.is_video === true || generation.is_video === 'true' || generation.is_video === 1;
                   const urlSuggestsVideo = isVideoUrl(generation.image_url);
                   const isVideo = isVideoFlag || urlSuggestsVideo;
+                  const workflowLabel = getWorkflowLabel(generation.workflow);
                   
                   return (
                     <div 
-                      key={`${generation.id || index}-${generation.image_url ? generation.image_url.substring(0, 20) : index}`}
+                      key={`${generation.id || index}-${generation.created_at || Date.now()}`}
                       className="relative group rounded-md overflow-hidden bg-black cursor-pointer aspect-[3/4]" 
                       onClick={() => handleImageClick(generation)}
                     >
@@ -209,8 +232,9 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
                         <div className="line-clamp-2 mb-1">
                           {generation.prompt || "No prompt"}
                         </div>
-                        <div className="text-white/60">
-                          {formatDate(generation.created_at)}
+                        <div className="flex justify-between text-white/60">
+                          <span>{formatDate(generation.created_at)}</span>
+                          <span className="bg-purple-500/30 px-1 rounded text-white/90">{workflowLabel}</span>
                         </div>
                       </div>
                     </div>

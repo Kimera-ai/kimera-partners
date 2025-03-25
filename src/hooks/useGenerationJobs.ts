@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { GenerationJobType } from '@/components/prompt-maker/GenerationJob';
@@ -14,17 +13,20 @@ export const useGenerationJobs = (session: any) => {
   const [isRefreshingHistory, setIsRefreshingHistory] = useState(false);
   const latestJobRef = useRef<string | null>(null);
   const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const refreshCountRef = useRef<number>(0);
   const jobsCompletedRef = useRef<boolean>(false);
   const { toast } = useToast();
 
   // Optimized fetch function with debouncing
-  const fetchPreviousGens = useCallback(async () => {
-    if (isRefreshingHistory) return Promise.resolve([]);
+  const fetchPreviousGens = useCallback(async (forceRefresh = false) => {
+    if (isRefreshingHistory && !forceRefresh) return Promise.resolve([]);
     
     setIsRefreshingHistory(true);
+    console.log('Fetching previous generations...');
     
     try {
       const generations = await fetchPreviousGenerations();
+      console.log(`Fetched ${generations.length} generations`);
       setPreviousGenerations(generations);
       return generations;
     } catch (error) {
@@ -84,6 +86,8 @@ export const useGenerationJobs = (session: any) => {
       isVideo?: boolean;
     }
   ) => {
+    console.log(`Job ${jobConfig.jobId} completed with ${completedImages.length} images`);
+    
     setGeneratedImages(prev => [...prev, ...completedImages]);
     
     setGenerationJobs(prevJobs => 
@@ -95,14 +99,38 @@ export const useGenerationJobs = (session: any) => {
     );
     
     // Store results
-    await storeGeneratedImages(session, completedImages, jobConfig);
+    const storageResult = await storeGeneratedImages(session, completedImages, jobConfig);
+    console.log(`Storage result: ${storageResult ? 'success' : 'failed'}`);
     
-    // Flag for refresh
+    // Flag for refresh and trigger an immediate refresh
     jobsCompletedRef.current = true;
     
-    // Perform a single refresh
-    await fetchPreviousGens();
-  }, [fetchPreviousGens, session]);
+    // Force an immediate refresh
+    await fetchPreviousGens(true);
+    
+    // Schedule additional refreshes to ensure database propagation
+    if (refreshTimeoutRef.current) {
+      clearTimeout(refreshTimeoutRef.current);
+    }
+    
+    refreshTimeoutRef.current = setTimeout(async () => {
+      console.log('Running delayed history refresh after generation...');
+      await fetchPreviousGens(true);
+      
+      // One more refresh after another delay
+      refreshTimeoutRef.current = setTimeout(async () => {
+        console.log('Running final history refresh after generation...');
+        await fetchPreviousGens(true);
+        refreshTimeoutRef.current = null;
+      }, 2000);
+    }, 2000);
+    
+    toast({
+      title: "Generation Complete",
+      description: `Successfully generated ${completedImages.length} ${jobConfig.isVideo ? 'videos' : 'images'}`,
+      duration: 3000
+    });
+  }, [fetchPreviousGens, session, toast]);
 
   // Check for job completion and refresh only when needed
   useEffect(() => {
@@ -184,7 +212,7 @@ export const useGenerationJobs = (session: any) => {
       duration: 2000
     });
     
-    await fetchPreviousGens();
+    await fetchPreviousGens(true);
     return Promise.resolve();
   }, [isRefreshingHistory, fetchPreviousGens, toast]);
 
