@@ -36,13 +36,13 @@ serve(async (req) => {
       standardizedWorkflow = standardizedWorkflow.toLowerCase().trim();
     }
     
-    // Determine final workflow based on the inputs and ensure with-reference is preserved for Face Gen
+    // Determine final workflow based on the inputs
     let finalWorkflow;
     if (isVideoBoolean) {
       // For videos, always use 'video' workflow
       finalWorkflow = 'video';
     } else if (standardizedWorkflow === 'with-reference') {
-      // Face Gen mode - preserve this workflow value exactly
+      // Face Gen mode
       finalWorkflow = 'with-reference';
     } else if (standardizedWorkflow === 'cartoon') {
       // Reference mode
