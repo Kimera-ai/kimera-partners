@@ -30,6 +30,16 @@ serve(async (req) => {
     console.log(`Using pipeline: ${selectedPipelineId} for ${isVideoBoolean ? 'video' : 'image'} generation`);
     console.log(`Using workflow: ${workflow}`);
 
+    // Determine actual workflow based on input
+    let actualWorkflow = workflow;
+    if (isVideoBoolean) {
+      actualWorkflow = 'video';
+    } else if (workflow === 'with-reference') {
+      actualWorkflow = 'with-reference'; // This is the Face Gen mode
+    }
+
+    console.log(`Actual workflow being used: ${actualWorkflow}`);
+
     // Create request body based on whether it's a video or image generation
     let requestBody;
     
@@ -57,7 +67,7 @@ serve(async (req) => {
           lora_scale: loraScale,
           style: style,
           seed: seed,
-          workflow: workflow // Include the actual workflow used
+          workflow: actualWorkflow // Include the actual workflow used
         }
       };
     }
@@ -104,7 +114,7 @@ serve(async (req) => {
     data.isVideo = isVideoBoolean;
     
     // Explicitly include workflow in the response
-    data.workflow = isVideoBoolean ? 'video' : workflow;
+    data.workflow = actualWorkflow;
     
     console.log(`Final response with isVideo=${isVideoBoolean}, workflow=${data.workflow}:`, JSON.stringify(data));
 

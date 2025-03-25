@@ -162,13 +162,12 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     
     if (!workflow) return "Image Generator";
     
-    switch(workflow) {
-      case "with-reference": return "Face Gen";
-      case "cartoon": return "Reference Mode";
-      case "video": return "Video Generator";
-      case "no-reference": return "Image Generator";
-      default: return workflow.charAt(0).toUpperCase() + workflow.slice(1).replace(/-/g, ' ');
-    }
+    if (workflow === "with-reference") return "Face Gen";
+    if (workflow === "cartoon") return "Reference Mode";
+    if (workflow === "video") return "Video Generator";
+    if (workflow === "no-reference") return "Image Generator";
+    
+    return workflow.charAt(0).toUpperCase() + workflow.slice(1).replace(/-/g, ' ');
   }, []);
 
   const uniqueGenerations = useMemo(() => {
@@ -188,7 +187,9 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
         
         if (isVideo && generation.workflow !== 'video') {
           generation.workflow = 'video';
-        } else if (!generation.workflow) {
+        }
+        
+        if (!generation.workflow || generation.workflow === 'undefined') {
           generation.workflow = 'no-reference';
         }
         
@@ -212,7 +213,9 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
         
         if (isVideo && generation.workflow !== 'video') {
           generation.workflow = 'video';
-        } else if (!generation.workflow) {
+        }
+        
+        if (!generation.workflow || generation.workflow === 'undefined') {
           generation.workflow = 'no-reference';
         }
         

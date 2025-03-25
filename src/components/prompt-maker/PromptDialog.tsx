@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { Download, X, Video, Share } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
@@ -30,17 +31,19 @@ export const PromptDialog: React.FC<PromptDialogProps> = ({
   };
 
   const getWorkflowLabel = (workflow: string | undefined, isVideo: boolean = false) => {
+    // If it's a video, always return "Video Generator"
     if (isVideo) return "Video Generator";
     
     if (!workflow) return "Image Generator";
     
-    switch(workflow) {
-      case "with-reference": return "Face Gen";
-      case "cartoon": return "Reference Mode";
-      case "video": return "Video Generator";
-      case "no-reference": return "Image Generator";
-      default: return workflow.charAt(0).toUpperCase() + workflow.slice(1).replace(/-/g, ' ');
-    }
+    // Explicit mapping with precise string matching
+    if (workflow === "with-reference") return "Face Gen";
+    if (workflow === "cartoon") return "Reference Mode";
+    if (workflow === "video") return "Video Generator";
+    if (workflow === "no-reference") return "Image Generator";
+    
+    // Default case: capitalize and clean up the workflow name
+    return workflow.charAt(0).toUpperCase() + workflow.slice(1).replace(/-/g, ' ');
   };
 
   const handleShareImage = async () => {
