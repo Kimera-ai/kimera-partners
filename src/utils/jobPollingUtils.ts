@@ -1,7 +1,9 @@
+
 import { GenerationJobType } from "@/components/prompt-maker/GenerationJob";
 
 type SetJobsFn = React.Dispatch<React.SetStateAction<GenerationJobType[]>>;
 
+// Update the type signature of handleJobComplete to match usage in useGenerationJobs.ts
 export const pollJobStatus = async (
   config: {
     apiJobId: string;
@@ -17,6 +19,7 @@ export const pollJobStatus = async (
     isVideo?: boolean;
   },
   setGenerationJobs: SetJobsFn,
+  // Changed return type to Promise<boolean> to match implementation
   handleJobComplete: (completedImages: string[], jobConfig: any) => Promise<boolean>
 ) => {
   const {

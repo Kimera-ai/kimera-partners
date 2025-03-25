@@ -32,12 +32,12 @@ export const createNewJob = (numImagesToGenerate: number, jobIdCounter: number, 
 
 export const fetchPreviousGenerations = async () => {
   try {
-    // Force cache-busting with unique timestamp
+    // Generate unique cache-busting timestamp
     const timestamp = new Date().getTime();
     
     console.log(`Fetching previous generations with timestamp: ${timestamp}`);
     
-    // Use a more direct query with no filters - this ensures we get ALL records
+    // Use a simple, direct query with no filters
     const { data, error } = await supabase
       .from('generated_images')
       .select('*')
@@ -51,7 +51,7 @@ export const fetchPreviousGenerations = async () => {
     
     console.log(`Fetched ${data?.length || 0} previous generations`);
     
-    // Verify the data structure
+    // Check data structure if available
     if (data && data.length > 0) {
       console.log('Sample generation data:', JSON.stringify(data[0]));
     } else {
@@ -65,7 +65,7 @@ export const fetchPreviousGenerations = async () => {
   }
 };
 
-// Define a proper interface for the job configuration to avoid excessive type instantiation
+// Define a proper interface for the job configuration
 interface JobConfig {
   jobPrompt: string;
   jobStyle: string;
@@ -115,7 +115,7 @@ export const storeGeneratedImages = async (
         continue;
       }
       
-      console.log(`Processing image ${i + 1}/${generatedImages.length}: ${imageUrl.substring(0, 50)}...`);
+      console.log(`Processing URL for storage (${i+1}/${generatedImages.length}): ${imageUrl.substring(0, 50)}...`);
       
       const item = {
         user_id: userId,
@@ -141,38 +141,55 @@ export const storeGeneratedImages = async (
       return false;
     }
     
-    // First attempt a single insert with upsert behavior to avoid duplicates
-    console.log(`Attempting to insert ${insertData.length} images/videos...`);
-    const { error, data } = await supabase
-      .from('generated_images')
-      .upsert(insertData, { onConflict: 'image_url' })
-      .select();
+    // Use multiple insertion methods for redundancy
+    let successResult = false;
     
-    if (error) {
-      console.error('Error storing generated images:', error);
+    // First try: Direct insert with less data
+    console.log(`Attempt 1: Basic insert with ${insertData.length} items...`);
+    const basicInsert = await supabase
+      .from('generated_images')
+      .insert(insertData.map(item => ({
+        user_id: item.user_id,
+        image_url: item.image_url,
+        prompt: item.prompt,
+        style: item.style,
+        is_video: item.is_video
+      })));
       
-      // Try inserting one by one if batch fails
-      console.log('Batch insert failed, trying one-by-one insertion...');
-      let successCount = 0;
+    if (!basicInsert.error) {
+      console.log('Basic insert successful');
+      successResult = true;
+    } else {
+      console.error('Basic insert failed:', basicInsert.error);
+      
+      // Second try: Insert one by one
+      console.log('Attempt 2: One-by-one insertion...');
+      let insertCount = 0;
       
       for (const item of insertData) {
-        const { error: singleError } = await supabase
+        const { error } = await supabase
           .from('generated_images')
-          .insert([item]);
+          .insert([{
+            user_id: item.user_id,
+            image_url: item.image_url,
+            prompt: item.prompt,
+            style: item.style,
+            is_video: item.is_video
+          }]);
           
-        if (!singleError) {
-          successCount++;
-        } else {
-          console.error(`Error inserting individual item:`, singleError);
+        if (!error) {
+          insertCount++;
         }
       }
       
-      console.log(`One-by-one insertion: ${successCount}/${insertData.length} successful`);
-      return successCount > 0;
+      console.log(`One-by-one insertion: ${insertCount}/${insertData.length} successful`);
+      successResult = insertCount > 0;
     }
     
-    console.log('Successfully stored all images/videos in database:', data);
-    return true;
+    // Force delay to ensure DB writes complete
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    return successResult;
   } catch (error) {
     console.error('Error in storeGeneratedImages:', error);
     return false;

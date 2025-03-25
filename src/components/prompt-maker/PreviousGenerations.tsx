@@ -28,16 +28,28 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
   const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(null);
   const [lastRefreshTime, setLastRefreshTime] = useState<number>(0);
   const [emptyHistoryShown, setEmptyHistoryShown] = useState<boolean>(false);
-  const [refreshCount, setRefreshCount] = useState(0);
+  
+  // Fixed: Using a ref to prevent refresh loops
+  const refreshCountRef = React.useRef<number>(0);
+  const isInitialMount = React.useRef(true);
+  const autoRefreshTimerRef = React.useRef<NodeJS.Timeout | null>(null);
 
   // Reset video playback when panel closes
   useEffect(() => {
     if (!isHistoryOpen) {
       setPlayingVideo(null);
-    } else {
+      
+      // Clear any pending auto-refresh timers when panel closes
+      if (autoRefreshTimerRef.current) {
+        clearTimeout(autoRefreshTimerRef.current);
+        autoRefreshTimerRef.current = null;
+      }
+    } else if (isInitialMount.current) {
       console.log(`History panel opened, found ${previousGenerations.length} items`);
-      // Increment refresh count when panel opens
-      setRefreshCount(prev => prev + 1);
+      isInitialMount.current = false;
+      
+      // Only increment refresh count on first panel open
+      refreshCountRef.current++;
     }
   }, [isHistoryOpen, previousGenerations.length]);
 
@@ -46,34 +58,40 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     setPlayingVideo(null);
   }, [refreshTrigger]);
 
-  // Auto-refresh when panel opens or after a delay since last refresh
+  // Auto-refresh only when panel opens initially or after a long delay
   useEffect(() => {
     if (isHistoryOpen) {
       const now = Date.now();
       const timeSinceLastRefresh = now - lastRefreshTime;
       
-      // If it's been more than 5 seconds since the last refresh or refresh count changed
-      if (timeSinceLastRefresh > 5000 || lastRefreshTime === 0) {
-        console.log(`Auto-refreshing history (time since last: ${timeSinceLastRefresh}ms, refresh count: ${refreshCount})`);
+      // Fixed: Only refresh if it's been more than 10 seconds since last refresh
+      if (timeSinceLastRefresh > 10000 || lastRefreshTime === 0) {
+        console.log(`Auto-refreshing history (time since last: ${timeSinceLastRefresh}ms, count: ${refreshCountRef.current})`);
         
-        if (!isRefreshingHistory) {
-          manualRefreshHistory().then(() => {
-            setLastRefreshTime(Date.now());
-          });
+        // Clear any existing timers
+        if (autoRefreshTimerRef.current) {
+          clearTimeout(autoRefreshTimerRef.current);
         }
+        
+        // Schedule a refresh after a short delay to prevent rapid refreshes
+        autoRefreshTimerRef.current = setTimeout(() => {
+          if (!isRefreshingHistory) {
+            manualRefreshHistory().then(() => {
+              setLastRefreshTime(Date.now());
+            });
+          }
+          autoRefreshTimerRef.current = null;
+        }, 500);
       }
     }
-  }, [isHistoryOpen, isRefreshingHistory, manualRefreshHistory, lastRefreshTime, refreshCount]);
-
-  // Trigger immediate refresh when refreshCount changes
-  useEffect(() => {
-    if (refreshCount > 0 && isHistoryOpen && !isRefreshingHistory) {
-      console.log(`Refresh triggered by count change: ${refreshCount}`);
-      manualRefreshHistory().then(() => {
-        setLastRefreshTime(Date.now());
-      });
-    }
-  }, [refreshCount, isHistoryOpen, isRefreshingHistory, manualRefreshHistory]);
+    
+    return () => {
+      if (autoRefreshTimerRef.current) {
+        clearTimeout(autoRefreshTimerRef.current);
+        autoRefreshTimerRef.current = null;
+      }
+    };
+  }, [isHistoryOpen, isRefreshingHistory, manualRefreshHistory, lastRefreshTime]);
 
   // Show empty history message only after initial load and certain time
   useEffect(() => {
@@ -96,7 +114,7 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     }
   }, [previousGenerations]);
 
-  // Debounced refresh handler to prevent rapid clicking
+  // Debounced refresh handler with cooldown to prevent rapid clicking
   const handleManualRefresh = useCallback(async () => {
     if (!isHistoryOpen || internalRefreshing || isRefreshingHistory) return;
     
@@ -112,15 +130,15 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
       await manualRefreshHistory();
       setLastRefreshTime(Date.now());
       // Increment refresh count to trigger re-renders
-      setRefreshCount(prev => prev + 1);
+      refreshCountRef.current++;
     } catch (error) {
       console.error("Manual refresh error:", error);
       toast.error("Failed to refresh history");
     } finally {
-      // Use a short debounce to prevent rapid re-clicks
+      // Use a cooldown period to prevent rapid re-clicks
       const timer = setTimeout(() => {
         setInternalRefreshing(false);
-      }, 1000);
+      }, 2000);
       
       setDebounceTimer(timer);
     }
@@ -131,6 +149,9 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     return () => {
       if (debounceTimer) {
         clearTimeout(debounceTimer);
+      }
+      if (autoRefreshTimerRef.current) {
+        clearTimeout(autoRefreshTimerRef.current);
       }
     };
   }, [debounceTimer]);
@@ -235,6 +256,11 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
                   const isVideo = isVideoFlag || urlSuggestsVideo;
                   const workflowLabel = getWorkflowLabel(generation.workflow);
                   
+                  // Add cache busting to image URLs
+                  const imageUrl = generation.image_url.includes('?') 
+                    ? `${generation.image_url}&t=${Date.now()}`
+                    : `${generation.image_url}?t=${Date.now()}`;
+                  
                   return (
                     <div 
                       key={`${generation.id || index}-${generation.created_at || Date.now()}`}
@@ -267,7 +293,7 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
                         </>
                       ) : (
                         <img 
-                          src={`${generation.image_url}?t=${Date.now()}`} 
+                          src={imageUrl} 
                           alt={`Generated ${index}`} 
                           className="w-full h-full object-cover" 
                           onError={(e) => {

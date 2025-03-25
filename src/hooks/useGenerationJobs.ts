@@ -18,14 +18,26 @@ export const useGenerationJobs = (session: any) => {
   const refreshCountRef = useRef<number>(0);
   const lastStorageSuccessRef = useRef<boolean>(false);
   const forceRefreshCounterRef = useRef<number>(0);
+  const isFirstRenderRef = useRef<boolean>(true);
+  const lastRefreshTimeRef = useRef<number>(0);
   const { toast } = useToast();
 
-  // Improved fetch function with force option and debouncing
+  // Improved fetch function with debouncing and cooldown
   const fetchPreviousGens = useCallback(async (force = false) => {
+    // Prevent too frequent refreshes
+    const now = Date.now();
+    const timeSinceLastRefresh = now - lastRefreshTimeRef.current;
+    
+    // Don't refresh if it's been less than 2 seconds since last refresh unless forced
+    if (timeSinceLastRefresh < 2000 && !force) {
+      console.log(`Skipping refresh, only ${timeSinceLastRefresh}ms since last refresh`);
+      return previousGenerations;
+    }
+    
     // Don't fetch if already fetching and not forced
     if (isRefreshingHistory && !force) {
       console.log("Already refreshing history, skipping fetch");
-      return Promise.resolve([]);
+      return Promise.resolve(previousGenerations);
     }
     
     setIsRefreshingHistory(true);
@@ -43,25 +55,37 @@ export const useGenerationJobs = (session: any) => {
       console.log(`Fetched ${generations.length} generations at ${new Date().toISOString()}`);
       
       // Only update state if we got data and component is still mounted
-      setPreviousGenerations(generations);
+      if (generations.length > 0) {
+        setPreviousGenerations(generations);
+      } else {
+        console.log("No generations returned from database");
+      }
+      
+      // Update last refresh time
+      lastRefreshTimeRef.current = Date.now();
+      
       return generations;
     } catch (error) {
       console.error("HISTORY FETCH ERROR:", error);
-      return [];
+      return previousGenerations;
     } finally {
-      setIsRefreshingHistory(false);
+      // Add a short delay before setting refreshing to false to prevent rapid consecutive refreshes
+      setTimeout(() => {
+        setIsRefreshingHistory(false);
+      }, 500);
     }
-  }, [isRefreshingHistory]);
+  }, [isRefreshingHistory, previousGenerations]);
 
   // Initial fetch when session is available
   useEffect(() => {
-    if (session?.user) {
+    if (session?.user && isFirstRenderRef.current) {
+      isFirstRenderRef.current = false;
       console.log("Initial history fetch on session load");
       fetchPreviousGens(true).catch(err => console.error("Initial fetch error:", err));
     }
   }, [session?.user, fetchPreviousGens]);
 
-  // Enhanced job completion and storage handler with aggressive refreshing
+  // Fixed type signature to match usage in jobPollingUtils.ts
   const handleJobComplete = useCallback(async (
     completedImages: string[], 
     jobConfig: {
@@ -101,33 +125,26 @@ export const useGenerationJobs = (session: any) => {
         description: `Successfully saved ${completedImages.length} ${jobConfig.isVideo ? 'videos' : 'images'} to your history`,
         duration: 3000
       });
-    }
-    
-    // Schedule multiple refreshes to ensure we get the latest data
-    if (refreshTimeoutRef.current) {
-      clearTimeout(refreshTimeoutRef.current);
-    }
-    
-    // Aggressive refresh strategy
-    const refreshSchedule = [
-      { delay: 0, reason: "immediate" },
-      { delay: 1000, reason: "1s after completion" },
-      { delay: 3000, reason: "3s after completion" },
-      { delay: 5000, reason: "5s after completion" },
-      { delay: 10000, reason: "10s after completion" }
-    ];
-    
-    // Execute all refreshes according to schedule
-    refreshSchedule.forEach(({ delay, reason }) => {
-      setTimeout(async () => {
-        console.log(`Running ${reason} history refresh`);
+      
+      // Clear any existing timeout
+      if (refreshTimeoutRef.current) {
+        clearTimeout(refreshTimeoutRef.current);
+        refreshTimeoutRef.current = null;
+      }
+      
+      // Schedule a single delayed refresh to avoid overwhelming the system
+      refreshTimeoutRef.current = setTimeout(async () => {
+        console.log("Running post-completion history refresh");
         try {
           await fetchPreviousGens(true);
         } catch (error) {
-          console.error(`Refresh failed (${reason}):`, error);
+          console.error("Post-completion refresh failed:", error);
         }
-      }, delay);
-    });
+        refreshTimeoutRef.current = null;
+      }, 1500);
+    } else {
+      console.error("Failed to store generated images");
+    }
     
     return storageResult;
   }, [fetchPreviousGens, session, toast]);
@@ -201,7 +218,7 @@ export const useGenerationJobs = (session: any) => {
     );
   }, [handleJobComplete]);
 
-  // Manual refresh function with better error handling
+  // Manual refresh function with cooldown
   const manualRefreshHistory = useCallback(async () => {
     if (isRefreshingHistory) {
       toast({
