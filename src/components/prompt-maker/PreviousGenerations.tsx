@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { ChevronRight, Video, RefreshCw } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -176,6 +177,7 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
       if (!generation.image_url) return;
       
       if (generation.id) {
+        // Ensure workflow is properly set based on is_video flag for display purposes
         if (generation.is_video === true) {
           generation.workflow = 'video';
         } else if (!generation.workflow) {
@@ -194,6 +196,7 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
       const normalizedUrl = generation.image_url.split('?')[0];
       
       if (!processedUrls.current.has(normalizedUrl)) {
+        // Ensure workflow is properly set for items without IDs too
         if (generation.is_video === true) {
           generation.workflow = 'video';
         } else if (!generation.workflow) {
@@ -208,6 +211,7 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     
     const uniqueItems = Array.from(idMap.values());
     console.log(`After strong deduplication: ${uniqueItems.length} unique items`);
+    console.log("Sample workflows:", uniqueItems.slice(0, 3).map(item => item.workflow));
     
     return uniqueItems;
   }, [previousGenerations]);
@@ -285,10 +289,12 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
                   const urlSuggestsVideo = isVideoUrl(generation.image_url);
                   const isVideo = isVideoFlag || urlSuggestsVideo;
                   
+                  // Always make sure we have the correct workflow based on the media type
                   if (isVideo && generation.workflow !== 'video') {
                     generation.workflow = 'video';
                   }
                   
+                  // Get the proper workflow label for display
                   const workflowLabel = getWorkflowLabel(generation.workflow);
                   
                   const imageUrl = generation.image_url;
@@ -365,4 +371,3 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     </Sheet>
   );
 };
-
