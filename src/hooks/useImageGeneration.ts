@@ -174,7 +174,8 @@ export const useImageGeneration = (
           data: {
             lora_scale: parseFloat(currentLoraScale),
             style: currentStyle,
-            seed: seedValue
+            seed: seedValue,
+            workflow: currentWorkflow // Make sure to include the workflow in the API request
           }
         };
         

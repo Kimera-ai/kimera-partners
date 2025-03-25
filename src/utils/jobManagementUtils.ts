@@ -139,6 +139,14 @@ export const storeGeneratedImages = async (
       
       console.log(`Processing URL for storage (${i+1}/${generatedImages.length}): ${imageUrl.substring(0, 50)}...`);
       
+      // Ensure workflow is correctly set based on jobConfig or isVideo
+      let workflowToStore = jobConfig.jobWorkflow || 'no-reference';
+      
+      // If it's a video, ensure workflow is set to 'video'
+      if (isVideo) {
+        workflowToStore = 'video';
+      }
+      
       const item = {
         user_id: userId,
         image_url: imageUrl,
@@ -146,7 +154,7 @@ export const storeGeneratedImages = async (
         style: jobConfig.jobStyle || '',
         ratio: jobConfig.jobRatio || '',
         lora_scale: jobConfig.jobLoraScale || '',
-        workflow: jobConfig.jobWorkflow || '',
+        workflow: workflowToStore,
         pipeline_id: jobConfig.pipeline_id || null,
         seed: typeof jobConfig.seed === 'number' ? 
               jobConfig.seed.toString() : 

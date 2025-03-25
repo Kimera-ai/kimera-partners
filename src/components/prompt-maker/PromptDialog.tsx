@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Download, X, Video, Share } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -77,12 +76,19 @@ export const PromptDialog: React.FC<PromptDialogProps> = ({
     }
   };
 
-  // For debugging purposes
-  React.useEffect(() => {
+  useEffect(() => {
     if (selectedGeneration) {
+      if (isVideo && selectedGeneration.workflow !== 'video') {
+        selectedGeneration.workflow = 'video';
+      }
+      
+      if (!selectedGeneration.workflow) {
+        selectedGeneration.workflow = 'no-reference';
+      }
+      
       console.log("Selected generation details:", selectedGeneration);
     }
-  }, [selectedGeneration]);
+  }, [selectedGeneration, isVideo]);
 
   return (
     <Dialog open={showPromptDialog} onOpenChange={setShowPromptDialog}>
@@ -133,7 +139,7 @@ export const PromptDialog: React.FC<PromptDialogProps> = ({
               <div className="grid grid-cols-2 gap-2">
                 <div className="text-sm">
                   <span className="text-muted-foreground">Mode:</span>
-                  <div className="font-medium">{getWorkflowLabel(selectedGeneration?.workflow)}</div>
+                  <div className="font-medium text-purple-400">{getWorkflowLabel(selectedGeneration?.workflow)}</div>
                 </div>
                 
                 <div className="text-sm">
