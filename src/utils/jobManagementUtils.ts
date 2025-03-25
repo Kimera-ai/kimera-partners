@@ -55,12 +55,18 @@ export const fetchPreviousGenerations = async () => {
     if (data && data.length > 0) {
       console.log('Sample generation data:', JSON.stringify(data[0]));
       
-      // Use a Map to deduplicate by ID
+      // Use a Map with image_url as key for deduplication
       const uniqueItems = new Map();
       
       data.forEach(item => {
-        if (item.id && !uniqueItems.has(item.id)) {
-          uniqueItems.set(item.id, item);
+        if (!item.image_url) return;
+        
+        // Normalize URL by removing query parameters
+        const normalizedUrl = item.image_url.split('?')[0];
+        const key = item.id || normalizedUrl;
+        
+        if (!uniqueItems.has(key)) {
+          uniqueItems.set(key, item);
         }
       });
       

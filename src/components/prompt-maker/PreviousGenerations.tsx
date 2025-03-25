@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { ChevronRight, Video, RefreshCw } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -32,7 +33,7 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
   const isInitialMount = React.useRef(true);
   const autoRefreshTimerRef = React.useRef<NodeJS.Timeout | null>(null);
   
-  const processedIdsRef = useRef(new Set<string>());
+  const processedUrls = useRef(new Set<string>());
   
   useEffect(() => {
     if (!isHistoryOpen) {
@@ -164,31 +165,43 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
       default: return "Image Generator";
     }
   }, []);
-  
+
+  // Strong deduplication logic that uses both URLs and IDs
   const uniqueGenerations = useMemo(() => {
     console.log(`Deduplicating ${previousGenerations.length} history items`);
     
-    const idMap = new Map<string, any>();
-    const urlMap = new Map<string, boolean>();
+    // Reset the set on each recomputation
+    processedUrls.current.clear();
     
+    const idMap = new Map<string, any>();
+    
+    // First pass: Use IDs when available
     previousGenerations.forEach(generation => {
+      if (!generation.image_url) return;
+      
       if (generation.id) {
         idMap.set(generation.id, generation);
-        return;
       }
+    });
+    
+    // Second pass: Use normalized URLs for items without IDs
+    previousGenerations.forEach(generation => {
+      if (!generation.image_url) return;
       
-      const normalizedUrl = generation.image_url?.split('?')[0] || '';
+      // Skip if already added by ID
+      if (generation.id && idMap.has(generation.id)) return;
       
-      const compositeKey = `${normalizedUrl}|${generation.prompt?.substring(0, 50) || ''}|${generation.created_at || ''}`;
+      const normalizedUrl = generation.image_url.split('?')[0];
       
-      if (normalizedUrl && !urlMap.has(normalizedUrl)) {
+      if (!processedUrls.current.has(normalizedUrl)) {
+        const compositeKey = `url-${normalizedUrl}`;
         idMap.set(compositeKey, generation);
-        urlMap.set(normalizedUrl, true);
+        processedUrls.current.add(normalizedUrl);
       }
     });
     
     const uniqueItems = Array.from(idMap.values());
-    console.log(`After deduplication: ${uniqueItems.length} unique items`);
+    console.log(`After strong deduplication: ${uniqueItems.length} unique items`);
     
     return uniqueItems;
   }, [previousGenerations]);
@@ -269,10 +282,11 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
                   const workflowLabel = getWorkflowLabel(generation.workflow);
                   
                   const imageUrl = generation.image_url;
-                  const displayUrl = imageUrl;
+                  if (!imageUrl) return null;
                   
+                  // Create a stable unique key for each item
                   const itemKey = generation.id || 
-                    `${generation.image_url?.split('?')[0]}-${generation.created_at}-${index}`;
+                    `${imageUrl.split('?')[0]}-${index}`;
                   
                   return (
                     <div 
@@ -283,7 +297,7 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
                       {isVideo ? (
                         <>
                           <video 
-                            src={displayUrl} 
+                            src={imageUrl} 
                             className="w-full h-full object-cover" 
                             autoPlay 
                             loop 
@@ -291,7 +305,7 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
                             playsInline 
                             onClick={e => e.stopPropagation()} 
                             onError={(e) => {
-                              console.error(`Failed to load video at ${displayUrl}`);
+                              console.error(`Failed to load video at ${imageUrl}`);
                               (e.target as HTMLVideoElement).style.display = 'none';
                               const fallbackImg = document.createElement('img');
                               fallbackImg.src = 'https://placehold.co/600x800/191223/404040?text=Video+Failed+to+Load';
@@ -306,11 +320,11 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
                         </>
                       ) : (
                         <img 
-                          src={displayUrl} 
+                          src={imageUrl} 
                           alt={`Generated ${index}`} 
                           className="w-full h-full object-cover" 
                           onError={(e) => {
-                            console.error(`Failed to load image at ${displayUrl}`);
+                            console.error(`Failed to load image at ${imageUrl}`);
                             e.currentTarget.src = 'https://placehold.co/600x800/191223/404040?text=Image+Failed+to+Load';
                           }}
                         />
