@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { ChevronRight, Video, RefreshCw } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -166,16 +165,13 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     }
   }, []);
 
-  // Strong deduplication logic that uses both URLs and IDs
   const uniqueGenerations = useMemo(() => {
     console.log(`Deduplicating ${previousGenerations.length} history items`);
     
-    // Reset the set on each recomputation
     processedUrls.current.clear();
     
     const idMap = new Map<string, any>();
     
-    // First pass: Use IDs when available
     previousGenerations.forEach(generation => {
       if (!generation.image_url) return;
       
@@ -184,11 +180,9 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
       }
     });
     
-    // Second pass: Use normalized URLs for items without IDs
     previousGenerations.forEach(generation => {
       if (!generation.image_url) return;
       
-      // Skip if already added by ID
       if (generation.id && idMap.has(generation.id)) return;
       
       const normalizedUrl = generation.image_url.split('?')[0];
@@ -211,7 +205,7 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
       <SheetTrigger asChild>
         <Button variant="outline" size="sm" className="fixed right-0 top-1/2 -translate-y-1/2 bg-card/30 backdrop-blur-md border-l border-t border-b border-white/10 hover:bg-card/50 rounded-r-none z-10 px-0 py-[54px] mx-0 my-[236px]">
           <div className="flex flex-col items-center">
-            <span className="whitespace-nowrap rotate-90 text-sm">History</span>
+            <span className="whitespace-nowrap rotate-90 text-sm text-primary hover:text-white transition-colors">History</span>
           </div>
           <ChevronRight className="h-4 w-4 absolute -right-1 opacity-60" />
         </Button>
@@ -284,7 +278,6 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
                   const imageUrl = generation.image_url;
                   if (!imageUrl) return null;
                   
-                  // Create a stable unique key for each item
                   const itemKey = generation.id || 
                     `${imageUrl.split('?')[0]}-${index}`;
                   
