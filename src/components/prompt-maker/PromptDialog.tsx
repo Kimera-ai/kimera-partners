@@ -41,6 +41,13 @@ export const PromptDialog: React.FC<PromptDialogProps> = ({
     }
   };
 
+  // For debugging purposes
+  React.useEffect(() => {
+    if (selectedGeneration) {
+      console.log("Selected generation details:", selectedGeneration);
+    }
+  }, [selectedGeneration]);
+
   return (
     <Dialog open={showPromptDialog} onOpenChange={setShowPromptDialog}>
       <DialogContent className="sm:max-w-4xl bg-background/95 backdrop-blur-md border-white/10">
@@ -74,6 +81,10 @@ export const PromptDialog: React.FC<PromptDialogProps> = ({
                 src={selectedGeneration?.image_url} 
                 alt="Generated" 
                 className="w-full h-full object-contain" 
+                onError={(e) => {
+                  console.error(`Error loading image: ${selectedGeneration?.image_url}`);
+                  e.currentTarget.src = 'https://placehold.co/600x800/191223/404040?text=Image+Failed+to+Load';
+                }}
               />
             )}
           </div>
@@ -110,6 +121,15 @@ export const PromptDialog: React.FC<PromptDialogProps> = ({
                   <div className="text-sm">
                     <span className="text-muted-foreground">Seed:</span>
                     <div className="font-medium">{selectedGeneration?.seed === '-1' ? 'Random' : selectedGeneration?.seed}</div>
+                  </div>
+                )}
+                
+                {selectedGeneration?.user_id && (
+                  <div className="text-sm">
+                    <span className="text-muted-foreground">User ID:</span>
+                    <div className="font-medium truncate" title={selectedGeneration?.user_id}>
+                      {selectedGeneration?.user_id.substring(0, 8)}...
+                    </div>
                   </div>
                 )}
               </div>

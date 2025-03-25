@@ -26,6 +26,7 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
   const [internalRefreshing, setInternalRefreshing] = useState(false);
   const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(null);
+  const [lastRefreshTime, setLastRefreshTime] = useState<number>(0);
 
   // Reset video playback when panel closes
   useEffect(() => {
@@ -39,13 +40,21 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     setPlayingVideo(null);
   }, [refreshTrigger]);
 
-  // Auto-refresh when panel opens
+  // Auto-refresh when panel opens or after a delay since last refresh
   useEffect(() => {
     if (isHistoryOpen && !isRefreshingHistory) {
-      console.log("History panel opened, refreshing history");
-      manualRefreshHistory();
+      const now = Date.now();
+      const timeSinceLastRefresh = now - lastRefreshTime;
+      
+      // If it's been more than 30 seconds since the last refresh
+      if (timeSinceLastRefresh > 30000 || lastRefreshTime === 0) {
+        console.log("History panel opened or stale, refreshing history");
+        manualRefreshHistory().then(() => {
+          setLastRefreshTime(Date.now());
+        });
+      }
     }
-  }, [isHistoryOpen, isRefreshingHistory, manualRefreshHistory]);
+  }, [isHistoryOpen, isRefreshingHistory, manualRefreshHistory, lastRefreshTime]);
 
   // Debounced refresh handler to prevent rapid clicking
   const handleManualRefresh = useCallback(async () => {
@@ -61,6 +70,7 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     
     try {
       await manualRefreshHistory();
+      setLastRefreshTime(Date.now());
     } finally {
       // Use a short debounce to prevent rapid re-clicks
       const timer = setTimeout(() => {
@@ -163,6 +173,9 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
             <div className="flex-1 flex items-center justify-center p-6">
               <div className="text-center">
                 <p className="text-muted-foreground">No previous generations found</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {isRefreshingHistory ? "Loading history..." : "Try generating some images or refreshing"}
+                </p>
                 {isHistoryOpen && (
                   <Button 
                     variant="outline" 

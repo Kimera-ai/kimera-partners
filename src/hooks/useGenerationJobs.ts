@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { GenerationJobType } from '@/components/prompt-maker/GenerationJob';
@@ -15,6 +16,7 @@ export const useGenerationJobs = (session: any) => {
   const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const refreshCountRef = useRef<number>(0);
   const jobsCompletedRef = useRef<boolean>(false);
+  const lastStorageSuccessRef = useRef<boolean>(false);
   const { toast } = useToast();
 
   // Optimized fetch function with debouncing
@@ -40,7 +42,7 @@ export const useGenerationJobs = (session: any) => {
   // Initial load only once when session is available
   useEffect(() => {
     if (session?.user) {
-      fetchPreviousGens();
+      fetchPreviousGens(true);
     }
   }, [session?.user, fetchPreviousGens]);
 
@@ -100,6 +102,7 @@ export const useGenerationJobs = (session: any) => {
     
     // Store results
     const storageResult = await storeGeneratedImages(session, completedImages, jobConfig);
+    lastStorageSuccessRef.current = storageResult;
     console.log(`Storage result: ${storageResult ? 'success' : 'failed'}`);
     
     // Flag for refresh and trigger an immediate refresh
@@ -113,31 +116,45 @@ export const useGenerationJobs = (session: any) => {
       clearTimeout(refreshTimeoutRef.current);
     }
     
-    refreshTimeoutRef.current = setTimeout(async () => {
-      console.log('Running delayed history refresh after generation...');
-      await fetchPreviousGens(true);
-      
-      // One more refresh after another delay
+    // Add multiple delayed refreshes to ensure we catch all database updates
+    const scheduleRefresh = (delay: number) => {
       refreshTimeoutRef.current = setTimeout(async () => {
-        console.log('Running final history refresh after generation...');
+        console.log(`Running delayed history refresh after ${delay}ms...`);
         await fetchPreviousGens(true);
         refreshTimeoutRef.current = null;
-      }, 2000);
-    }, 2000);
+      }, delay);
+    };
+    
+    // Schedule 3 refreshes at different intervals
+    scheduleRefresh(2000);  // 2 seconds
+    scheduleRefresh(5000);  // 5 seconds
+    scheduleRefresh(10000); // 10 seconds
+    
+    let toastMessage = `Successfully generated ${completedImages.length} ${jobConfig.isVideo ? 'videos' : 'images'}`;
+    
+    if (!storageResult) {
+      toastMessage += " (But failed to save to history)";
+    }
     
     toast({
       title: "Generation Complete",
-      description: `Successfully generated ${completedImages.length} ${jobConfig.isVideo ? 'videos' : 'images'}`,
-      duration: 3000
+      description: toastMessage,
+      duration: 5000
     });
   }, [fetchPreviousGens, session, toast]);
 
   // Check for job completion and refresh only when needed
   useEffect(() => {
     if (jobsCompletedRef.current) {
+      let toastMessage = "Generation completed successfully!";
+      
+      if (!lastStorageSuccessRef.current) {
+        toastMessage += " But there was an issue saving to history.";
+      }
+      
       toast({
         title: "Success",
-        description: "Generation completed successfully!",
+        description: toastMessage,
         duration: 3000
       });
       
@@ -146,11 +163,20 @@ export const useGenerationJobs = (session: any) => {
         clearTimeout(refreshTimeoutRef.current);
       }
       
-      // Schedule a single delayed refresh after 2 seconds
+      // Schedule a final delayed refresh after 2 seconds
       refreshTimeoutRef.current = setTimeout(async () => {
-        await fetchPreviousGens();
+        await fetchPreviousGens(true);
         refreshTimeoutRef.current = null;
         jobsCompletedRef.current = false;
+        
+        // If storage failed, show a message
+        if (!lastStorageSuccessRef.current) {
+          toast({
+            title: "History Issue",
+            description: "There was a problem saving your generations to history. They may not appear in your history panel.",
+            duration: 5000
+          });
+        }
       }, 2000);
     }
     

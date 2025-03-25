@@ -32,13 +32,17 @@ export const createNewJob = (numImagesToGenerate: number, jobIdCounter: number, 
 
 export const fetchPreviousGenerations = async () => {
   try {
-    // Add cache-busting parameter to ensure we get fresh data
+    // Force cache-busting with unique timestamp
     const timestamp = new Date().getTime();
+    
+    console.log(`Fetching previous generations with cache-buster: ${timestamp}`);
+    
     const { data, error } = await supabase
       .from('generated_images')
       .select('*')
       .order('created_at', { ascending: false })
-      .limit(100);
+      .limit(100)
+      .filter('updated_at', 'gte', new Date(Date.now() - 3600000).toISOString()); // Last hour as minimum
     
     if (error) {
       console.error('Error fetching previous generations:', error);
@@ -85,6 +89,14 @@ export const storeGeneratedImages = async (
     const isVideo = Boolean(jobConfig.isVideo);
     
     console.log(`Storing ${generatedImages.length} ${isVideo ? 'videos' : 'images'} with workflow: ${jobConfig.jobWorkflow || 'unknown'}`);
+    console.log('Storage data:', JSON.stringify({
+      userId, 
+      prompt: jobConfig.jobPrompt,
+      style: jobConfig.jobStyle,
+      ratio: jobConfig.jobRatio,
+      workflow: jobConfig.jobWorkflow,
+      isVideo
+    }));
     
     // Prepare batch insert data
     const insertData = [];
