@@ -80,23 +80,51 @@ export const pollJobStatus = async (
         let imageUrl = null;
         
         if (isVideo) {
-          // For video response
-          console.log("Video job completed. Result:", data.result);
+          // For video response - improved detection
+          console.log("Video job completed. Result structure:", JSON.stringify(data.result));
           
-          // Check all possible paths where the URL might be
-          imageUrl = data.result?.url ||                      // Direct URL property
-                    data.result ||                           // Result might be the URL directly
-                    (typeof data.result === 'string' ? data.result : null); // Result is a string
-                    
-          // Extract URL from quotes if needed
-          if (typeof imageUrl === 'string' && imageUrl.includes('"')) {
-            imageUrl = imageUrl.replace(/"/g, '');
+          // Try multiple possible paths for video URL
+          if (typeof data.result === 'string') {
+            // Direct string URL (possibly quoted)
+            imageUrl = data.result.replace(/^"|"$/g, '');
+          } else if (data.result?.url) {
+            // Object with url property
+            imageUrl = data.result.url;
+          } else if (data.result?.video) {
+            // Object with video property
+            imageUrl = data.result.video;
+          } else if (Array.isArray(data.result) && data.result.length > 0) {
+            // Array of results, take first
+            imageUrl = typeof data.result[0] === 'string' 
+              ? data.result[0] 
+              : data.result[0]?.url || data.result[0]?.video;
           }
           
           console.log(`Extracted video URL: ${imageUrl}`);
         } else {
-          // For image response
-          imageUrl = data.result?.images?.[0] || null;
+          // For image response - improved detection
+          console.log("Image job completed. Result structure:", JSON.stringify(data.result));
+          
+          // Try multiple possible paths for image URL
+          if (data.result?.images && Array.isArray(data.result.images)) {
+            // Standard format with images array
+            imageUrl = data.result.images[0];
+          } else if (typeof data.result === 'string') {
+            // Direct string URL
+            imageUrl = data.result;
+          } else if (data.result?.url) {
+            // Object with url property
+            imageUrl = data.result.url;
+          } else if (data.result?.image) {
+            // Object with image property
+            imageUrl = data.result.image;
+          } else if (Array.isArray(data.result) && data.result.length > 0) {
+            // Array of results, take first
+            imageUrl = typeof data.result[0] === 'string' 
+              ? data.result[0] 
+              : data.result[0]?.url || data.result[0]?.image;
+          }
+          
           console.log(`Extracted image URL: ${imageUrl}`);
         }
         
@@ -162,7 +190,7 @@ export const pollJobStatus = async (
             return prevJobs;
           });
         } else {
-          console.error(`Job ${apiJobId} completed but no ${isVideo ? 'video' : 'image'} URL found:`, data);
+          console.error(`Job ${apiJobId} completed but no ${isVideo ? 'video' : 'image'} URL found. Full response:`, JSON.stringify(data));
           
           setGenerationJobs(prev => 
             prev.map(job => 

@@ -29,11 +29,13 @@ serve(async (req) => {
     let requestBody;
     
     if (isVideo) {
-      // For video, only send the required fields: pipeline_id, imageUrl, and prompt
+      // For video, include the essential parameters
       requestBody = {
         pipeline_id: VIDEO_PIPELINE_ID,
         imageUrl,
-        prompt
+        prompt,
+        // Include ratio for video too for consistency
+        ratio
       };
     } else {
       // For image, include all the additional parameters
@@ -62,7 +64,21 @@ serve(async (req) => {
       body: JSON.stringify(requestBody)
     });
 
-    const data = await response.json();
+    // Check if response is valid JSON
+    let data;
+    try {
+      data = await response.json();
+    } catch (e) {
+      console.error('Failed to parse API response as JSON:', e);
+      const rawText = await response.text();
+      console.log('Raw response text:', rawText);
+      return new Response(
+        JSON.stringify({ error: 'Invalid response from API', rawResponse: rawText }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      );
+    }
+
+    console.log("API response:", JSON.stringify(data));
 
     // Ensure pipeline_id is included in the response
     if (!data.pipeline_id) {
