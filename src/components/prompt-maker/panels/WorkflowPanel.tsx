@@ -10,6 +10,9 @@ type WorkflowPanelProps = Pick<GenerationSettings, "workflow" | "setWorkflow"> &
   Pick<ImageSettings, "imagePreview" | "isUploading" | "handleImageUpload" | "removeImage">;
 
 export const WorkflowPanel = ({ workflow, setWorkflow, imagePreview, isUploading, handleImageUpload, removeImage }: WorkflowPanelProps) => {
+  // Make sure workflow has a valid value
+  const displayWorkflow = workflow || "no-reference";
+
   return (
     <div className="p-3">
       <div className="flex items-center justify-between">
@@ -38,7 +41,7 @@ export const WorkflowPanel = ({ workflow, setWorkflow, imagePreview, isUploading
         <ChevronDown className="w-4 h-4 text-white/60" />
       </div>
       <div className="mt-2">
-        <Select value={workflow} onValueChange={setWorkflow}>
+        <Select value={displayWorkflow} onValueChange={setWorkflow}>
           <SelectTrigger id="workflow" className="w-full bg-[#141220] border-white/10 text-white">
             <SelectValue placeholder="Select workflow" />
           </SelectTrigger>

@@ -214,7 +214,7 @@ export const PromptDialog: React.FC<PromptDialogProps> = ({
           <div className="flex gap-2">
             <Button 
               variant="secondary" 
-              onClick={handleShareImage}
+              onClick={() => selectedGeneration && handleShareImage()}
             >
               <Share className="h-4 w-4 mr-2" /> Share
             </Button>
