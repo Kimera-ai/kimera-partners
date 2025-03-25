@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { ChevronRight, Video, RefreshCw } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -31,7 +31,9 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
   const refreshCountRef = React.useRef<number>(0);
   const isInitialMount = React.useRef(true);
   const autoRefreshTimerRef = React.useRef<NodeJS.Timeout | null>(null);
-
+  
+  const [processedGenerations, setProcessedGenerations] = useState<Set<string>>(new Set());
+  
   useEffect(() => {
     if (!isHistoryOpen) {
       setPlayingVideo(null);
@@ -43,7 +45,6 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     } else if (isInitialMount.current) {
       console.log(`History panel opened, found ${previousGenerations.length} items`);
       isInitialMount.current = false;
-      
       refreshCountRef.current++;
     }
   }, [isHistoryOpen, previousGenerations.length]);
@@ -163,6 +164,19 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
       default: return "Image Generator";
     }
   }, []);
+  
+  const uniqueGenerations = useMemo(() => {
+    const generationsMap = new Map();
+    
+    previousGenerations.forEach(generation => {
+      const id = generation.id || `${generation.image_url}-${generation.created_at}`;
+      if (!generationsMap.has(id)) {
+        generationsMap.set(id, generation);
+      }
+    });
+    
+    return Array.from(generationsMap.values());
+  }, [previousGenerations]);
 
   return (
     <Sheet open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
@@ -190,7 +204,7 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
               className="relative"
             >
               <RefreshCw className={`h-4 w-4 ${(internalRefreshing || isRefreshingHistory) ? 'animate-spin' : ''}`} />
-              {previousGenerations.length > 0 && (
+              {uniqueGenerations.length > 0 && (
                 <span className="absolute top-0 right-0 flex h-3 w-3">
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
                 </span>
@@ -198,7 +212,7 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
             </Button>
           </div>
           
-          {previousGenerations.length === 0 ? (
+          {uniqueGenerations.length === 0 ? (
             <div className="flex-1 flex items-center justify-center p-6">
               <div className="text-center">
                 <p className="text-muted-foreground">
@@ -232,7 +246,7 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
           ) : (
             <div className="flex-1 overflow-y-auto scrollbar-none">
               <div className="p-3 grid grid-cols-2 gap-3">
-                {previousGenerations.map((generation, index) => {
+                {uniqueGenerations.map((generation, index) => {
                   const isVideoFlag = generation.is_video === true || generation.is_video === 'true' || generation.is_video === 1;
                   const urlSuggestsVideo = isVideoUrl(generation.image_url);
                   const isVideo = isVideoFlag || urlSuggestsVideo;
@@ -311,3 +325,4 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     </Sheet>
   );
 };
+
