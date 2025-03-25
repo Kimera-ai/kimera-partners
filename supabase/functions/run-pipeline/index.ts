@@ -89,6 +89,9 @@ serve(async (req) => {
     if (!data.seed && data.data?.seed !== undefined) {
       data.seed = String(data.data.seed);
     }
+    
+    // Include isVideo in the response
+    data.isVideo = isVideo;
 
     return new Response(
       JSON.stringify(data),

@@ -77,9 +77,9 @@ export const storeGeneratedImages = async (
   
   try {
     const userId = session.user.id;
-    console.log(`Storing ${generatedImages.length} images for user ${userId}`);
+    console.log(`Storing ${generatedImages.length} ${jobConfig.isVideo ? 'videos' : 'images'} for user ${userId}`);
     
-    // Prepare batch insert data - convert all values to the expected types
+    // Prepare batch insert data
     const insertData = generatedImages.map(imageUrl => ({
       user_id: userId,
       image_url: imageUrl,
@@ -88,14 +88,13 @@ export const storeGeneratedImages = async (
       ratio: jobConfig.jobRatio,
       lora_scale: jobConfig.jobLoraScale,
       pipeline_id: jobConfig.pipeline_id,
-      // Convert seed to string, which is what the database schema expects
       seed: typeof jobConfig.seed === 'number' ? 
             jobConfig.seed.toString() : 
-            jobConfig.seed === 'random' ? '-1' : jobConfig.seed
-      // Note: We removed is_video as it's not in the database schema
+            jobConfig.seed === 'random' ? '-1' : jobConfig.seed,
+      is_video: jobConfig.isVideo // Add this to store whether it's a video
     }));
     
-    console.log("Inserting data:", insertData.length, "rows");
+    console.log("Inserting data:", JSON.stringify(insertData));
     
     // Use the existing generated_images table
     const { error, data } = await supabase
@@ -105,6 +104,7 @@ export const storeGeneratedImages = async (
     
     if (error) {
       console.error('Error storing generated images:', error);
+      console.error('Error details:', error.details, error.hint, error.message);
       return false;
     }
     

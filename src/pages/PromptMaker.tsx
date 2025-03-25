@@ -54,11 +54,31 @@ const PromptMaker = () => {
   } = useGenerationJobs(session);
 
   useEffect(() => {
-    if (generationJobs.some(job => job.isCompleted)) {
+    if (session?.user) {
+      fetchPreviousGenerations();
+    }
+  }, [session?.user, fetchPreviousGenerations]);
+
+  useEffect(() => {
+    const hasCompletedJobs = generationJobs.some(job => job.isCompleted);
+    if (hasCompletedJobs) {
+      console.log("Jobs changed, refreshing history");
       fetchPreviousGenerations();
       setHistoryRefreshTrigger(prev => prev + 1);
     }
   }, [generationJobs, fetchPreviousGenerations]);
+
+  useEffect(() => {
+    if (session?.user) {
+      const refreshInterval = setInterval(() => {
+        console.log("Periodic history refresh");
+        fetchPreviousGenerations();
+        setHistoryRefreshTrigger(prev => prev + 1);
+      }, 30000); // Refresh every 30 seconds
+      
+      return () => clearInterval(refreshInterval);
+    }
+  }, [session?.user, fetchPreviousGenerations]);
   
   const {
     workflow,
@@ -108,6 +128,7 @@ const PromptMaker = () => {
       lora_scale: loraScale,
       seed: imageData.seed,
       pipeline_id: imageData.pipeline_id,
+      is_video: imageData.isVideo,
       created_at: new Date().toISOString()
     };
     
