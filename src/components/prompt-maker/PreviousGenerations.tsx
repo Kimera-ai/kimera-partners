@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from "react";
 import { ChevronRight, Video, RefreshCw } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -54,7 +55,12 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     if (!isHistoryOpen || internalRefreshing || isRefreshingHistory) return;
     
     if (manualRefreshHistory) {
-      await manualRefreshHistory();
+      try {
+        setInternalRefreshing(true);
+        await manualRefreshHistory();
+      } finally {
+        setInternalRefreshing(false);
+      }
       return;
     }
     

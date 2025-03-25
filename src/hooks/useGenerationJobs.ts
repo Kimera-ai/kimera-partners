@@ -22,8 +22,10 @@ export const useGenerationJobs = (session: any) => {
       const generations = await fetchPreviousGenerations();
       console.log("HISTORY FETCH: Completed with", generations.length, "items");
       setPreviousGenerations(generations);
+      return generations;
     } catch (error) {
       console.error("HISTORY FETCH ERROR:", error);
+      throw error;
     } finally {
       setIsRefreshingHistory(false);
     }
@@ -177,7 +179,6 @@ export const useGenerationJobs = (session: any) => {
     );
   }, [handleJobComplete]);
 
-  // Modify this function to return a Promise
   const manualRefreshHistory = useCallback(async () => {
     toast({
       title: "Refreshing History",
@@ -185,27 +186,28 @@ export const useGenerationJobs = (session: any) => {
       duration: 2000
     });
     
-    // Make sure to await this
-    await fetchPreviousGens();
-    
-    // Multiple refreshes with increasing delays - converted to use async/await
-    const refreshDelays = [1000, 2500, 5000];
-    
-    // Create promises for all the delayed refreshes
-    const refreshPromises = refreshDelays.map(delay => 
-      new Promise<void>(resolve => {
-        setTimeout(async () => {
-          console.log(`MANUAL REFRESH: Delayed refresh after ${delay}ms`);
-          await fetchPreviousGens();
-          resolve();
-        }, delay);
-      })
-    );
-    
-    // Return a promise that resolves when all the delayed refreshes are complete
-    return Promise.all(refreshPromises).then(() => {
-      console.log("All manual refresh operations completed");
-    });
+    try {
+      await fetchPreviousGens();
+      
+      const refreshDelays = [1000, 2500, 5000];
+      
+      const refreshPromises = refreshDelays.map(delay => 
+        new Promise<void>(resolve => {
+          setTimeout(async () => {
+            console.log(`MANUAL REFRESH: Delayed refresh after ${delay}ms`);
+            await fetchPreviousGens();
+            resolve();
+          }, delay);
+        })
+      );
+      
+      return await Promise.all(refreshPromises).then(() => {
+        console.log("All manual refresh operations completed");
+      });
+    } catch (error) {
+      console.error("MANUAL REFRESH ERROR:", error);
+      throw error;
+    }
   }, [fetchPreviousGens, toast]);
 
   return {

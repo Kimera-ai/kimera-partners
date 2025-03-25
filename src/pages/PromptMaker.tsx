@@ -157,22 +157,27 @@ const PromptMaker = () => {
     uploadedImageUrl
   );
 
-  const wrappedHandleGenerate = useCallback(() => {
+  const wrappedHandleGenerate = useCallback(async () => {
     generationStartTimeRef.current = Date.now();
     console.log("PROMPTMAKER: Generation started at", new Date().toISOString());
     
-    fetchPreviousGenerations();
+    await fetchPreviousGenerations();
     
     handleGenerate();
     
     const postStartDelays = [5000, 10000, 15000, 20000, 30000];
-    postStartDelays.forEach((delay, index) => {
-      setTimeout(() => {
-        console.log(`PROMPTMAKER: Post-generation refresh ${index + 1}/${postStartDelays.length} (${delay}ms)`);
-        fetchPreviousGenerations();
-        historyFetchCountRef.current += 1;
-      }, delay);
-    });
+    const refreshPromises = postStartDelays.map((delay, index) => 
+      new Promise<void>((resolve) => {
+        setTimeout(async () => {
+          console.log(`PROMPTMAKER: Post-generation refresh ${index + 1}/${postStartDelays.length} (${delay}ms)`);
+          await fetchPreviousGenerations();
+          historyFetchCountRef.current += 1;
+          resolve();
+        }, delay);
+      })
+    );
+    
+    return Promise.all(refreshPromises);
   }, [fetchPreviousGenerations, handleGenerate]);
 
   useScrollToLatestJob(latestJobRef, jobRefs, generationJobs);

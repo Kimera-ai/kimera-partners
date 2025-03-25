@@ -1,4 +1,3 @@
-
 export interface PromptSettings {
   prompt: string;
   setPrompt: (prompt: string) => void;
@@ -40,7 +39,6 @@ export interface GenerationState {
   handleGenerate: () => Promise<void>;
 }
 
-// Adding the HistoryRefreshProps interface to make the type explicit
 export interface HistoryRefreshProps {
   isRefreshingHistory: boolean;
   manualRefreshHistory: () => Promise<void>;
