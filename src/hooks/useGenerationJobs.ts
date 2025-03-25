@@ -127,6 +127,7 @@ export const useGenerationJobs = (session: any) => {
       jobStyle: string;
       jobRatio: string;
       jobLoraScale: string;
+      jobWorkflow?: string; // Add workflow to config
       pipeline_id?: string;
       seed?: number | string;
       isVideo?: boolean;
@@ -181,6 +182,7 @@ export const useGenerationJobs = (session: any) => {
     jobStyle: string;
     jobRatio: string;
     jobLoraScale: string;
+    jobWorkflow?: string; // Add workflow to config
     pipeline_id?: string;
     seed?: number | string;
     isVideo?: boolean;

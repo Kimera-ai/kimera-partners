@@ -22,6 +22,7 @@ export const useImageGeneration = (
     jobStyle: string;
     jobRatio: string;
     jobLoraScale: string;
+    jobWorkflow?: string;
     pipeline_id?: string;
     seed?: number | string;
     isVideo?: boolean;
@@ -265,6 +266,7 @@ export const useImageGeneration = (
           jobStyle: currentStyle,
           jobRatio: currentRatio,
           jobLoraScale: currentLoraScale,
+          jobWorkflow: currentWorkflow,
           pipeline_id: pipelineId,
           seed: currentSeed === "random" ? -1 : parseInt(currentSeed),
           isVideo: isVideoGeneration

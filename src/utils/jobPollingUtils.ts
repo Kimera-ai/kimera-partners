@@ -1,4 +1,3 @@
-
 import { GenerationJobType } from "@/components/prompt-maker/GenerationJob";
 
 type SetJobsFn = React.Dispatch<React.SetStateAction<GenerationJobType[]>>;
@@ -12,12 +11,13 @@ export const pollJobStatus = async (
     jobStyle: string;
     jobRatio: string;
     jobLoraScale: string;
+    jobWorkflow?: string;
     pipeline_id?: string;
     seed?: number | string;
     isVideo?: boolean;
   },
   setGenerationJobs: SetJobsFn,
-  handleJobComplete: (completedImages: string[], jobConfig: any) => Promise<void>
+  handleJobComplete: (completedImages: string[], jobConfig: any) => void
 ) => {
   const {
     apiJobId,
@@ -27,6 +27,7 @@ export const pollJobStatus = async (
     jobStyle,
     jobRatio,
     jobLoraScale,
+    jobWorkflow,
     pipeline_id,
     seed,
     isVideo = false
@@ -37,7 +38,7 @@ export const pollJobStatus = async (
   let lastStatus = '';
   let statusInterval: number;
   
-  const checkJobStatus = async () => {
+  const checkStatus = async () => {
     try {
       const response = await fetch(`https://api.kimera.ai/v1/pipeline/run/${apiJobId}`, {
         method: 'GET',
@@ -194,6 +195,7 @@ export const pollJobStatus = async (
                   jobStyle,
                   jobRatio,
                   jobLoraScale,
+                  jobWorkflow,
                   pipeline_id,
                   seed,
                   isVideo
@@ -205,6 +207,7 @@ export const pollJobStatus = async (
                   jobStyle,
                   jobRatio,
                   jobLoraScale,
+                  jobWorkflow,
                   pipeline_id,
                   seed,
                   isVideo
@@ -265,8 +268,8 @@ export const pollJobStatus = async (
   
   // Check immediately, then set up polling
   let errorCount = 0;
-  await checkJobStatus();
-  statusInterval = setInterval(checkJobStatus, 2000) as unknown as number;
+  await checkStatus();
+  statusInterval = setInterval(checkStatus, 2000) as unknown as number;
 };
 
 const updateJobStatus = (
