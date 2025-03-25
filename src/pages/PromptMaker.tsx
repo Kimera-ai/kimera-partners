@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { useSession } from "@/hooks/useSession";
@@ -53,12 +54,15 @@ const PromptMaker = () => {
     fetchPreviousGenerations
   } = useGenerationJobs(session);
 
+  // Fetch previous generations when the component mounts
   useEffect(() => {
     if (session?.user) {
+      console.log("Initial fetch of previous generations");
       fetchPreviousGenerations();
     }
   }, [session?.user, fetchPreviousGenerations]);
 
+  // Refresh history when a job completes
   useEffect(() => {
     const hasCompletedJobs = generationJobs.some(job => job.isCompleted);
     if (hasCompletedJobs) {
@@ -68,18 +72,28 @@ const PromptMaker = () => {
     }
   }, [generationJobs, fetchPreviousGenerations]);
 
+  // Periodic refresh of history
   useEffect(() => {
     if (session?.user) {
       const refreshInterval = setInterval(() => {
         console.log("Periodic history refresh");
         fetchPreviousGenerations();
         setHistoryRefreshTrigger(prev => prev + 1);
-      }, 30000); // Refresh every 30 seconds
+      }, 15000); // Refresh every 15 seconds (decreased from 30 seconds)
       
       return () => clearInterval(refreshInterval);
     }
   }, [session?.user, fetchPreviousGenerations]);
   
+  // Refresh history when history panel is opened
+  useEffect(() => {
+    if (isHistoryOpen && session?.user) {
+      console.log("History panel opened, refreshing history");
+      fetchPreviousGenerations();
+      setHistoryRefreshTrigger(prev => prev + 1);
+    }
+  }, [isHistoryOpen, session?.user, fetchPreviousGenerations]);
+
   const {
     workflow,
     setWorkflow,
@@ -179,23 +193,23 @@ const PromptMaker = () => {
         containerRef={containerRef} 
         sidebar={
           <Sidebar
-            workflow={sidebarProps.workflow}
-            setWorkflow={sidebarProps.setWorkflow}
-            ratio={sidebarProps.ratio}
-            setRatio={sidebarProps.setRatio}
-            style={sidebarProps.style}
-            setStyle={sidebarProps.setStyle}
-            loraScale={sidebarProps.loraScale}
-            setLoraScale={sidebarProps.setLoraScale}
-            seed={sidebarProps.seed}
-            setSeed={sidebarProps.setSeed}
-            numberOfImages={sidebarProps.numberOfImages}
-            setNumberOfImages={sidebarProps.setNumberOfImages}
-            imagePreview={sidebarProps.imagePreview}
-            isUploading={sidebarProps.isUploading}
-            handleImageUpload={sidebarProps.handleImageUpload}
-            removeImage={sidebarProps.removeImage}
-            CREDITS_PER_GENERATION={sidebarProps.CREDITS_PER_GENERATION}
+            workflow={workflow}
+            setWorkflow={setWorkflow}
+            ratio={ratio}
+            setRatio={setRatio}
+            style={style}
+            setStyle={setStyle}
+            loraScale={loraScale}
+            setLoraScale={setLoraScale}
+            seed={seed}
+            setSeed={setSeed}
+            numberOfImages={numberOfImages}
+            setNumberOfImages={setNumberOfImages}
+            imagePreview={imagePreview}
+            isUploading={isUploading}
+            handleImageUpload={handleImageUpload}
+            removeImage={removeImage}
+            CREDITS_PER_GENERATION={CREDITS_PER_GENERATION}
           />
         }
       >

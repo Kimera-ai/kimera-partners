@@ -24,7 +24,7 @@ export const createNewJob = (numImagesToGenerate: number, jobIdCounter: number, 
     startTime: Date.now(),
     elapsedTime: 0,
     isVideo: isVideo,
-    ratio: ratio  // Add the ratio to the job
+    ratio: ratio
   };
   
   return { job, newJobId };
@@ -32,7 +32,7 @@ export const createNewJob = (numImagesToGenerate: number, jobIdCounter: number, 
 
 export const fetchPreviousGenerations = async () => {
   try {
-    // Use the existing generated_images table instead of user_generations
+    console.log('Fetching previous generations...');
     const { data, error } = await supabase
       .from('generated_images')
       .select('*')
@@ -45,6 +45,12 @@ export const fetchPreviousGenerations = async () => {
     }
     
     console.log('Fetched generations count:', data?.length || 0);
+    
+    // Log first item for debugging
+    if (data && data.length > 0) {
+      console.log('Sample generation:', data[0]);
+    }
+    
     return data || [];
   } catch (error) {
     console.error('Error in fetchPreviousGenerations:', error);
@@ -91,7 +97,7 @@ export const storeGeneratedImages = async (
       seed: typeof jobConfig.seed === 'number' ? 
             jobConfig.seed.toString() : 
             jobConfig.seed === 'random' ? '-1' : jobConfig.seed,
-      is_video: jobConfig.isVideo // Add this to store whether it's a video
+      is_video: jobConfig.isVideo // Make sure is_video flag is set
     }));
     
     console.log("Inserting data:", JSON.stringify(insertData));
@@ -109,6 +115,9 @@ export const storeGeneratedImages = async (
     }
     
     console.log('Successfully stored images:', data?.length || 0);
+    if (data && data.length > 0) {
+      console.log('First stored item ID:', data[0].id);
+    }
     return true;
   } catch (error) {
     console.error('Error in storeGeneratedImages:', error);

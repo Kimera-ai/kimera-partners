@@ -24,6 +24,7 @@ serve(async (req) => {
 
     // Select the appropriate pipeline ID
     const selectedPipelineId = isVideo ? VIDEO_PIPELINE_ID : PIPELINE_ID;
+    console.log(`Using pipeline: ${selectedPipelineId} for ${isVideo ? 'video' : 'image'} generation`);
 
     // Create request body based on whether it's a video or image generation
     let requestBody;
@@ -90,8 +91,9 @@ serve(async (req) => {
       data.seed = String(data.data.seed);
     }
     
-    // Include isVideo in the response
+    // Explicitly include isVideo in the response
     data.isVideo = isVideo;
+    console.log(`Final response with isVideo=${isVideo}:`, JSON.stringify(data));
 
     return new Response(
       JSON.stringify(data),

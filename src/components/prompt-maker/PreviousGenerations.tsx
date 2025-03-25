@@ -1,8 +1,7 @@
 
 import React, { useState, useEffect } from "react";
-import { ChevronRight, Play, Pause, Video } from "lucide-react";
+import { ChevronRight, Video } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 
 interface PreviousGenerationsProps {
@@ -37,11 +36,6 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     }
   };
 
-  const toggleVideoPlayback = (videoUrl: string, event: React.MouseEvent) => {
-    event.stopPropagation();
-    setPlayingVideo(playingVideo === videoUrl ? null : videoUrl);
-  };
-
   // Reset playing video when the sheet is closed
   useEffect(() => {
     if (!isHistoryOpen) {
@@ -59,6 +53,8 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     console.log("Previous generations loaded:", previousGenerations.length);
     if (previousGenerations.length > 0) {
       console.log("Sample generation:", previousGenerations[0]);
+      // Check for is_video flag on first item
+      console.log("is_video flag exists:", previousGenerations[0].is_video !== undefined);
     }
   }, [previousGenerations]);
 
@@ -90,6 +86,8 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
               <div className="p-3 grid grid-cols-2 gap-3">
                 {previousGenerations.map((generation, index) => {
                   const isVideo = isVideoUrl(generation.image_url, generation.is_video);
+                  console.log(`Item ${index}: isVideo=${isVideo}, url=${generation.image_url.substring(0, 50)}...`);
+                  
                   return (
                     <div 
                       key={index} 
@@ -106,15 +104,14 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
                             muted 
                             playsInline 
                             onClick={e => e.stopPropagation()} 
-                            onError={() => {
-                              console.error(`Failed to load video at ${generation.image_url}`);
+                            onError={(e) => {
+                              console.error(`Failed to load video at ${generation.image_url}`, e);
                             }} 
                           />
                           <div className="absolute top-2 right-2 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded-full flex items-center gap-1">
                             <Video className="h-3 w-3" />
                             <span>Video</span>
                           </div>
-                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         </>
                       ) : (
                         <img 
