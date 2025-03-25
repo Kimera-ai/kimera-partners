@@ -37,7 +37,7 @@ export const fetchPreviousGenerations = async () => {
       .from('generated_images')
       .select('*')
       .order('created_at', { ascending: false })
-      .limit(100); // Increased from 20 to 100 to show more history
+      .limit(100);
     
     if (error) {
       console.error('Error fetching previous generations:', error);
@@ -46,11 +46,19 @@ export const fetchPreviousGenerations = async () => {
     
     console.log('Fetched generations count:', data?.length || 0);
     
-    // Log first few items for debugging
+    // Log the first few and last few items to better debug potential issues
     if (data && data.length > 0) {
-      const sampleSize = Math.min(data.length, 3);
+      const sampleSize = Math.min(data.length, 2);
+      console.log(`First ${sampleSize} generations:`);
       for (let i = 0; i < sampleSize; i++) {
-        console.log(`Sample generation ${i}:`, JSON.stringify(data[i]));
+        console.log(`Item ${i}:`, JSON.stringify(data[i]));
+      }
+      
+      if (data.length > 4) {
+        console.log(`Last ${sampleSize} generations:`);
+        for (let i = data.length - sampleSize; i < data.length; i++) {
+          console.log(`Item ${i}:`, JSON.stringify(data[i]));
+        }
       }
     }
     
@@ -88,49 +96,52 @@ export const storeGeneratedImages = async (
     const userId = session.user.id;
     const isVideo = Boolean(jobConfig.isVideo);
     console.log(`Storing ${generatedImages.length} ${isVideo ? 'videos' : 'images'} for user ${userId}`);
-    console.log("Storage config:", { 
-      isVideo: isVideo,
-      pipeline: jobConfig.pipeline_id,
-      urls: generatedImages.map(url => url.substring(0, 50) + '...')
-    });
+    console.log("Storage config:", JSON.stringify(jobConfig));
     
-    // Check if URLs indicate videos, even if the flag doesn't
-    const urlsContainVideos = generatedImages.some(url => 
-      /\.(mp4|webm|mov)($|\?)/.test(url.toLowerCase())
-    );
+    // Prepare batch insert data with direct debugging
+    console.log(`Preparing data for ${generatedImages.length} items`);
+    const insertData = [];
     
-    if (urlsContainVideos !== isVideo) {
-      console.warn(`URL format suggests videos (${urlsContainVideos}) but isVideo flag is ${isVideo}`);
-      // Trust the URLs if they explicitly show video extensions
-      // But maintain the provided flag for consistency
-    }
-    
-    // Prepare batch insert data
-    const insertData = generatedImages.map(imageUrl => {
-      // Verify each URL for debugging
+    for (let i = 0; i < generatedImages.length; i++) {
+      const imageUrl = generatedImages[i];
+      if (!imageUrl) {
+        console.error(`Image URL at index ${i} is null or undefined, skipping`);
+        continue;
+      }
+      
+      // Verify URL for debugging
       const urlSuggestsVideo = /\.(mp4|webm|mov)($|\?)/.test(imageUrl.toLowerCase());
       if (urlSuggestsVideo !== isVideo) {
         console.warn(`URL ${imageUrl.substring(0, 50)}... suggests video=${urlSuggestsVideo}, but flag is ${isVideo}`);
       }
       
-      return {
+      const item = {
         user_id: userId,
         image_url: imageUrl,
-        prompt: jobConfig.jobPrompt,
-        style: jobConfig.jobStyle,
-        ratio: jobConfig.jobRatio,
-        lora_scale: jobConfig.jobLoraScale,
-        pipeline_id: jobConfig.pipeline_id,
+        prompt: jobConfig.jobPrompt || '',
+        style: jobConfig.jobStyle || '',
+        ratio: jobConfig.jobRatio || '',
+        lora_scale: jobConfig.jobLoraScale || '',
+        pipeline_id: jobConfig.pipeline_id || null,
         seed: typeof jobConfig.seed === 'number' ? 
               jobConfig.seed.toString() : 
-              jobConfig.seed === 'random' ? '-1' : jobConfig.seed,
-        is_video: isVideo // Now properly stored with our new column
+              jobConfig.seed === 'random' ? '-1' : 
+              jobConfig.seed || '-1',
+        is_video: isVideo
       };
-    });
+      
+      console.log(`Image ${i} data:`, JSON.stringify(item));
+      insertData.push(item);
+    }
     
-    console.log("Inserting data:", JSON.stringify(insertData));
+    if (insertData.length === 0) {
+      console.error('No valid items to insert after processing');
+      return false;
+    }
     
-    // Use the existing generated_images table
+    console.log(`Inserting ${insertData.length} rows into generated_images`);
+    
+    // Execute the insert with detailed error logging
     const { error, data } = await supabase
       .from('generated_images')
       .insert(insertData)
@@ -139,6 +150,7 @@ export const storeGeneratedImages = async (
     if (error) {
       console.error('Error storing generated images:', error);
       console.error('Error details:', error.details, error.hint, error.message);
+      console.error('First insert item for reference:', JSON.stringify(insertData[0]));
       return false;
     }
     
@@ -147,6 +159,27 @@ export const storeGeneratedImages = async (
       console.log('First stored item ID:', data[0].id);
       console.log('First stored item is_video:', data[0].is_video);
     }
+    
+    // Force an immediate extra query to confirm items were stored
+    try {
+      const { data: checkData, error: checkError } = await supabase
+        .from('generated_images')
+        .select('id, image_url, is_video')
+        .order('created_at', { ascending: false })
+        .limit(5);
+        
+      if (checkError) {
+        console.error('Error verifying stored data:', checkError);
+      } else {
+        console.log('Verification check - latest items:', checkData?.length || 0);
+        if (checkData && checkData.length > 0) {
+          console.log('Latest stored items:', JSON.stringify(checkData));
+        }
+      }
+    } catch (checkErr) {
+      console.error('Exception during verification check:', checkErr);
+    }
+    
     return true;
   } catch (error) {
     console.error('Error in storeGeneratedImages:', error);

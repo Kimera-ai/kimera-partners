@@ -1,8 +1,9 @@
 
-import React, { useState, useEffect } from "react";
-import { ChevronRight, Video } from "lucide-react";
+import React, { useState, useEffect, useCallback } from "react";
+import { ChevronRight, Video, RefreshCw } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PreviousGenerationsProps {
   previousGenerations: any[];
@@ -20,6 +21,7 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
   refreshTrigger
 }) => {
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Helper function to check if URL is a video or if is_video flag is set
   const isVideoUrl = (url: string | undefined, isVideo?: boolean) => {
@@ -48,24 +50,45 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     setPlayingVideo(null);
   }, [refreshTrigger]);
 
+  // Manual refresh function
+  const handleManualRefresh = useCallback(async () => {
+    if (!isHistoryOpen || isRefreshing) return;
+    
+    setIsRefreshing(true);
+    console.log("Manual history refresh triggered");
+    
+    try {
+      // Direct database query to bypass any cached data
+      const { data, error } = await supabase
+        .from('generated_images')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(100);
+        
+      if (error) {
+        console.error("Manual refresh error:", error);
+      } else {
+        console.log(`Manual refresh loaded ${data?.length || 0} items`);
+        if (data && data.length > 0) {
+          console.log("Latest generation:", JSON.stringify(data[0]));
+        }
+      }
+    } catch (err) {
+      console.error("Error during manual refresh:", err);
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [isHistoryOpen, isRefreshing]);
+
   // Log generations for debugging
   useEffect(() => {
-    console.log("Previous generations loaded:", previousGenerations.length);
+    console.log("Previous generations loaded in component:", previousGenerations.length);
     if (previousGenerations.length > 0) {
-      console.log("Sample generation:", previousGenerations[0]);
+      console.log("First generation:", JSON.stringify(previousGenerations[0]));
       
       // Check for is_video flag on all items
       const hasIsVideo = previousGenerations.some(gen => gen.is_video !== undefined);
       console.log("is_video flag exists on generations:", hasIsVideo);
-      
-      // Log all items to check for video flag
-      previousGenerations.forEach((gen, index) => {
-        // Get the actual boolean value, handling all possible formats
-        const isVideoFlag = gen.is_video === true || gen.is_video === 'true' || gen.is_video === 1;
-        const urlSuggestsVideo = isVideoUrl(gen.image_url);
-        
-        console.log(`Generation ${index}: is_video=${isVideoFlag}, url_suggests_video=${urlSuggestsVideo}, url=${gen.image_url?.substring(0, 30)}...`);
-      });
     }
   }, [previousGenerations]);
 
@@ -81,15 +104,38 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
       </SheetTrigger>
       <SheetContent className="w-full sm:max-w-md p-0 bg-card/95 backdrop-blur border-white/10 overflow-hidden">
         <div className="flex flex-col h-full">
-          <div className="p-4 border-b border-white/10">
-            <h2 className="text-xl font-semibold text-white">Previous Generations</h2>
-            <p className="text-sm text-muted-foreground">Your previous image and video generations</p>
+          <div className="p-4 border-b border-white/10 flex justify-between items-center">
+            <div>
+              <h2 className="text-xl font-semibold text-white">Previous Generations</h2>
+              <p className="text-sm text-muted-foreground">Your previous image and video generations</p>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={handleManualRefresh}
+              disabled={isRefreshing}
+              title="Refresh history"
+            >
+              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            </Button>
           </div>
           
           {previousGenerations.length === 0 ? (
             <div className="flex-1 flex items-center justify-center p-6">
               <div className="text-center">
                 <p className="text-muted-foreground">No previous generations found</p>
+                {isHistoryOpen && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="mt-4"
+                    onClick={handleManualRefresh}
+                    disabled={isRefreshing}
+                  >
+                    <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+                    Refresh History
+                  </Button>
+                )}
               </div>
             </div>
           ) : (
@@ -101,11 +147,9 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
                   const urlSuggestsVideo = isVideoUrl(generation.image_url);
                   const isVideo = isVideoFlag || urlSuggestsVideo;
                   
-                  console.log(`Rendering item ${index}: isVideoFlag=${isVideoFlag}, urlSuggestsVideo=${urlSuggestsVideo}, final isVideo=${isVideo}`);
-                  
                   return (
                     <div 
-                      key={index} 
+                      key={`${generation.id || index}-${generation.image_url.substring(0, 20)}`}
                       className="relative group rounded-md overflow-hidden bg-black cursor-pointer aspect-[3/4]" 
                       onClick={() => handleImageClick(generation)}
                     >

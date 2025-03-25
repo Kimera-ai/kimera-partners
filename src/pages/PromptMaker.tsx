@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { useSession } from "@/hooks/useSession";
@@ -24,6 +25,7 @@ const PromptMaker = () => {
   const [historyRefreshTrigger, setHistoryRefreshTrigger] = useState(0);
   const jobRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const lastRefreshTimeRef = useRef<number>(0);
   
   const {
     imagePreview, 
@@ -53,6 +55,7 @@ const PromptMaker = () => {
     fetchPreviousGenerations
   } = useGenerationJobs(session);
 
+  // Initial fetch when component mounts
   useEffect(() => {
     if (session?.user) {
       console.log("Initial fetch of previous generations");
@@ -60,15 +63,18 @@ const PromptMaker = () => {
     }
   }, [session?.user, fetchPreviousGenerations]);
 
+  // Force aggressive refreshes after job completion
   useEffect(() => {
     const completedJobs = generationJobs.filter(job => job.isCompleted);
     if (completedJobs.length > 0) {
       console.log(`${completedJobs.length} job(s) completed, aggressively refreshing history`);
       
+      // Immediate refresh
       fetchPreviousGenerations();
       setHistoryRefreshTrigger(prev => prev + 1);
       
-      const refreshDelays = [500, 1000, 2000, 3000, 5000, 10000];
+      // Multiple delayed refreshes to catch async database updates
+      const refreshDelays = [500, 1000, 2000, 3000, 5000, 10000, 15000];
       
       refreshDelays.forEach(delay => {
         setTimeout(() => {
@@ -80,25 +86,35 @@ const PromptMaker = () => {
     }
   }, [generationJobs, fetchPreviousGenerations]);
 
+  // Periodic refresh with rate limiting
   useEffect(() => {
     if (session?.user) {
       const refreshInterval = setInterval(() => {
-        console.log("Periodic history refresh");
-        fetchPreviousGenerations();
-        setHistoryRefreshTrigger(prev => prev + 1);
+        // Rate limit refreshes to avoid too many requests
+        const now = Date.now();
+        const timeSinceLastRefresh = now - lastRefreshTimeRef.current;
+        
+        if (timeSinceLastRefresh >= 3000) { // 3 seconds minimum between refreshes
+          console.log("Periodic history refresh");
+          fetchPreviousGenerations();
+          setHistoryRefreshTrigger(prev => prev + 1);
+          lastRefreshTimeRef.current = now;
+        }
       }, 3000);
       
       return () => clearInterval(refreshInterval);
     }
   }, [session?.user, fetchPreviousGenerations]);
   
+  // History panel open refresh
   useEffect(() => {
     if (isHistoryOpen && session?.user) {
       console.log("History panel opened, refreshing history");
       fetchPreviousGenerations();
       setHistoryRefreshTrigger(prev => prev + 1);
       
-      const openRefreshDelays = [200, 500, 1000, 2000];
+      // Multiple refreshes with increasing delays
+      const openRefreshDelays = [200, 500, 1000, 2000, 5000];
       openRefreshDelays.forEach(delay => {
         setTimeout(() => {
           console.log(`History panel open refresh (${delay}ms)`);
@@ -163,6 +179,15 @@ const PromptMaker = () => {
     
     handleImageClick(generationData);
   }, [prompt, style, ratio, loraScale, handleImageClick]);
+
+  // Force a refresh when new images are generated
+  useEffect(() => {
+    if (generatedImages.length > 0) {
+      console.log(`${generatedImages.length} new images generated, refreshing history`);
+      fetchPreviousGenerations();
+      setHistoryRefreshTrigger(prev => prev + 1);
+    }
+  }, [generatedImages, fetchPreviousGenerations]);
 
   const sidebarProps = useMemo(() => ({
     workflow,
