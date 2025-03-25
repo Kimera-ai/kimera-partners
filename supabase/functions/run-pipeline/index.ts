@@ -4,6 +4,7 @@ import { corsHeaders } from "../_shared/cors.ts";
 
 const KIMERA_API_KEY = "1712edc40e3eb72c858332fe7500bf33e885324f8c1cd52b8cded2cdfd724cee";
 const PIPELINE_ID = "803a4MBY";
+const FACE_GEN_PIPELINE_ID = "FYpcEIUj"; // Added Face Gen specific pipeline ID
 const VIDEO_PIPELINE_ID = "1bPwBZEg"; // Updated video pipeline ID from wkE3eiap to 1bPwBZEg
 
 serve(async (req) => {
@@ -25,12 +26,7 @@ serve(async (req) => {
     // Convert isVideo to a proper boolean to avoid string/boolean confusion
     const isVideoBoolean = isVideo === true || isVideo === 'true' || isVideo === 1;
     
-    // Select the appropriate pipeline ID
-    const selectedPipelineId = isVideoBoolean ? VIDEO_PIPELINE_ID : PIPELINE_ID;
-    console.log(`Using pipeline: ${selectedPipelineId} for ${isVideoBoolean ? 'video' : 'image'} generation`);
-    console.log(`Input workflow parameter: ${workflow}`);
-
-    // Forcefully standardize workflow value to ensure consistent casing/format
+    // Standardize workflow value to ensure consistent casing/format
     let standardizedWorkflow = workflow;
     if (typeof standardizedWorkflow === 'string') {
       standardizedWorkflow = standardizedWorkflow.toLowerCase().trim();
@@ -59,6 +55,18 @@ serve(async (req) => {
     const requestId = crypto.randomUUID();
     console.log(`Generated unique request ID: ${requestId}`);
 
+    // Select the appropriate pipeline ID based on workflow
+    let selectedPipelineId;
+    if (isVideoBoolean) {
+      selectedPipelineId = VIDEO_PIPELINE_ID;
+    } else if (finalWorkflow === 'with-reference') {
+      selectedPipelineId = FACE_GEN_PIPELINE_ID; // Use the Face Gen specific pipeline ID
+    } else {
+      selectedPipelineId = PIPELINE_ID;
+    }
+    
+    console.log(`Using pipeline: ${selectedPipelineId} for ${isVideoBoolean ? 'video' : finalWorkflow === 'with-reference' ? 'face gen' : 'image'} generation`);
+
     // Create request body based on whether it's a video or image generation
     let requestBody;
     
@@ -79,7 +87,7 @@ serve(async (req) => {
     } else {
       // For image, include all the additional parameters
       requestBody = {
-        pipeline_id: PIPELINE_ID,
+        pipeline_id: selectedPipelineId, // Use the selected pipeline ID
         imageUrl,
         ratio,
         prompt,
@@ -93,7 +101,7 @@ serve(async (req) => {
       };
     }
 
-    console.log(`Making ${isVideoBoolean ? 'video' : 'image'} generation request with:`, JSON.stringify(requestBody));
+    console.log(`Making ${isVideoBoolean ? 'video' : finalWorkflow === 'with-reference' ? 'face gen' : 'image'} generation request with:`, JSON.stringify(requestBody));
 
     // Make request to Kimera AI API
     const response = await fetch('https://api.kimera.ai/v1/pipeline/run', {
