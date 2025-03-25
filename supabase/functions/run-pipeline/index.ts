@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { imageUrl, prompt, ratio = "2:3", loraScale = 0.5, style = "Cinematic", seed = -1, isVideo = false } = await req.json();
+    const { imageUrl, prompt, ratio = "2:3", loraScale = 0.5, style = "Cinematic", seed = -1, isVideo = false, workflow = "no-reference" } = await req.json();
 
     if (!imageUrl || !prompt) {
       return new Response(
@@ -28,6 +28,7 @@ serve(async (req) => {
     // Select the appropriate pipeline ID
     const selectedPipelineId = isVideoBoolean ? VIDEO_PIPELINE_ID : PIPELINE_ID;
     console.log(`Using pipeline: ${selectedPipelineId} for ${isVideoBoolean ? 'video' : 'image'} generation`);
+    console.log(`Using workflow: ${workflow}`);
 
     // Create request body based on whether it's a video or image generation
     let requestBody;
@@ -39,7 +40,11 @@ serve(async (req) => {
         imageUrl,
         prompt,
         // Include ratio for video too for consistency
-        ratio
+        ratio,
+        // Add workflow for videos as well
+        data: {
+          workflow: 'video' // Always set video workflow for videos
+        }
       };
     } else {
       // For image, include all the additional parameters
@@ -51,7 +56,8 @@ serve(async (req) => {
         data: {
           lora_scale: loraScale,
           style: style,
-          seed: seed
+          seed: seed,
+          workflow: workflow // Include the actual workflow used
         }
       };
     }
@@ -96,7 +102,11 @@ serve(async (req) => {
     
     // Explicitly include isVideo in the response as a boolean
     data.isVideo = isVideoBoolean;
-    console.log(`Final response with isVideo=${isVideoBoolean}:`, JSON.stringify(data));
+    
+    // Explicitly include workflow in the response
+    data.workflow = isVideoBoolean ? 'video' : workflow;
+    
+    console.log(`Final response with isVideo=${isVideoBoolean}, workflow=${data.workflow}:`, JSON.stringify(data));
 
     return new Response(
       JSON.stringify(data),

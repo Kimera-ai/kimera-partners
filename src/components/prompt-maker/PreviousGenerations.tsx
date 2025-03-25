@@ -100,6 +100,10 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     if (previousGenerations.length > 0) {
       console.log(`PreviousGenerations received ${previousGenerations.length} items`);
       console.log(`First item timestamp: ${previousGenerations[0]?.created_at}`);
+      
+      const workflowTypes = previousGenerations.map(gen => gen.workflow).filter(Boolean);
+      const uniqueWorkflows = [...new Set(workflowTypes)];
+      console.log("Unique workflow types:", uniqueWorkflows);
     }
   }, [previousGenerations]);
 
@@ -178,11 +182,17 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
       if (!generation.image_url) return;
       
       if (generation.id) {
-        if (generation.is_video === true) {
+        const isVideoFlag = generation.is_video === true || generation.is_video === 'true' || generation.is_video === 1;
+        const urlSuggestsVideo = isVideoUrl(generation.image_url);
+        const isVideo = isVideoFlag || urlSuggestsVideo;
+        
+        if (isVideo && generation.workflow !== 'video') {
           generation.workflow = 'video';
         } else if (!generation.workflow) {
           generation.workflow = 'no-reference';
         }
+        
+        console.log(`Generation ID: ${generation.id}, Workflow: ${generation.workflow}`);
         
         idMap.set(generation.id, generation);
       }
@@ -196,7 +206,11 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
       const normalizedUrl = generation.image_url.split('?')[0];
       
       if (!processedUrls.current.has(normalizedUrl)) {
-        if (generation.is_video === true) {
+        const isVideoFlag = generation.is_video === true || generation.is_video === 'true' || generation.is_video === 1;
+        const urlSuggestsVideo = isVideoUrl(generation.image_url);
+        const isVideo = isVideoFlag || urlSuggestsVideo;
+        
+        if (isVideo && generation.workflow !== 'video') {
           generation.workflow = 'video';
         } else if (!generation.workflow) {
           generation.workflow = 'no-reference';
@@ -210,10 +224,16 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     
     const uniqueItems = Array.from(idMap.values());
     console.log(`After strong deduplication: ${uniqueItems.length} unique items`);
-    console.log("Sample workflows:", uniqueItems.slice(0, 3).map(item => item.workflow));
+    
+    if (uniqueItems.length > 0) {
+      console.log("Sample workflows:", uniqueItems.slice(0, 5).map(item => ({
+        workflow: item.workflow,
+        isVideo: item.is_video === true || isVideoUrl(item.image_url)
+      })));
+    }
     
     return uniqueItems;
-  }, [previousGenerations]);
+  }, [previousGenerations, isVideoUrl]);
 
   return (
     <Sheet open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>

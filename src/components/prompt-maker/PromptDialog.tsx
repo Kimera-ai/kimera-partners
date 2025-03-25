@@ -29,15 +29,17 @@ export const PromptDialog: React.FC<PromptDialogProps> = ({
     }
   };
 
-  const getWorkflowLabel = (workflow: string | undefined) => {
+  const getWorkflowLabel = (workflow: string | undefined, isVideo: boolean = false) => {
+    if (isVideo) return "Video Generator";
+    
     if (!workflow) return "Image Generator";
     
     switch(workflow) {
       case "with-reference": return "Face Gen";
       case "cartoon": return "Reference Mode";
       case "video": return "Video Generator";
-      case "no-reference": 
-      default: return "Image Generator";
+      case "no-reference": return "Image Generator";
+      default: return workflow.charAt(0).toUpperCase() + workflow.slice(1).replace(/-/g, ' ');
     }
   };
 
@@ -78,15 +80,12 @@ export const PromptDialog: React.FC<PromptDialogProps> = ({
 
   useEffect(() => {
     if (selectedGeneration) {
+      console.log("Selected generation workflow:", selectedGeneration.workflow);
+      
+      // Only override workflow if it's a video and doesn't already have video workflow
       if (isVideo && selectedGeneration.workflow !== 'video') {
         selectedGeneration.workflow = 'video';
       }
-      
-      if (!selectedGeneration.workflow) {
-        selectedGeneration.workflow = 'no-reference';
-      }
-      
-      console.log("Selected generation details:", selectedGeneration);
     }
   }, [selectedGeneration, isVideo]);
 
@@ -139,7 +138,9 @@ export const PromptDialog: React.FC<PromptDialogProps> = ({
               <div className="grid grid-cols-2 gap-2">
                 <div className="text-sm">
                   <span className="text-muted-foreground">Mode:</span>
-                  <div className="font-medium text-purple-400">{getWorkflowLabel(selectedGeneration?.workflow)}</div>
+                  <div className="font-medium text-purple-400">
+                    {getWorkflowLabel(selectedGeneration?.workflow, isVideo)}
+                  </div>
                 </div>
                 
                 <div className="text-sm">
