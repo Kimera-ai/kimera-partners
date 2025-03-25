@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from "react";
 import { ChevronRight, Video, RefreshCw } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -29,17 +28,14 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
   const [lastRefreshTime, setLastRefreshTime] = useState<number>(0);
   const [emptyHistoryShown, setEmptyHistoryShown] = useState<boolean>(false);
   
-  // Fixed: Using a ref to prevent refresh loops
   const refreshCountRef = React.useRef<number>(0);
   const isInitialMount = React.useRef(true);
   const autoRefreshTimerRef = React.useRef<NodeJS.Timeout | null>(null);
 
-  // Reset video playback when panel closes
   useEffect(() => {
     if (!isHistoryOpen) {
       setPlayingVideo(null);
       
-      // Clear any pending auto-refresh timers when panel closes
       if (autoRefreshTimerRef.current) {
         clearTimeout(autoRefreshTimerRef.current);
         autoRefreshTimerRef.current = null;
@@ -48,32 +44,26 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
       console.log(`History panel opened, found ${previousGenerations.length} items`);
       isInitialMount.current = false;
       
-      // Only increment refresh count on first panel open
       refreshCountRef.current++;
     }
   }, [isHistoryOpen, previousGenerations.length]);
 
-  // Reset video playback on refresh
   useEffect(() => {
     setPlayingVideo(null);
   }, [refreshTrigger]);
 
-  // Auto-refresh only when panel opens initially or after a long delay
   useEffect(() => {
     if (isHistoryOpen) {
       const now = Date.now();
       const timeSinceLastRefresh = now - lastRefreshTime;
       
-      // Fixed: Only refresh if it's been more than 10 seconds since last refresh
       if (timeSinceLastRefresh > 10000 || lastRefreshTime === 0) {
         console.log(`Auto-refreshing history (time since last: ${timeSinceLastRefresh}ms, count: ${refreshCountRef.current})`);
         
-        // Clear any existing timers
         if (autoRefreshTimerRef.current) {
           clearTimeout(autoRefreshTimerRef.current);
         }
         
-        // Schedule a refresh after a short delay to prevent rapid refreshes
         autoRefreshTimerRef.current = setTimeout(() => {
           if (!isRefreshingHistory) {
             manualRefreshHistory().then(() => {
@@ -93,7 +83,6 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     };
   }, [isHistoryOpen, isRefreshingHistory, manualRefreshHistory, lastRefreshTime]);
 
-  // Show empty history message only after initial load and certain time
   useEffect(() => {
     if (isHistoryOpen && previousGenerations.length === 0 && !isRefreshingHistory) {
       const timer = setTimeout(() => {
@@ -106,7 +95,6 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     }
   }, [isHistoryOpen, previousGenerations.length, isRefreshingHistory]);
 
-  // Double-check on previous generations changes
   useEffect(() => {
     if (previousGenerations.length > 0) {
       console.log(`PreviousGenerations received ${previousGenerations.length} items`);
@@ -114,28 +102,23 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     }
   }, [previousGenerations]);
 
-  // Debounced refresh handler with cooldown to prevent rapid clicking
   const handleManualRefresh = useCallback(async () => {
     if (!isHistoryOpen || internalRefreshing || isRefreshingHistory) return;
     
-    // Clear any existing debounce timer
     if (debounceTimer) {
       clearTimeout(debounceTimer);
     }
     
-    // Set refreshing state immediately for better UX
     setInternalRefreshing(true);
     
     try {
       await manualRefreshHistory();
       setLastRefreshTime(Date.now());
-      // Increment refresh count to trigger re-renders
       refreshCountRef.current++;
     } catch (error) {
       console.error("Manual refresh error:", error);
       toast.error("Failed to refresh history");
     } finally {
-      // Use a cooldown period to prevent rapid re-clicks
       const timer = setTimeout(() => {
         setInternalRefreshing(false);
       }, 2000);
@@ -144,7 +127,6 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     }
   }, [isHistoryOpen, internalRefreshing, isRefreshingHistory, manualRefreshHistory, debounceTimer]);
 
-  // Cleanup timer on unmount
   useEffect(() => {
     return () => {
       if (debounceTimer) {
@@ -254,9 +236,9 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
                   const isVideoFlag = generation.is_video === true || generation.is_video === 'true' || generation.is_video === 1;
                   const urlSuggestsVideo = isVideoUrl(generation.image_url);
                   const isVideo = isVideoFlag || urlSuggestsVideo;
+                  
                   const workflowLabel = getWorkflowLabel(generation.workflow);
                   
-                  // Add cache busting to image URLs
                   const imageUrl = generation.image_url.includes('?') 
                     ? `${generation.image_url}&t=${Date.now()}`
                     : `${generation.image_url}?t=${Date.now()}`;
