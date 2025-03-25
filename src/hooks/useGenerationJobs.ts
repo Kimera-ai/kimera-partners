@@ -11,14 +11,23 @@ export const useGenerationJobs = (session: any) => {
   const [previousGenerations, setPreviousGenerations] = useState<any[]>([]);
   const [generationJobs, setGenerationJobs] = useState<GenerationJobType[]>([]);
   const [jobIdCounter, setJobIdCounter] = useState(0);
+  const [isRefreshingHistory, setIsRefreshingHistory] = useState(false);
   const latestJobRef = useRef<string | null>(null);
   const jobCompletedRef = useRef<{images: string[], config: any} | null>(null);
   const { toast } = useToast();
 
   const fetchPreviousGens = useCallback(async () => {
-    const generations = await fetchPreviousGenerations();
-    console.log("Fetched previous generations:", generations.length);
-    setPreviousGenerations(generations);
+    setIsRefreshingHistory(true);
+    console.log("HISTORY FETCH: Starting fetch of previous generations");
+    try {
+      const generations = await fetchPreviousGenerations();
+      console.log("HISTORY FETCH: Completed with", generations.length, "items");
+      setPreviousGenerations(generations);
+    } catch (error) {
+      console.error("HISTORY FETCH ERROR:", error);
+    } finally {
+      setIsRefreshingHistory(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -55,21 +64,39 @@ export const useGenerationJobs = (session: any) => {
       });
       
       const processStorage = async () => {
-        console.log("Storing generated images:", images.length);
-        console.log("Store config:", JSON.stringify(config));
-        const stored = await storeGeneratedImages(session, images, config);
-        console.log("Storage result:", stored);
-        if (stored) {
-          console.log("Images stored, refreshing history");
-          await fetchPreviousGens();
-        } else {
-          console.error("Failed to store images");
+        console.log("JOB COMPLETE: Storage processing started");
+        console.log("JOB COMPLETE: Storing", images.length, "items with config:", JSON.stringify(config));
+        try {
+          const stored = await storeGeneratedImages(session, images, config);
+          console.log("JOB COMPLETE: Storage result:", stored);
+          if (stored) {
+            console.log("JOB COMPLETE: Images stored, refreshing history");
+            await fetchPreviousGens();
+          } else {
+            console.error("JOB COMPLETE: Failed to store images");
+            toast({
+              title: "Warning",
+              description: "Generated items may not have been saved to history. Please check and try again.",
+              duration: 5000
+            });
+          }
+          
+          // Force multiple refreshes after storage with increasing delays
+          const refreshDelays = [500, 1500, 3000, 6000];
+          refreshDelays.forEach((delay, index) => {
+            setTimeout(() => {
+              console.log(`JOB COMPLETE: Delayed history refresh ${index + 1}/${refreshDelays.length} (${delay}ms)`);
+              fetchPreviousGens();
+            }, delay);
+          });
+        } catch (error) {
+          console.error("JOB COMPLETE ERROR: Storage failed with exception:", error);
+          toast({
+            title: "Error",
+            description: "Failed to save items to history. Please try again or check console for details.",
+            duration: 5000
+          });
         }
-        // Force another refresh after a delay to ensure updates are captured
-        setTimeout(() => {
-          console.log("Delayed refresh after storage");
-          fetchPreviousGens();
-        }, 1000);
       };
       
       processStorage();
@@ -101,14 +128,17 @@ export const useGenerationJobs = (session: any) => {
       )
     );
     
-    console.log(`Job ${jobConfig.jobId}: completed=true, validImages=${completedImages.length}, isVideo=${jobConfig.isVideo || false}`);
+    console.log(`JOB COMPLETE: Job ${jobConfig.jobId} with ${completedImages.length} valid images, isVideo=${jobConfig.isVideo || false}`);
     
+    // Copy the data to avoid reference issues
     jobCompletedRef.current = {
-      images: completedImages,
-      config: jobConfig
+      images: [...completedImages],
+      config: {...jobConfig}
     };
     
-  }, []);
+    // Immediately try to refresh history 
+    fetchPreviousGens();
+  }, [fetchPreviousGens]);
 
   const startNewJob = useCallback((numImagesToGenerate: number, ratio: string = "2:3", isVideo: boolean = false) => {
     const { job: newJob, newJobId } = createNewJob(numImagesToGenerate, jobIdCounter, ratio, isVideo);
@@ -148,6 +178,25 @@ export const useGenerationJobs = (session: any) => {
     );
   }, [handleJobComplete]);
 
+  const manualRefreshHistory = useCallback(async () => {
+    toast({
+      title: "Refreshing History",
+      description: "Fetching your latest generations...",
+      duration: 2000
+    });
+    
+    await fetchPreviousGens();
+    
+    // Multiple refreshes with increasing delays
+    const refreshDelays = [1000, 2500, 5000];
+    refreshDelays.forEach(delay => {
+      setTimeout(() => {
+        console.log(`MANUAL REFRESH: Delayed refresh after ${delay}ms`);
+        fetchPreviousGens();
+      }, delay);
+    });
+  }, [fetchPreviousGens, toast]);
+
   return {
     generatedImages,
     setGeneratedImages,
@@ -163,6 +212,8 @@ export const useGenerationJobs = (session: any) => {
     pollJobStatus: startJobPolling,
     startNewJob,
     updateJobStatus,
-    latestJobRef
+    latestJobRef,
+    isRefreshingHistory,
+    manualRefreshHistory
   };
 };

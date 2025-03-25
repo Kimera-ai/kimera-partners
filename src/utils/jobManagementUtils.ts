@@ -33,6 +33,10 @@ export const createNewJob = (numImagesToGenerate: number, jobIdCounter: number, 
 export const fetchPreviousGenerations = async () => {
   try {
     console.log('Fetching previous generations...');
+    
+    // Add a random query parameter to bust cache
+    const cacheBuster = `?cache_bust=${Date.now()}`;
+    
     const { data, error } = await supabase
       .from('generated_images')
       .select('*')
@@ -95,7 +99,7 @@ export const storeGeneratedImages = async (
   try {
     const userId = session.user.id;
     const isVideo = Boolean(jobConfig.isVideo);
-    console.log(`Storing ${generatedImages.length} ${isVideo ? 'videos' : 'images'} for user ${userId}`);
+    console.log(`STORAGE ATTEMPT: Storing ${generatedImages.length} ${isVideo ? 'videos' : 'images'} for user ${userId}`);
     console.log("Storage config:", JSON.stringify(jobConfig));
     
     // Prepare batch insert data with direct debugging
@@ -115,6 +119,9 @@ export const storeGeneratedImages = async (
         console.warn(`URL ${imageUrl.substring(0, 50)}... suggests video=${urlSuggestsVideo}, but flag is ${isVideo}`);
       }
       
+      // Force the correct is_video flag based on URL if there's a mismatch
+      const finalIsVideo = urlSuggestsVideo || isVideo;
+      
       const item = {
         user_id: userId,
         image_url: imageUrl,
@@ -127,10 +134,10 @@ export const storeGeneratedImages = async (
               jobConfig.seed.toString() : 
               jobConfig.seed === 'random' ? '-1' : 
               jobConfig.seed || '-1',
-        is_video: isVideo
+        is_video: finalIsVideo
       };
       
-      console.log(`Image ${i} data:`, JSON.stringify(item));
+      console.log(`STORAGE ITEM ${i}: `, JSON.stringify(item));
       insertData.push(item);
     }
     
@@ -139,7 +146,7 @@ export const storeGeneratedImages = async (
       return false;
     }
     
-    console.log(`Inserting ${insertData.length} rows into generated_images`);
+    console.log(`STORAGE INSERT: Attempting to insert ${insertData.length} rows into generated_images`);
     
     // Execute the insert with detailed error logging
     const { error, data } = await supabase
@@ -148,13 +155,35 @@ export const storeGeneratedImages = async (
       .select();
     
     if (error) {
-      console.error('Error storing generated images:', error);
+      console.error('STORAGE ERROR: Error storing generated images:', error);
       console.error('Error details:', error.details, error.hint, error.message);
       console.error('First insert item for reference:', JSON.stringify(insertData[0]));
-      return false;
+      
+      // Try individual inserts as fallback
+      console.log('STORAGE FALLBACK: Attempting individual inserts');
+      let successCount = 0;
+      
+      for (let i = 0; i < insertData.length; i++) {
+        try {
+          const { error: itemError } = await supabase
+            .from('generated_images')
+            .insert([insertData[i]]);
+            
+          if (itemError) {
+            console.error(`STORAGE FALLBACK ERROR: Item ${i} failed:`, itemError);
+          } else {
+            successCount++;
+          }
+        } catch (e) {
+          console.error(`STORAGE FALLBACK EXCEPTION: Item ${i} exception:`, e);
+        }
+      }
+      
+      console.log(`STORAGE FALLBACK COMPLETE: ${successCount}/${insertData.length} items stored successfully`);
+      return successCount > 0;
     }
     
-    console.log('Successfully stored images:', data?.length || 0);
+    console.log('STORAGE SUCCESS: Successfully stored images:', data?.length || 0);
     if (data && data.length > 0) {
       console.log('First stored item ID:', data[0].id);
       console.log('First stored item is_video:', data[0].is_video);
@@ -182,7 +211,7 @@ export const storeGeneratedImages = async (
     
     return true;
   } catch (error) {
-    console.error('Error in storeGeneratedImages:', error);
+    console.error('STORAGE EXCEPTION: Error in storeGeneratedImages:', error);
     return false;
   }
 };
