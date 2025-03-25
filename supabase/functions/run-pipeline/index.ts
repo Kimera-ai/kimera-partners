@@ -22,14 +22,17 @@ serve(async (req) => {
       );
     }
 
+    // Convert isVideo to a proper boolean to avoid string/boolean confusion
+    const isVideoBoolean = isVideo === true || isVideo === 'true' || isVideo === 1;
+    
     // Select the appropriate pipeline ID
-    const selectedPipelineId = isVideo ? VIDEO_PIPELINE_ID : PIPELINE_ID;
-    console.log(`Using pipeline: ${selectedPipelineId} for ${isVideo ? 'video' : 'image'} generation`);
+    const selectedPipelineId = isVideoBoolean ? VIDEO_PIPELINE_ID : PIPELINE_ID;
+    console.log(`Using pipeline: ${selectedPipelineId} for ${isVideoBoolean ? 'video' : 'image'} generation`);
 
     // Create request body based on whether it's a video or image generation
     let requestBody;
     
-    if (isVideo) {
+    if (isVideoBoolean) {
       // For video, include the essential parameters
       requestBody = {
         pipeline_id: VIDEO_PIPELINE_ID,
@@ -53,7 +56,7 @@ serve(async (req) => {
       };
     }
 
-    console.log(`Making ${isVideo ? 'video' : 'image'} generation request with:`, JSON.stringify(requestBody));
+    console.log(`Making ${isVideoBoolean ? 'video' : 'image'} generation request with:`, JSON.stringify(requestBody));
 
     // Make request to Kimera AI API
     const response = await fetch('https://api.kimera.ai/v1/pipeline/run', {
@@ -91,9 +94,9 @@ serve(async (req) => {
       data.seed = String(data.data.seed);
     }
     
-    // Explicitly include isVideo in the response
-    data.isVideo = Boolean(isVideo);
-    console.log(`Final response with isVideo=${isVideo}:`, JSON.stringify(data));
+    // Explicitly include isVideo in the response as a boolean
+    data.isVideo = isVideoBoolean;
+    console.log(`Final response with isVideo=${isVideoBoolean}:`, JSON.stringify(data));
 
     return new Response(
       JSON.stringify(data),

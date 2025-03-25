@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { useSession } from "@/hooks/useSession";
@@ -62,56 +61,58 @@ const PromptMaker = () => {
     }
   }, [session?.user, fetchPreviousGenerations]);
 
-  // Refresh history when a job completes
+  // Force immediate refresh when any job completes - more aggressive refresh
   useEffect(() => {
-    const hasCompletedJobs = generationJobs.some(job => job.isCompleted);
-    if (hasCompletedJobs) {
-      console.log("Jobs changed, refreshing history");
+    const completedJobs = generationJobs.filter(job => job.isCompleted);
+    if (completedJobs.length > 0) {
+      console.log(`${completedJobs.length} job(s) completed, aggressively refreshing history`);
+      
+      // Immediately refresh
       fetchPreviousGenerations();
-      // Trigger multiple refreshes with delays
       setHistoryRefreshTrigger(prev => prev + 1);
       
-      // Additional refreshes after delays
-      setTimeout(() => {
-        console.log("Delayed history refresh (2s)");
-        fetchPreviousGenerations();
-        setHistoryRefreshTrigger(prev => prev + 1);
-      }, 2000);
+      // Set up a sequence of delayed refreshes to ensure we catch all updates
+      const refreshDelays = [500, 1000, 2000, 3000, 5000];
       
-      setTimeout(() => {
-        console.log("Delayed history refresh (5s)");
-        fetchPreviousGenerations();
-        setHistoryRefreshTrigger(prev => prev + 1);
-      }, 5000);
+      refreshDelays.forEach(delay => {
+        setTimeout(() => {
+          console.log(`Delayed history refresh (${delay}ms)`);
+          fetchPreviousGenerations();
+          setHistoryRefreshTrigger(prev => prev + 1);
+        }, delay);
+      });
     }
   }, [generationJobs, fetchPreviousGenerations]);
 
-  // Periodic refresh of history
+  // More frequent periodic refresh of history (every 5 seconds)
   useEffect(() => {
     if (session?.user) {
       const refreshInterval = setInterval(() => {
         console.log("Periodic history refresh");
         fetchPreviousGenerations();
         setHistoryRefreshTrigger(prev => prev + 1);
-      }, 10000); // Refresh every 10 seconds (decreased from 15 seconds)
+      }, 5000); // Refresh every 5 seconds (decreased from 10 seconds)
       
       return () => clearInterval(refreshInterval);
     }
   }, [session?.user, fetchPreviousGenerations]);
   
-  // Refresh history when history panel is opened
+  // Refresh history when history panel is opened - with multiple attempts
   useEffect(() => {
     if (isHistoryOpen && session?.user) {
       console.log("History panel opened, refreshing history");
       fetchPreviousGenerations();
       setHistoryRefreshTrigger(prev => prev + 1);
       
-      // Force an additional refresh after a short delay
-      setTimeout(() => {
-        console.log("Forced refresh after history panel open");
-        fetchPreviousGenerations();
-        setHistoryRefreshTrigger(prev => prev + 1);
-      }, 500);
+      // Multiple refreshes after opening the panel
+      const openRefreshDelays = [200, 500, 1000];
+      openRefreshDelays.forEach(delay => {
+        setTimeout(() => {
+          console.log(`History panel open refresh (${delay}ms)`);
+          fetchPreviousGenerations();
+          setHistoryRefreshTrigger(prev => prev + 1);
+        }, delay);
+      });
     }
   }, [isHistoryOpen, session?.user, fetchPreviousGenerations]);
 

@@ -37,7 +37,7 @@ export const fetchPreviousGenerations = async () => {
       .from('generated_images')
       .select('*')
       .order('created_at', { ascending: false })
-      .limit(20);
+      .limit(100); // Increased from 20 to 100 to show more history
     
     if (error) {
       console.error('Error fetching previous generations:', error);
@@ -46,9 +46,12 @@ export const fetchPreviousGenerations = async () => {
     
     console.log('Fetched generations count:', data?.length || 0);
     
-    // Log first item for debugging
+    // Log first few items for debugging
     if (data && data.length > 0) {
-      console.log('Sample generation:', data[0]);
+      const sampleSize = Math.min(data.length, 3);
+      for (let i = 0; i < sampleSize; i++) {
+        console.log(`Sample generation ${i}:`, JSON.stringify(data[i]));
+      }
     }
     
     return data || [];
@@ -83,27 +86,47 @@ export const storeGeneratedImages = async (
   
   try {
     const userId = session.user.id;
-    console.log(`Storing ${generatedImages.length} ${jobConfig.isVideo ? 'videos' : 'images'} for user ${userId}`);
+    const isVideo = Boolean(jobConfig.isVideo);
+    console.log(`Storing ${generatedImages.length} ${isVideo ? 'videos' : 'images'} for user ${userId}`);
     console.log("Storage config:", { 
-      isVideo: jobConfig.isVideo,
+      isVideo: isVideo,
       pipeline: jobConfig.pipeline_id,
       urls: generatedImages.map(url => url.substring(0, 50) + '...')
     });
     
+    // Check if URLs indicate videos, even if the flag doesn't
+    const urlsContainVideos = generatedImages.some(url => 
+      /\.(mp4|webm|mov)($|\?)/.test(url.toLowerCase())
+    );
+    
+    if (urlsContainVideos !== isVideo) {
+      console.warn(`URL format suggests videos (${urlsContainVideos}) but isVideo flag is ${isVideo}`);
+      // Trust the URLs if they explicitly show video extensions
+      // But maintain the provided flag for consistency
+    }
+    
     // Prepare batch insert data
-    const insertData = generatedImages.map(imageUrl => ({
-      user_id: userId,
-      image_url: imageUrl,
-      prompt: jobConfig.jobPrompt,
-      style: jobConfig.jobStyle,
-      ratio: jobConfig.jobRatio,
-      lora_scale: jobConfig.jobLoraScale,
-      pipeline_id: jobConfig.pipeline_id,
-      seed: typeof jobConfig.seed === 'number' ? 
-            jobConfig.seed.toString() : 
-            jobConfig.seed === 'random' ? '-1' : jobConfig.seed,
-      is_video: Boolean(jobConfig.isVideo) // Ensure is_video is a boolean
-    }));
+    const insertData = generatedImages.map(imageUrl => {
+      // Verify each URL for debugging
+      const urlSuggestsVideo = /\.(mp4|webm|mov)($|\?)/.test(imageUrl.toLowerCase());
+      if (urlSuggestsVideo !== isVideo) {
+        console.warn(`URL ${imageUrl.substring(0, 50)}... suggests video=${urlSuggestsVideo}, but flag is ${isVideo}`);
+      }
+      
+      return {
+        user_id: userId,
+        image_url: imageUrl,
+        prompt: jobConfig.jobPrompt,
+        style: jobConfig.jobStyle,
+        ratio: jobConfig.jobRatio,
+        lora_scale: jobConfig.jobLoraScale,
+        pipeline_id: jobConfig.pipeline_id,
+        seed: typeof jobConfig.seed === 'number' ? 
+              jobConfig.seed.toString() : 
+              jobConfig.seed === 'random' ? '-1' : jobConfig.seed,
+        is_video: isVideo // Store as true/false boolean
+      };
+    });
     
     console.log("Inserting data:", JSON.stringify(insertData));
     
@@ -122,6 +145,7 @@ export const storeGeneratedImages = async (
     console.log('Successfully stored images:', data?.length || 0);
     if (data && data.length > 0) {
       console.log('First stored item ID:', data[0].id);
+      console.log('First stored item is_video:', data[0].is_video);
     }
     return true;
   } catch (error) {
