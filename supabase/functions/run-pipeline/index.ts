@@ -55,6 +55,10 @@ serve(async (req) => {
     console.log(`Standardized input workflow: ${standardizedWorkflow}`);
     console.log(`Final workflow being used: ${finalWorkflow}`);
 
+    // Make sure ratio is never "Default"
+    const normalizedRatio = (ratio === "Default" || !ratio) ? "2:3" : ratio;
+    console.log(`Using normalized ratio: ${normalizedRatio}`);
+
     // Generate a unique request ID to help with deduplication
     const requestId = crypto.randomUUID();
     console.log(`Generated unique request ID: ${requestId}`);
@@ -68,8 +72,8 @@ serve(async (req) => {
         pipeline_id: VIDEO_PIPELINE_ID,
         imageUrl,
         prompt,
-        // Include ratio for video too for consistency
-        ratio,
+        // Include normalized ratio for video too for consistency
+        ratio: normalizedRatio,
         // Add workflow for videos as well
         data: {
           workflow: 'video', // Always set video workflow for videos
@@ -81,7 +85,7 @@ serve(async (req) => {
       requestBody = {
         pipeline_id: PIPELINE_ID,
         imageUrl,
-        ratio,
+        ratio: normalizedRatio,
         prompt,
         data: {
           lora_scale: loraScale,
@@ -140,7 +144,10 @@ serve(async (req) => {
     // Add the request ID to the response for tracking
     data.request_id = requestId;
     
-    console.log(`Final response with isVideo=${isVideoBoolean}, workflow=${finalWorkflow}, requestId=${requestId}:`, JSON.stringify(data));
+    // Include the normalized ratio in the response
+    data.ratio = normalizedRatio;
+    
+    console.log(`Final response with isVideo=${isVideoBoolean}, workflow=${finalWorkflow}, requestId=${requestId}, ratio=${normalizedRatio}:`, JSON.stringify(data));
 
     return new Response(
       JSON.stringify(data),
