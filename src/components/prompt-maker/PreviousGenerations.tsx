@@ -86,24 +86,6 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     };
   }, [debounceTimer]);
 
-  // Format workflow to display name
-  const formatWorkflow = (workflow?: string) => {
-    if (!workflow) return "Unknown";
-    
-    switch (workflow) {
-      case "no-reference":
-        return "Image Generator";
-      case "with-reference":
-        return "Face Gen";
-      case "cartoon":
-        return "Reference Mode";
-      case "video":
-        return "Video Generator";
-      default:
-        return workflow.charAt(0).toUpperCase() + workflow.slice(1).replace(/-/g, ' ');
-    }
-  };
-
   // Log generations on panel open for debugging
   useEffect(() => {
     if (isHistoryOpen) {
@@ -227,11 +209,8 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
                         <div className="line-clamp-2 mb-1">
                           {generation.prompt || "No prompt"}
                         </div>
-                        <div className="flex justify-between items-center text-white/60">
-                          <span>{formatDate(generation.created_at)}</span>
-                          <span className="bg-white/20 rounded-full px-1.5 py-0.5 text-[10px] font-medium text-white">
-                            {formatWorkflow(generation.workflow)}
-                          </span>
+                        <div className="text-white/60">
+                          {formatDate(generation.created_at)}
                         </div>
                       </div>
                     </div>

@@ -1,162 +1,215 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 
-export const PromptDialog = ({ 
-  showPromptDialog, 
-  setShowPromptDialog, 
-  selectedGeneration, 
-  handleDownload 
-}: {
+import React, { useEffect, useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Download, Share2, Check, Video } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+interface PromptDialogProps {
   showPromptDialog: boolean;
   setShowPromptDialog: (open: boolean) => void;
   selectedGeneration: any | null;
   handleDownload: (imageUrl: string) => Promise<void>;
-}) => {
-  const isVideo = selectedGeneration?.is_video === true || selectedGeneration?.is_video === 'true' || selectedGeneration?.is_video === 1;
+}
 
-  const formatDate = (dateString: string) => {
-    try {
-      return new Date(dateString).toLocaleString();
-    } catch {
-      return "Unknown date";
+export const PromptDialog = ({ 
+  showPromptDialog, 
+  setShowPromptDialog, 
+  selectedGeneration,
+  handleDownload
+}: PromptDialogProps) => {
+  const { toast } = useToast();
+  const [isCopied, setIsCopied] = useState(false);
+  
+  // Helper function to check if URL is a video or if is_video flag is set
+  const isVideo = selectedGeneration ? 
+    (selectedGeneration.is_video === true || 
+     selectedGeneration.is_video === 'true' || 
+     selectedGeneration.is_video === 1 || 
+     /\.(mp4|webm|mov)($|\?)/.test(selectedGeneration.image_url?.toLowerCase())) 
+    : false;
+  
+  // Reset pointer events when dialog opens/closes
+  useEffect(() => {
+    if (!showPromptDialog) {
+      // Ensure pointer events are restored when dialog is closed
+      document.body.style.pointerEvents = '';
+      setIsCopied(false); // Reset copy state when dialog closes
     }
-  };
-
-  // Format workflow to display name
-  const formatWorkflow = (workflow?: string) => {
-    if (!workflow) return "Unknown Mode";
     
-    switch (workflow) {
-      case "no-reference":
-        return "Image Generator";
-      case "with-reference":
-        return "Face Gen";
-      case "cartoon":
-        return "Reference Mode";
-      case "video":
-        return "Video Generator";
-      default:
-        return workflow.charAt(0).toUpperCase() + workflow.slice(1).replace(/-/g, ' ');
+    return () => {
+      // Clean up on unmount
+      document.body.style.pointerEvents = '';
+    };
+  }, [showPromptDialog]);
+  
+  const handleShare = async () => {
+    try {
+      if (!selectedGeneration?.image_url) {
+        throw new Error('No valid URL to share');
+      }
+      
+      // Copy the URL to clipboard
+      await navigator.clipboard.writeText(selectedGeneration.image_url);
+      
+      // Set copied state to true
+      setIsCopied(true);
+      
+      // Reset after 2 seconds
+      setTimeout(() => {
+        setIsCopied(false);
+      }, 2000);
+      
+      toast({
+        title: "Link copied!",
+        description: `${isVideo ? "Video" : "Image"} link has been copied to clipboard`,
+        duration: 3000
+      });
+    } catch (error) {
+      console.error('Error sharing content:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to copy link to clipboard",
+        duration: 3000
+      });
     }
   };
-
+  
+  // Log for debugging
+  useEffect(() => {
+    if (selectedGeneration) {
+      console.log("Dialog showing generation:", {
+        url: selectedGeneration.image_url,
+        is_video: selectedGeneration.is_video,
+        isVideo: isVideo
+      });
+    }
+  }, [selectedGeneration, isVideo]);
+  
   return (
-    <Dialog open={showPromptDialog} onOpenChange={setShowPromptDialog}>
-      <DialogContent className="sm:max-w-[500px] bg-card border-white/10">
+    <Dialog 
+      open={showPromptDialog} 
+      onOpenChange={(open) => {
+        setShowPromptDialog(open);
+        if (!open) {
+          // Reset pointer events when dialog closes
+          document.body.style.pointerEvents = '';
+        }
+      }}
+    >
+      <DialogContent className="sm:max-w-3xl bg-card/95 backdrop-blur border-white/10 h-auto max-h-[90vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle className="text-xl">Generation Details</DialogTitle>
-          <DialogDescription>
-            Details for this {isVideo ? "video" : "image"} generation
-          </DialogDescription>
+          <DialogTitle className="flex items-center gap-2">
+            {isVideo && <Video className="h-4 w-4" />}
+            {isVideo ? "Video" : "Image"} Details
+          </DialogTitle>
         </DialogHeader>
         
         {selectedGeneration && (
-          <div className="py-4 space-y-4">
-            <div className="relative overflow-hidden rounded-md aspect-[3/4] bg-black mx-auto max-w-[300px]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-hidden">
+            <div className="aspect-[3/4] rounded-md overflow-hidden h-auto flex-shrink-0 bg-black/30">
               {isVideo ? (
                 <video 
                   src={selectedGeneration.image_url} 
-                  controls 
-                  className="w-full h-full object-cover" 
-                  autoPlay 
-                  muted 
+                  className="w-full h-auto max-h-[600px] object-contain"
+                  controls
+                  autoPlay
                   loop
-                  playsInline
-                  onError={() => {
-                    console.error(`Failed to load video at ${selectedGeneration.image_url}`);
-                  }}
-                ></video>
+                  muted
+                />
               ) : (
                 <img 
                   src={selectedGeneration.image_url} 
                   alt="Selected generation" 
                   className="w-full h-full object-cover"
-                  onError={(e) => {
-                    console.error(`Failed to load image at ${selectedGeneration.image_url}`);
-                    e.currentTarget.src = 'https://placehold.co/600x800/191223/404040?text=Image+Failed+to+Load';
-                  }}
                 />
               )}
             </div>
             
-            <div className="space-y-3">
-              <div>
-                <Label className="text-sm text-muted-foreground">Generation Mode</Label>
-                <div className="bg-white/5 rounded-md px-3 py-2 text-sm mt-1">
-                  {formatWorkflow(selectedGeneration.workflow)}
+            <div className="space-y-3 overflow-y-auto pr-2 flex-grow">
+              <div className="space-y-2">
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground">Prompt</h4>
+                  <p className="text-sm">{selectedGeneration.prompt}</p>
                 </div>
-              </div>
-            
-              <div>
-                <Label className="text-sm text-muted-foreground">Prompt</Label>
-                <div className="bg-white/5 rounded-md px-3 py-2 text-sm mt-1">
-                  {selectedGeneration.prompt || "No prompt available"}
+                
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground">Style</h4>
+                  <p className="text-sm">{selectedGeneration.style || "Not specified"}</p>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-x-2">
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground">Ratio</h4>
+                    <p className="text-sm">{selectedGeneration.ratio || "Not specified"}</p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground">Lora Scale</h4>
+                    <p className="text-sm">{selectedGeneration.lora_scale || "Not specified"}</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-x-2">
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground">Seed</h4>
+                    <p className="text-sm">{selectedGeneration.seed || (selectedGeneration.seed === 0 ? "0" : "Random (-1)")}</p>
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground">Pipeline ID</h4>
+                    <p className="text-sm truncate" title={selectedGeneration.pipeline_id || "Not specified"}>
+                      {selectedGeneration.pipeline_id || "Not specified"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-x-2">
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground">Type</h4>
+                    <p className="text-sm">
+                      {isVideo ? "Video" : "Image"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground">Created At</h4>
+                    <p className="text-sm">
+                      {selectedGeneration.created_at 
+                        ? new Date(selectedGeneration.created_at).toLocaleString() 
+                        : "Not available"}
+                    </p>
+                  </div>
                 </div>
               </div>
               
-              <div>
-                <Label className="text-sm text-muted-foreground">Style</Label>
-                <div className="bg-white/5 rounded-md px-3 py-2 text-sm mt-1">
-                  {selectedGeneration.style || "No style available"}
-                </div>
-              </div>
-
-              <div>
-                <Label className="text-sm text-muted-foreground">Ratio</Label>
-                <div className="bg-white/5 rounded-md px-3 py-2 text-sm mt-1">
-                  {selectedGeneration.ratio || "No ratio available"}
-                </div>
-              </div>
-
-              <div>
-                <Label className="text-sm text-muted-foreground">Lora Scale</Label>
-                <div className="bg-white/5 rounded-md px-3 py-2 text-sm mt-1">
-                  {selectedGeneration.lora_scale || "No Lora Scale available"}
-                </div>
-              </div>
-
-              <div>
-                <Label className="text-sm text-muted-foreground">Seed</Label>
-                <div className="bg-white/5 rounded-md px-3 py-2 text-sm mt-1">
-                  {selectedGeneration.seed || "No seed available"}
-                </div>
-              </div>
-              
-              <div>
-                <Label className="text-sm text-muted-foreground">Generated On</Label>
-                <div className="bg-white/5 rounded-md px-3 py-2 text-sm mt-1">
-                  {formatDate(selectedGeneration.created_at)}
-                </div>
+              <div className="flex gap-2 pt-2">
+                <Button 
+                  className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600" 
+                  onClick={() => selectedGeneration.image_url && handleDownload(selectedGeneration.image_url)}
+                >
+                  <Download className="h-4 w-4 mr-2" /> Download
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className={`flex-1 border-white/10 hover:bg-white/10 transition-all duration-300 ${isCopied ? 'bg-green-500/20 border-green-500/50 text-green-500' : ''}`}
+                  onClick={handleShare}
+                >
+                  {isCopied ? (
+                    <>
+                      <Check className="h-4 w-4 mr-2" /> Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Share2 className="h-4 w-4 mr-2" /> Share Link
+                    </>
+                  )}
+                </Button>
               </div>
             </div>
           </div>
         )}
-        
-        <DialogFooter className="gap-2">
-          <Button 
-            variant="outline"
-            size="sm"
-            onClick={() => setShowPromptDialog(false)} 
-            className="flex-1 sm:flex-none"
-          >
-            Close
-          </Button>
-          <Button 
-            size="sm"
-            onClick={() => selectedGeneration && handleDownload(selectedGeneration.image_url)} 
-            className="flex-1 sm:flex-none"
-          >
-            Download {isVideo ? "Video" : "Image"}
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

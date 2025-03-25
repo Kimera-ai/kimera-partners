@@ -43,16 +43,3 @@ export interface HistoryRefreshProps {
   isRefreshingHistory: boolean;
   manualRefreshHistory: () => Promise<void>;
 }
-
-export interface HistoryItemProps {
-  id?: string;
-  image_url: string;
-  prompt?: string;
-  created_at: string;
-  is_video?: boolean;
-  workflow?: string;
-  style?: string;
-  ratio?: string;
-  lora_scale?: string;
-  seed?: string;
-}
