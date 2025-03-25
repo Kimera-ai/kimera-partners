@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { GenerationJobType } from '@/components/prompt-maker/GenerationJob';
 import { pollJobStatus } from '@/utils/jobPollingUtils';
 import { createNewJob, fetchPreviousGenerations, formatTime, storeGeneratedImages } from '@/utils/jobManagementUtils';
+import { toast } from "sonner";
 
 export const useGenerationJobs = (session: any) => {
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
@@ -16,9 +17,10 @@ export const useGenerationJobs = (session: any) => {
   const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const refreshCountRef = useRef<number>(0);
   const lastStorageSuccessRef = useRef<boolean>(false);
+  const forceRefreshCounterRef = useRef<number>(0);
   const { toast } = useToast();
 
-  // Improved fetch function with timestamps to avoid caching
+  // Improved fetch function with force option and debouncing
   const fetchPreviousGens = useCallback(async (force = false) => {
     // Don't fetch if already fetching and not forced
     if (isRefreshingHistory && !force) {
@@ -27,9 +29,16 @@ export const useGenerationJobs = (session: any) => {
     }
     
     setIsRefreshingHistory(true);
-    console.log('Fetching previous generations at', new Date().toISOString());
+    const timestamp = new Date().toISOString();
+    console.log(`Fetching previous generations at ${timestamp} (forced: ${force})`);
     
     try {
+      // Increment the force refresh counter when forced
+      if (force) {
+        forceRefreshCounterRef.current += 1;
+        console.log(`Force refresh #${forceRefreshCounterRef.current}`);
+      }
+      
       const generations = await fetchPreviousGenerations();
       console.log(`Fetched ${generations.length} generations at ${new Date().toISOString()}`);
       
@@ -52,34 +61,7 @@ export const useGenerationJobs = (session: any) => {
     }
   }, [session?.user, fetchPreviousGens]);
 
-  // Timer for job elapsed time - using RAF for better performance
-  useEffect(() => {
-    let rafId: number;
-    const updateJobTimes = () => {
-      setGenerationJobs(prevJobs => {
-        // Check if any jobs need updating to avoid unnecessary renders
-        const needsUpdate = prevJobs.some(job => !job.isCompleted);
-        if (!needsUpdate) return prevJobs;
-        
-        return prevJobs.map(job => {
-          if (!job.isCompleted) {
-            return { ...job, elapsedTime: Date.now() - job.startTime };
-          }
-          return job;
-        });
-      });
-      
-      rafId = requestAnimationFrame(updateJobTimes);
-    };
-    
-    rafId = requestAnimationFrame(updateJobTimes);
-    
-    return () => {
-      cancelAnimationFrame(rafId);
-    };
-  }, []);
-
-  // Enhanced job completion and storage handler
+  // Enhanced job completion and storage handler with aggressive refreshing
   const handleJobComplete = useCallback(async (
     completedImages: string[], 
     jobConfig: {
@@ -107,64 +89,75 @@ export const useGenerationJobs = (session: any) => {
     );
     
     // Store results in database
+    console.log("Storing generated images to database...");
     const storageResult = await storeGeneratedImages(session, completedImages, jobConfig);
     lastStorageSuccessRef.current = storageResult;
     
     console.log(`Storage result: ${storageResult ? 'success' : 'failed'}`);
+    
+    if (storageResult) {
+      toast({
+        title: "Images Saved",
+        description: `Successfully saved ${completedImages.length} ${jobConfig.isVideo ? 'videos' : 'images'} to your history`,
+        duration: 3000
+      });
+    }
     
     // Schedule multiple refreshes to ensure we get the latest data
     if (refreshTimeoutRef.current) {
       clearTimeout(refreshTimeoutRef.current);
     }
     
-    // Immediate refresh
-    try {
-      console.log("Running immediate post-generation history refresh");
-      await fetchPreviousGens(true);
-    } catch (error) {
-      console.error("Immediate refresh failed:", error);
-    }
+    // Aggressive refresh strategy
+    const refreshSchedule = [
+      { delay: 0, reason: "immediate" },
+      { delay: 1000, reason: "1s after completion" },
+      { delay: 3000, reason: "3s after completion" },
+      { delay: 5000, reason: "5s after completion" },
+      { delay: 10000, reason: "10s after completion" }
+    ];
     
-    // Follow-up refreshes with increasing delays
-    const scheduleRefreshes = () => {
-      // First refresh after 2 seconds
-      refreshTimeoutRef.current = setTimeout(async () => {
-        console.log("Running first delayed history refresh (2s)");
-        await fetchPreviousGens(true);
-        
-        // Second refresh after 5 seconds
-        refreshTimeoutRef.current = setTimeout(async () => {
-          console.log("Running second delayed history refresh (5s)");
+    // Execute all refreshes according to schedule
+    refreshSchedule.forEach(({ delay, reason }) => {
+      setTimeout(async () => {
+        console.log(`Running ${reason} history refresh`);
+        try {
           await fetchPreviousGens(true);
-          
-          // Third refresh after 10 seconds
-          refreshTimeoutRef.current = setTimeout(async () => {
-            console.log("Running final delayed history refresh (10s)");
-            await fetchPreviousGens(true);
-            refreshTimeoutRef.current = null;
-          }, 5000);
-        }, 3000);
-      }, 2000);
-    };
-    
-    scheduleRefreshes();
-    
-    // Show success notification
-    let toastMessage = `Successfully generated ${completedImages.length} ${jobConfig.isVideo ? 'videos' : 'images'}`;
-    
-    if (!storageResult) {
-      toastMessage += " (But failed to save to history)";
-      console.error("Failed to save images to history");
-    }
-    
-    toast({
-      title: "Generation Complete",
-      description: toastMessage,
-      duration: 5000
+        } catch (error) {
+          console.error(`Refresh failed (${reason}):`, error);
+        }
+      }, delay);
     });
     
     return storageResult;
   }, [fetchPreviousGens, session, toast]);
+
+  // Timer for job elapsed time - using RAF for better performance
+  useEffect(() => {
+    let rafId: number;
+    const updateJobTimes = () => {
+      setGenerationJobs(prevJobs => {
+        // Check if any jobs need updating to avoid unnecessary renders
+        const needsUpdate = prevJobs.some(job => !job.isCompleted);
+        if (!needsUpdate) return prevJobs;
+        
+        return prevJobs.map(job => {
+          if (!job.isCompleted) {
+            return { ...job, elapsedTime: Date.now() - job.startTime };
+          }
+          return job;
+        });
+      });
+      
+      rafId = requestAnimationFrame(updateJobTimes);
+    };
+    
+    rafId = requestAnimationFrame(updateJobTimes);
+    
+    return () => {
+      cancelAnimationFrame(rafId);
+    };
+  }, []);
 
   // Simplified job starting function
   const startNewJob = useCallback((numImagesToGenerate: number, ratio: string = "2:3", isVideo: boolean = false) => {

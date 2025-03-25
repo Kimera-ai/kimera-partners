@@ -37,6 +37,7 @@ export const fetchPreviousGenerations = async () => {
     
     console.log(`Fetching previous generations with timestamp: ${timestamp}`);
     
+    // Use a more direct query with no filters - this ensures we get ALL records
     const { data, error } = await supabase
       .from('generated_images')
       .select('*')
@@ -53,6 +54,8 @@ export const fetchPreviousGenerations = async () => {
     // Verify the data structure
     if (data && data.length > 0) {
       console.log('Sample generation data:', JSON.stringify(data[0]));
+    } else {
+      console.log('No generations found in the database');
     }
     
     return data || [];
@@ -138,11 +141,11 @@ export const storeGeneratedImages = async (
       return false;
     }
     
-    // First attempt a single insert
+    // First attempt a single insert with upsert behavior to avoid duplicates
     console.log(`Attempting to insert ${insertData.length} images/videos...`);
     const { error, data } = await supabase
       .from('generated_images')
-      .insert(insertData)
+      .upsert(insertData, { onConflict: 'image_url' })
       .select();
     
     if (error) {
@@ -155,8 +158,7 @@ export const storeGeneratedImages = async (
       for (const item of insertData) {
         const { error: singleError } = await supabase
           .from('generated_images')
-          .insert([item])
-          .select();
+          .insert([item]);
           
         if (!singleError) {
           successCount++;

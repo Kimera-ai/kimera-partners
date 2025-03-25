@@ -28,6 +28,7 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
   const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(null);
   const [lastRefreshTime, setLastRefreshTime] = useState<number>(0);
   const [emptyHistoryShown, setEmptyHistoryShown] = useState<boolean>(false);
+  const [refreshCount, setRefreshCount] = useState(0);
 
   // Reset video playback when panel closes
   useEffect(() => {
@@ -35,6 +36,8 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
       setPlayingVideo(null);
     } else {
       console.log(`History panel opened, found ${previousGenerations.length} items`);
+      // Increment refresh count when panel opens
+      setRefreshCount(prev => prev + 1);
     }
   }, [isHistoryOpen, previousGenerations.length]);
 
@@ -45,19 +48,32 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
 
   // Auto-refresh when panel opens or after a delay since last refresh
   useEffect(() => {
-    if (isHistoryOpen && !isRefreshingHistory) {
+    if (isHistoryOpen) {
       const now = Date.now();
       const timeSinceLastRefresh = now - lastRefreshTime;
       
-      // If it's been more than 30 seconds since the last refresh
-      if (timeSinceLastRefresh > 30000 || lastRefreshTime === 0) {
-        console.log("History panel opened or stale, refreshing history");
-        manualRefreshHistory().then(() => {
-          setLastRefreshTime(Date.now());
-        });
+      // If it's been more than 5 seconds since the last refresh or refresh count changed
+      if (timeSinceLastRefresh > 5000 || lastRefreshTime === 0) {
+        console.log(`Auto-refreshing history (time since last: ${timeSinceLastRefresh}ms, refresh count: ${refreshCount})`);
+        
+        if (!isRefreshingHistory) {
+          manualRefreshHistory().then(() => {
+            setLastRefreshTime(Date.now());
+          });
+        }
       }
     }
-  }, [isHistoryOpen, isRefreshingHistory, manualRefreshHistory, lastRefreshTime]);
+  }, [isHistoryOpen, isRefreshingHistory, manualRefreshHistory, lastRefreshTime, refreshCount]);
+
+  // Trigger immediate refresh when refreshCount changes
+  useEffect(() => {
+    if (refreshCount > 0 && isHistoryOpen && !isRefreshingHistory) {
+      console.log(`Refresh triggered by count change: ${refreshCount}`);
+      manualRefreshHistory().then(() => {
+        setLastRefreshTime(Date.now());
+      });
+    }
+  }, [refreshCount, isHistoryOpen, isRefreshingHistory, manualRefreshHistory]);
 
   // Show empty history message only after initial load and certain time
   useEffect(() => {
@@ -71,6 +87,14 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
       setEmptyHistoryShown(false);
     }
   }, [isHistoryOpen, previousGenerations.length, isRefreshingHistory]);
+
+  // Double-check on previous generations changes
+  useEffect(() => {
+    if (previousGenerations.length > 0) {
+      console.log(`PreviousGenerations received ${previousGenerations.length} items`);
+      console.log(`First item timestamp: ${previousGenerations[0]?.created_at}`);
+    }
+  }, [previousGenerations]);
 
   // Debounced refresh handler to prevent rapid clicking
   const handleManualRefresh = useCallback(async () => {
@@ -87,6 +111,8 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     try {
       await manualRefreshHistory();
       setLastRefreshTime(Date.now());
+      // Increment refresh count to trigger re-renders
+      setRefreshCount(prev => prev + 1);
     } catch (error) {
       console.error("Manual refresh error:", error);
       toast.error("Failed to refresh history");
@@ -108,25 +134,6 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
       }
     };
   }, [debounceTimer]);
-
-  // Log generations count for debugging
-  useEffect(() => {
-    if (isHistoryOpen) {
-      console.log("HISTORY COMPONENT: Previous generations loaded:", previousGenerations.length);
-      
-      if (previousGenerations.length > 0) {
-        // Log sample of the first generation to inspect structure
-        console.log("Sample generation:", JSON.stringify(previousGenerations[0]));
-        
-        const videoCount = previousGenerations.filter(gen => 
-          gen.is_video === true || 
-          (gen.image_url && /\.(mp4|webm|mov)($|\?)/.test(gen.image_url.toLowerCase()))
-        ).length;
-        
-        console.log(`HISTORY COMPONENT: Found ${videoCount} videos in history`);
-      }
-    }
-  }, [previousGenerations, isHistoryOpen]);
 
   const isVideoUrl = useCallback((url: string | undefined, isVideo?: boolean) => {
     if (isVideo === true) return true;
@@ -260,7 +267,7 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
                         </>
                       ) : (
                         <img 
-                          src={generation.image_url} 
+                          src={`${generation.image_url}?t=${Date.now()}`} 
                           alt={`Generated ${index}`} 
                           className="w-full h-full object-cover" 
                           onError={(e) => {
