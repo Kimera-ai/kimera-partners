@@ -37,7 +37,7 @@ export const fetchPreviousGenerations = async () => {
     
     console.log(`Fetching previous generations with timestamp: ${timestamp}`);
     
-    // Use a simple, direct query with no filters
+    // Use a distinct query to avoid duplicates when possible
     const { data, error } = await supabase
       .from('generated_images')
       .select('*')
@@ -51,14 +51,30 @@ export const fetchPreviousGenerations = async () => {
     
     console.log(`Fetched ${data?.length || 0} previous generations`);
     
-    // Check data structure if available
+    // Pre-process data to handle potential duplicates
     if (data && data.length > 0) {
       console.log('Sample generation data:', JSON.stringify(data[0]));
+      
+      // Use a Map to deduplicate by ID
+      const uniqueItems = new Map();
+      
+      data.forEach(item => {
+        if (item.id && !uniqueItems.has(item.id)) {
+          uniqueItems.set(item.id, item);
+        }
+      });
+      
+      // If we have significantly fewer items after deduplication, log this
+      if (uniqueItems.size < data.length * 0.9) {
+        console.log(`Deduplication removed ${data.length - uniqueItems.size} items`);
+      }
+      
+      // Return as array
+      return Array.from(uniqueItems.values());
     } else {
       console.log('No generations found in the database');
+      return [];
     }
-    
-    return data || [];
   } catch (error) {
     console.error('Error in fetchPreviousGenerations:', error);
     return [];

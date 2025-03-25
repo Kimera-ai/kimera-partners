@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { ChevronRight, Video, RefreshCw } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -32,7 +32,7 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
   const isInitialMount = React.useRef(true);
   const autoRefreshTimerRef = React.useRef<NodeJS.Timeout | null>(null);
   
-  const [processedGenerations, setProcessedGenerations] = useState<Set<string>>(new Set());
+  const processedIdsRef = useRef(new Set<string>());
   
   useEffect(() => {
     if (!isHistoryOpen) {
@@ -166,16 +166,31 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
   }, []);
   
   const uniqueGenerations = useMemo(() => {
-    const generationsMap = new Map();
+    console.log(`Deduplicating ${previousGenerations.length} history items`);
+    
+    const idMap = new Map<string, any>();
+    const urlMap = new Map<string, boolean>();
     
     previousGenerations.forEach(generation => {
-      const id = generation.id || `${generation.image_url}-${generation.created_at}`;
-      if (!generationsMap.has(id)) {
-        generationsMap.set(id, generation);
+      if (generation.id) {
+        idMap.set(generation.id, generation);
+        return;
+      }
+      
+      const normalizedUrl = generation.image_url?.split('?')[0] || '';
+      
+      const compositeKey = `${normalizedUrl}|${generation.prompt?.substring(0, 50) || ''}|${generation.created_at || ''}`;
+      
+      if (normalizedUrl && !urlMap.has(normalizedUrl)) {
+        idMap.set(compositeKey, generation);
+        urlMap.set(normalizedUrl, true);
       }
     });
     
-    return Array.from(generationsMap.values());
+    const uniqueItems = Array.from(idMap.values());
+    console.log(`After deduplication: ${uniqueItems.length} unique items`);
+    
+    return uniqueItems;
   }, [previousGenerations]);
 
   return (
@@ -253,20 +268,22 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
                   
                   const workflowLabel = getWorkflowLabel(generation.workflow);
                   
-                  const imageUrl = generation.image_url.includes('?') 
-                    ? `${generation.image_url}&t=${Date.now()}`
-                    : `${generation.image_url}?t=${Date.now()}`;
+                  const imageUrl = generation.image_url;
+                  const displayUrl = imageUrl;
+                  
+                  const itemKey = generation.id || 
+                    `${generation.image_url?.split('?')[0]}-${generation.created_at}-${index}`;
                   
                   return (
                     <div 
-                      key={`${generation.id || index}-${generation.created_at || Date.now()}`}
+                      key={itemKey}
                       className="relative group rounded-md overflow-hidden bg-black cursor-pointer aspect-[3/4]" 
                       onClick={() => handleImageClick(generation)}
                     >
                       {isVideo ? (
                         <>
                           <video 
-                            src={generation.image_url} 
+                            src={displayUrl} 
                             className="w-full h-full object-cover" 
                             autoPlay 
                             loop 
@@ -274,7 +291,7 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
                             playsInline 
                             onClick={e => e.stopPropagation()} 
                             onError={(e) => {
-                              console.error(`Failed to load video at ${generation.image_url}`);
+                              console.error(`Failed to load video at ${displayUrl}`);
                               (e.target as HTMLVideoElement).style.display = 'none';
                               const fallbackImg = document.createElement('img');
                               fallbackImg.src = 'https://placehold.co/600x800/191223/404040?text=Video+Failed+to+Load';
@@ -289,11 +306,11 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
                         </>
                       ) : (
                         <img 
-                          src={imageUrl} 
+                          src={displayUrl} 
                           alt={`Generated ${index}`} 
                           className="w-full h-full object-cover" 
                           onError={(e) => {
-                            console.error(`Failed to load image at ${generation.image_url}`);
+                            console.error(`Failed to load image at ${displayUrl}`);
                             e.currentTarget.src = 'https://placehold.co/600x800/191223/404040?text=Image+Failed+to+Load';
                           }}
                         />
@@ -325,4 +342,3 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     </Sheet>
   );
 };
-
