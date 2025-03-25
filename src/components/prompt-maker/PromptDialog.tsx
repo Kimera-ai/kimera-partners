@@ -19,6 +19,7 @@ export const PromptDialog: React.FC<PromptDialogProps> = ({
   selectedGeneration,
   handleDownload
 }) => {
+  // Determine if the media is a video based on either the explicit flag or the URL extension
   const isVideo = selectedGeneration?.is_video === true || 
     (selectedGeneration?.image_url && /\.(mp4|webm|mov)($|\?)/.test(selectedGeneration?.image_url.toLowerCase()));
 
@@ -30,20 +31,25 @@ export const PromptDialog: React.FC<PromptDialogProps> = ({
     }
   };
 
-  const getWorkflowLabel = (workflow: string | undefined, isVideo: boolean = false) => {
-    // If it's a video, always return "Video Generator"
-    if (isVideo) return "Video Generator";
+  // Consistent display of workflow labels
+  const getWorkflowLabel = (workflowValue: string | undefined, isVideoMedia: boolean = false) => {
+    // If it's a video, always return "Video Generator" regardless of other settings
+    if (isVideoMedia) return "Video Generator";
     
-    if (!workflow) return "Image Generator";
+    // Default to "Image Generator" if no workflow specified
+    if (!workflowValue) return "Image Generator";
     
-    // Explicit mapping with precise string matching
-    if (workflow === "with-reference") return "Face Gen";
-    if (workflow === "cartoon") return "Reference Mode";
-    if (workflow === "video") return "Video Generator";
-    if (workflow === "no-reference") return "Image Generator";
+    // Normalize the workflow string for consistent comparison
+    const normalizedWorkflow = String(workflowValue).toLowerCase().trim();
+    
+    // Explicit matching for known workflow types
+    if (normalizedWorkflow === "with-reference") return "Face Gen";
+    if (normalizedWorkflow === "cartoon") return "Reference Mode";
+    if (normalizedWorkflow === "video") return "Video Generator";
+    if (normalizedWorkflow === "no-reference") return "Image Generator";
     
     // Default case: capitalize and clean up the workflow name
-    return workflow.charAt(0).toUpperCase() + workflow.slice(1).replace(/-/g, ' ');
+    return workflowValue.charAt(0).toUpperCase() + workflowValue.slice(1).replace(/-/g, ' ');
   };
 
   const handleShareImage = async () => {
@@ -81,6 +87,7 @@ export const PromptDialog: React.FC<PromptDialogProps> = ({
     }
   };
 
+  // Ensure workflow is properly set when component mounts or selectedGeneration changes
   useEffect(() => {
     if (selectedGeneration) {
       console.log("Selected generation workflow:", selectedGeneration.workflow);
@@ -88,6 +95,11 @@ export const PromptDialog: React.FC<PromptDialogProps> = ({
       // Only override workflow if it's a video and doesn't already have video workflow
       if (isVideo && selectedGeneration.workflow !== 'video') {
         selectedGeneration.workflow = 'video';
+      }
+      
+      // Ensure workflow has a valid value
+      if (!selectedGeneration.workflow || selectedGeneration.workflow === 'undefined') {
+        selectedGeneration.workflow = isVideo ? 'video' : 'no-reference';
       }
     }
   }, [selectedGeneration, isVideo]);

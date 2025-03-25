@@ -28,17 +28,32 @@ serve(async (req) => {
     // Select the appropriate pipeline ID
     const selectedPipelineId = isVideoBoolean ? VIDEO_PIPELINE_ID : PIPELINE_ID;
     console.log(`Using pipeline: ${selectedPipelineId} for ${isVideoBoolean ? 'video' : 'image'} generation`);
-    console.log(`Using workflow: ${workflow}`);
+    console.log(`Input workflow parameter: ${workflow}`);
 
-    // Determine actual workflow based on input
-    let actualWorkflow = workflow;
+    // Forcefully standardize workflow value to ensure consistent casing/format
+    let standardizedWorkflow = workflow;
+    if (typeof standardizedWorkflow === 'string') {
+      standardizedWorkflow = standardizedWorkflow.toLowerCase().trim();
+    }
+    
+    // Determine final workflow based on the inputs
+    let finalWorkflow;
     if (isVideoBoolean) {
-      actualWorkflow = 'video';
-    } else if (workflow === 'with-reference') {
-      actualWorkflow = 'with-reference'; // This is the Face Gen mode
+      // For videos, always use 'video' workflow
+      finalWorkflow = 'video';
+    } else if (standardizedWorkflow === 'with-reference') {
+      // Face Gen mode
+      finalWorkflow = 'with-reference';
+    } else if (standardizedWorkflow === 'cartoon') {
+      // Reference mode
+      finalWorkflow = 'cartoon';
+    } else {
+      // Default to no-reference for normal image generation
+      finalWorkflow = 'no-reference';
     }
 
-    console.log(`Actual workflow being used: ${actualWorkflow}`);
+    console.log(`Standardized input workflow: ${standardizedWorkflow}`);
+    console.log(`Final workflow being used: ${finalWorkflow}`);
 
     // Create request body based on whether it's a video or image generation
     let requestBody;
@@ -67,7 +82,7 @@ serve(async (req) => {
           lora_scale: loraScale,
           style: style,
           seed: seed,
-          workflow: actualWorkflow // Include the actual workflow used
+          workflow: finalWorkflow // Include the standardized workflow
         }
       };
     }
@@ -113,10 +128,10 @@ serve(async (req) => {
     // Explicitly include isVideo in the response as a boolean
     data.isVideo = isVideoBoolean;
     
-    // Explicitly include workflow in the response
-    data.workflow = actualWorkflow;
+    // Explicitly include workflow in the response with the standardized value
+    data.workflow = finalWorkflow;
     
-    console.log(`Final response with isVideo=${isVideoBoolean}, workflow=${data.workflow}:`, JSON.stringify(data));
+    console.log(`Final response with isVideo=${isVideoBoolean}, workflow=${finalWorkflow}:`, JSON.stringify(data));
 
     return new Response(
       JSON.stringify(data),

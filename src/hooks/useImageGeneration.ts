@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -133,18 +132,6 @@ export const useImageGeneration = (
       
       const defaultImageUrl = "https://www.jeann.online/cdn-cgi/image/format=jpeg/https://kimera-media.s3.eu-north-1.amazonaws.com/623b36fe-ac7f-4c56-a124-cddb942a38e5_event/623b36fe-ac7f-4c56-a124-cddb942a38e5_source.jpeg";
       
-      const getPipelineId = () => {
-        switch (workflow) {
-          case "with-reference": return "FYpcEIUj";
-          case "cartoon": return "803a4MBY";
-          case "video": return "1bPwBZEg";
-          case "no-reference":
-          default: return "803a4MBY";
-        }
-      };
-      
-      const pipelineId = getPipelineId();
-      
       updateJobStatus(jobId, `Sending ${numImages} requests to Kimera API...`);
       
       const generateRequests = [];
@@ -166,26 +153,18 @@ export const useImageGeneration = (
       for (let i = 0; i < numImages; i++) {
         const seedValue = currentSeed === "random" ? -1 : parseInt(currentSeed);
         
-        const requestBody = {
-          pipeline_id: pipelineId,
-          imageUrl: currentUploadedImageUrl || defaultImageUrl,
-          ratio: currentRatio,
-          prompt: fullPrompt,
-          data: {
-            lora_scale: parseFloat(currentLoraScale),
+        // Use supabase function to handle all API logic
+        generateRequests.push(supabase.functions.invoke('run-pipeline', {
+          body: {
+            imageUrl: currentUploadedImageUrl || defaultImageUrl,
+            ratio: currentRatio,
+            prompt: fullPrompt,
+            loraScale: parseFloat(currentLoraScale),
             style: currentStyle,
             seed: seedValue,
-            workflow: currentWorkflow // Make sure to include the workflow in the API request
+            workflow: currentWorkflow,
+            isVideo: isVideoGeneration
           }
-        };
-        
-        generateRequests.push(fetch('https://api.kimera.ai/v1/pipeline/run', {
-          method: 'POST',
-          headers: {
-            'x-api-key': "1712edc40e3eb72c858332fe7500bf33e885324f8c1cd52b8cded2cdfd724cee",
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(requestBody)
         }));
       }
       
@@ -194,13 +173,9 @@ export const useImageGeneration = (
       
       const responseErrors = [];
       for (let i = 0; i < responses.length; i++) {
-        if (!responses[i].ok) {
-          try {
-            const errorData = await responses[i].json();
-            responseErrors.push(`${isVideoGeneration ? 'Video' : 'Image'} ${i+1}: ${errorData.message || 'Unknown error'}`);
-          } catch (e) {
-            responseErrors.push(`${isVideoGeneration ? 'Video' : 'Image'} ${i+1}: HTTP error ${responses[i].status}`);
-          }
+        const response = responses[i];
+        if (response.error) {
+          responseErrors.push(`${isVideoGeneration ? 'Video' : 'Image'} ${i+1}: ${response.error || 'Unknown error'}`);
         }
       }
       
@@ -213,11 +188,8 @@ export const useImageGeneration = (
         updateJobStatus(jobId, `Processing ${responses.length - responseErrors.length} of ${numImages} ${isVideoGeneration ? 'videos' : 'images'}...`);
       }
       
-      const successfulResponses = responses.filter(r => r.ok);
-      
-      // Use Promise.all for parallel processing of JSON responses
-      const responseDataArray = await Promise.all(successfulResponses.map(r => r.json()));
-      const apiJobIds = responseDataArray.map(data => data.id);
+      const successfulResponses = responses.filter(r => !r.error);
+      const apiJobIds = successfulResponses.map(response => response.data?.id).filter(Boolean);
       
       if (apiJobIds.length === 0) {
         throw new Error("Failed to start any generation jobs");
@@ -236,7 +208,6 @@ export const useImageGeneration = (
           jobRatio: currentRatio,
           jobLoraScale: currentLoraScale,
           jobWorkflow: currentWorkflow,
-          pipeline_id: pipelineId,
           seed: currentSeed === "random" ? -1 : parseInt(currentSeed),
           isVideo: isVideoGeneration
         });
