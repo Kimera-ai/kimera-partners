@@ -1,19 +1,17 @@
-
 import React, { useState, useEffect, useCallback } from "react";
 import { ChevronRight, Video, RefreshCw } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { HistoryRefreshProps } from "./types";
 
-interface PreviousGenerationsProps {
+interface PreviousGenerationsProps extends HistoryRefreshProps {
   previousGenerations: any[];
   handleImageClick: (generation: any) => void;
   isHistoryOpen: boolean;
   setIsHistoryOpen: (open: boolean) => void;
   refreshTrigger?: number;
-  isRefreshingHistory?: boolean;
-  manualRefreshHistory?: () => Promise<void>;
 }
 
 export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
@@ -28,7 +26,6 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
   const [internalRefreshing, setInternalRefreshing] = useState(false);
 
-  // Helper function to check if URL is a video or if is_video flag is set
   const isVideoUrl = (url: string | undefined, isVideo?: boolean) => {
     if (isVideo === true) return true;
     if (!url) return false;
@@ -43,7 +40,6 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     }
   };
 
-  // Reset playing video when the sheet is closed
   useEffect(() => {
     if (!isHistoryOpen) {
       setPlayingVideo(null);
@@ -51,11 +47,9 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
   }, [isHistoryOpen]);
 
   useEffect(() => {
-    // Reset playing videos when refresh trigger changes
     setPlayingVideo(null);
   }, [refreshTrigger]);
 
-  // Manual refresh function
   const handleManualRefresh = useCallback(async () => {
     if (!isHistoryOpen || internalRefreshing || isRefreshingHistory) return;
     
@@ -70,7 +64,6 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     try {
       toast.info("Refreshing history...");
       
-      // Direct database query to bypass any cached data
       const { data, error } = await supabase
         .from('generated_images')
         .select('*')
@@ -97,18 +90,15 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     }
   }, [isHistoryOpen, internalRefreshing, isRefreshingHistory, manualRefreshHistory]);
 
-  // Log generations for debugging
   useEffect(() => {
     if (isHistoryOpen) {
       console.log("HISTORY COMPONENT: Previous generations loaded:", previousGenerations.length);
       if (previousGenerations.length > 0) {
         console.log("HISTORY COMPONENT: First generation:", JSON.stringify(previousGenerations[0]));
         
-        // Check for is_video flag on all items
         const hasIsVideo = previousGenerations.some(gen => gen.is_video !== undefined);
         console.log("HISTORY COMPONENT: is_video flag exists on generations:", hasIsVideo);
         
-        // Check for videos in the loaded generations
         const videoCount = previousGenerations.filter(gen => 
           gen.is_video === true || 
           (gen.image_url && /\.(mp4|webm|mov)($|\?)/.test(gen.image_url.toLowerCase()))
@@ -175,7 +165,6 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
             <div className="flex-1 overflow-y-auto scrollbar-none">
               <div className="p-3 grid grid-cols-2 gap-3">
                 {previousGenerations.map((generation, index) => {
-                  // Determine if it's a video using both flag and URL
                   const isVideoFlag = generation.is_video === true || generation.is_video === 'true' || generation.is_video === 1;
                   const urlSuggestsVideo = isVideoUrl(generation.image_url);
                   const isVideo = isVideoFlag || urlSuggestsVideo;
@@ -198,7 +187,6 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
                             onClick={e => e.stopPropagation()} 
                             onError={(e) => {
                               console.error(`Failed to load video at ${generation.image_url}`, e);
-                              // Fallback image for video errors
                               (e.target as HTMLVideoElement).style.display = 'none';
                               const fallbackImg = document.createElement('img');
                               fallbackImg.src = 'https://placehold.co/600x800/191223/404040?text=Video+Failed+to+Load';
