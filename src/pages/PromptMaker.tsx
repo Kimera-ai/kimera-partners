@@ -26,7 +26,6 @@ const PromptMaker = () => {
   const jobRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const containerRef = useRef<HTMLDivElement | null>(null);
   const lastRefreshTimeRef = useRef<number>(0);
-  const historyFetchCountRef = useRef<number>(0);
   const generationStartTimeRef = useRef<number | null>(null);
   
   const {
@@ -59,70 +58,29 @@ const PromptMaker = () => {
     manualRefreshHistory
   } = useGenerationJobs(session);
 
+  // Simplified initial history fetch
   useEffect(() => {
     if (session?.user) {
       console.log("PROMPTMAKER: Initial fetch of previous generations");
       fetchPreviousGenerations();
-      historyFetchCountRef.current = 1;
     }
   }, [session?.user, fetchPreviousGenerations]);
 
+  // Simpler history refresh on job completion
   useEffect(() => {
     const completedJobs = generationJobs.filter(job => job.isCompleted);
     if (completedJobs.length > 0) {
-      console.log(`PROMPTMAKER: ${completedJobs.length} job(s) completed, aggressively refreshing history`);
-      
-      fetchPreviousGenerations();
+      console.log(`PROMPTMAKER: ${completedJobs.length} job(s) completed, refreshing history`);
       setHistoryRefreshTrigger(prev => prev + 1);
-      
-      const refreshDelays = [500, 1000, 2000, 3000, 5000, 7000, 10000, 15000];
-      
-      refreshDelays.forEach((delay, index) => {
-        setTimeout(() => {
-          console.log(`PROMPTMAKER: Delayed history refresh ${index + 1}/${refreshDelays.length} (${delay}ms)`);
-          fetchPreviousGenerations();
-          setHistoryRefreshTrigger(prev => prev + 1);
-          historyFetchCountRef.current += 1;
-        }, delay);
-      });
     }
-  }, [generationJobs, fetchPreviousGenerations]);
+  }, [generationJobs]);
 
-  useEffect(() => {
-    if (session?.user) {
-      const refreshInterval = setInterval(() => {
-        const now = Date.now();
-        const timeSinceLastRefresh = now - lastRefreshTimeRef.current;
-        
-        if (timeSinceLastRefresh >= 3000) {
-          console.log("PROMPTMAKER: Periodic history refresh");
-          fetchPreviousGenerations();
-          setHistoryRefreshTrigger(prev => prev + 1);
-          lastRefreshTimeRef.current = now;
-          historyFetchCountRef.current += 1;
-        }
-      }, 3000);
-      
-      return () => clearInterval(refreshInterval);
-    }
-  }, [session?.user, fetchPreviousGenerations]);
-  
+  // History panel open handler
   useEffect(() => {
     if (isHistoryOpen && session?.user) {
       console.log("PROMPTMAKER: History panel opened, refreshing history");
       fetchPreviousGenerations();
       setHistoryRefreshTrigger(prev => prev + 1);
-      historyFetchCountRef.current += 1;
-      
-      const openRefreshDelays = [200, 500, 1000, 2000, 5000];
-      openRefreshDelays.forEach((delay, index) => {
-        setTimeout(() => {
-          console.log(`PROMPTMAKER: History panel open refresh ${index + 1}/${openRefreshDelays.length} (${delay}ms)`);
-          fetchPreviousGenerations();
-          setHistoryRefreshTrigger(prev => prev + 1);
-          historyFetchCountRef.current += 1;
-        }, delay);
-      });
     }
   }, [isHistoryOpen, session?.user, fetchPreviousGenerations]);
 
@@ -157,27 +115,25 @@ const PromptMaker = () => {
     uploadedImageUrl
   );
 
-  const wrappedHandleGenerate = useCallback(async () => {
+  // Simplified generation handling with fewer refreshes
+  const wrappedHandleGenerate = useCallback(async (): Promise<void> => {
     generationStartTimeRef.current = Date.now();
     console.log("PROMPTMAKER: Generation started at", new Date().toISOString());
     
+    // Single pre-generation refresh
     await fetchPreviousGenerations();
     
+    // Start generation
     handleGenerate();
     
-    const postStartDelays = [5000, 10000, 15000, 20000, 30000];
-    const refreshPromises = postStartDelays.map((delay, index) => 
-      new Promise<void>((resolve) => {
-        setTimeout(async () => {
-          console.log(`PROMPTMAKER: Post-generation refresh ${index + 1}/${postStartDelays.length} (${delay}ms)`);
-          await fetchPreviousGenerations();
-          historyFetchCountRef.current += 1;
-          resolve();
-        }, delay);
-      })
-    );
-    
-    return Promise.all(refreshPromises);
+    // Only do a single delayed refresh 5 seconds after generation starts
+    return new Promise<void>(resolve => {
+      setTimeout(async () => {
+        console.log("PROMPTMAKER: Post-generation refresh");
+        await fetchPreviousGenerations();
+        resolve();
+      }, 5000);
+    });
   }, [fetchPreviousGenerations, handleGenerate]);
 
   useScrollToLatestJob(latestJobRef, jobRefs, generationJobs);
@@ -204,35 +160,22 @@ const PromptMaker = () => {
     handleImageClick(generationData);
   }, [prompt, style, ratio, loraScale, handleImageClick]);
 
+  // Simpler completed images handling
   useEffect(() => {
-    if (generatedImages.length > 0) {
-      console.log(`PROMPTMAKER: ${generatedImages.length} new images generated, refreshing history`);
-      fetchPreviousGenerations();
-      setHistoryRefreshTrigger(prev => prev + 1);
-      historyFetchCountRef.current += 1;
+    if (generatedImages.length > 0 && generationStartTimeRef.current) {
+      const generationTime = Date.now() - generationStartTimeRef.current;
+      console.log(`PROMPTMAKER: Generation completed in ${formatTime(generationTime)}`);
       
-      if (generationStartTimeRef.current) {
-        const generationTime = Date.now() - generationStartTimeRef.current;
-        console.log(`PROMPTMAKER: Generation completed in ${formatTime(generationTime)}`);
-        
-        if (previousGenerations.length === 0) {
-          console.log("PROMPTMAKER: History still empty after generation, showing help message");
-          toast.info(
-            "Your images may take a few moments to appear in history. Try refreshing or reopening the history panel.",
-            { duration: 8000 }
-          );
-        }
-        
-        generationStartTimeRef.current = null;
+      if (previousGenerations.length === 0) {
+        toast.info(
+          "Your images may take a few moments to appear in history. Try refreshing the history panel.",
+          { duration: 5000 }
+        );
       }
+      
+      generationStartTimeRef.current = null;
     }
-  }, [generatedImages, fetchPreviousGenerations, previousGenerations.length, formatTime]);
-
-  useEffect(() => {
-    if (historyFetchCountRef.current > 0 && historyFetchCountRef.current % 10 === 0) {
-      console.log(`PROMPTMAKER: History fetched ${historyFetchCountRef.current} times. Current count: ${previousGenerations.length}`);
-    }
-  }, [historyFetchCountRef.current, previousGenerations.length]);
+  }, [generatedImages, previousGenerations.length, formatTime]);
 
   const sidebarProps = useMemo(() => ({
     workflow,

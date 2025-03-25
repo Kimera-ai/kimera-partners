@@ -3,7 +3,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import { ChevronRight, Video, RefreshCw } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { HistoryRefreshProps } from "./types";
 
@@ -26,6 +25,7 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
 }) => {
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
   const [internalRefreshing, setInternalRefreshing] = useState(false);
+  const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(null);
 
   const isVideoUrl = (url: string | undefined, isVideo?: boolean) => {
     if (isVideo === true) return true;
@@ -41,67 +41,56 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     }
   };
 
+  // Reset video playback when panel closes
   useEffect(() => {
     if (!isHistoryOpen) {
       setPlayingVideo(null);
     }
   }, [isHistoryOpen]);
 
+  // Reset video playback on refresh
   useEffect(() => {
     setPlayingVideo(null);
   }, [refreshTrigger]);
 
+  // Debounced refresh handler to prevent rapid clicking
   const handleManualRefresh = useCallback(async () => {
     if (!isHistoryOpen || internalRefreshing || isRefreshingHistory) return;
     
-    if (manualRefreshHistory) {
-      try {
-        setInternalRefreshing(true);
-        await manualRefreshHistory();
-      } finally {
-        setInternalRefreshing(false);
-      }
-      return;
+    // Clear any existing debounce timer
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
     }
     
+    // Set refreshing state immediately for better UX
     setInternalRefreshing(true);
-    console.log("Manual history refresh triggered");
     
     try {
-      toast.info("Refreshing history...");
-      
-      const { data, error } = await supabase
-        .from('generated_images')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(100);
-        
-      if (error) {
-        console.error("Manual refresh error:", error);
-        toast.error("Error refreshing history");
-      } else {
-        console.log(`Manual refresh loaded ${data?.length || 0} items`);
-        if (data && data.length > 0) {
-          console.log("Latest generation:", JSON.stringify(data[0]));
-          toast.success(`Found ${data.length} items in history`);
-        } else {
-          toast.info("No items found in history");
-        }
-      }
-    } catch (err) {
-      console.error("Error during manual refresh:", err);
-      toast.error("Failed to refresh history");
+      await manualRefreshHistory();
     } finally {
-      setInternalRefreshing(false);
+      // Use a short debounce to prevent rapid re-clicks
+      const timer = setTimeout(() => {
+        setInternalRefreshing(false);
+      }, 1000);
+      
+      setDebounceTimer(timer);
     }
-  }, [isHistoryOpen, internalRefreshing, isRefreshingHistory, manualRefreshHistory]);
+  }, [isHistoryOpen, internalRefreshing, isRefreshingHistory, manualRefreshHistory, debounceTimer]);
 
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimer) {
+        clearTimeout(debounceTimer);
+      }
+    };
+  }, [debounceTimer]);
+
+  // Log generations on panel open for debugging
   useEffect(() => {
     if (isHistoryOpen) {
       console.log("HISTORY COMPONENT: Previous generations loaded:", previousGenerations.length);
       if (previousGenerations.length > 0) {
-        console.log("HISTORY COMPONENT: First generation:", JSON.stringify(previousGenerations[0]));
-        
         const hasIsVideo = previousGenerations.some(gen => gen.is_video !== undefined);
         console.log("HISTORY COMPONENT: is_video flag exists on generations:", hasIsVideo);
         
@@ -142,7 +131,6 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
               <RefreshCw className={`h-4 w-4 ${(internalRefreshing || isRefreshingHistory) ? 'animate-spin' : ''}`} />
               {previousGenerations.length > 0 && (
                 <span className="absolute top-0 right-0 flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
                 </span>
               )}
