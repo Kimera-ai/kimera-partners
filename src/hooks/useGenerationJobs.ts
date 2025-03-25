@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { GenerationJobType } from '@/components/prompt-maker/GenerationJob';
@@ -55,13 +56,20 @@ export const useGenerationJobs = (session: any) => {
       
       const processStorage = async () => {
         console.log("Storing generated images:", images.length);
+        console.log("Store config:", JSON.stringify(config));
         const stored = await storeGeneratedImages(session, images, config);
+        console.log("Storage result:", stored);
         if (stored) {
           console.log("Images stored, refreshing history");
           await fetchPreviousGens();
         } else {
           console.error("Failed to store images");
         }
+        // Force another refresh after a delay to ensure updates are captured
+        setTimeout(() => {
+          console.log("Delayed refresh after storage");
+          fetchPreviousGens();
+        }, 1000);
       };
       
       processStorage();

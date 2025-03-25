@@ -53,7 +53,6 @@ const PromptMaker = () => {
     fetchPreviousGenerations
   } = useGenerationJobs(session);
 
-  // Fetch previous generations when the component mounts
   useEffect(() => {
     if (session?.user) {
       console.log("Initial fetch of previous generations");
@@ -61,18 +60,15 @@ const PromptMaker = () => {
     }
   }, [session?.user, fetchPreviousGenerations]);
 
-  // Force immediate refresh when any job completes - more aggressive refresh
   useEffect(() => {
     const completedJobs = generationJobs.filter(job => job.isCompleted);
     if (completedJobs.length > 0) {
       console.log(`${completedJobs.length} job(s) completed, aggressively refreshing history`);
       
-      // Immediately refresh
       fetchPreviousGenerations();
       setHistoryRefreshTrigger(prev => prev + 1);
       
-      // Set up a sequence of delayed refreshes to ensure we catch all updates
-      const refreshDelays = [500, 1000, 2000, 3000, 5000];
+      const refreshDelays = [500, 1000, 2000, 3000, 5000, 10000];
       
       refreshDelays.forEach(delay => {
         setTimeout(() => {
@@ -84,28 +80,25 @@ const PromptMaker = () => {
     }
   }, [generationJobs, fetchPreviousGenerations]);
 
-  // More frequent periodic refresh of history (every 5 seconds)
   useEffect(() => {
     if (session?.user) {
       const refreshInterval = setInterval(() => {
         console.log("Periodic history refresh");
         fetchPreviousGenerations();
         setHistoryRefreshTrigger(prev => prev + 1);
-      }, 5000); // Refresh every 5 seconds (decreased from 10 seconds)
+      }, 3000);
       
       return () => clearInterval(refreshInterval);
     }
   }, [session?.user, fetchPreviousGenerations]);
   
-  // Refresh history when history panel is opened - with multiple attempts
   useEffect(() => {
     if (isHistoryOpen && session?.user) {
       console.log("History panel opened, refreshing history");
       fetchPreviousGenerations();
       setHistoryRefreshTrigger(prev => prev + 1);
       
-      // Multiple refreshes after opening the panel
-      const openRefreshDelays = [200, 500, 1000];
+      const openRefreshDelays = [200, 500, 1000, 2000];
       openRefreshDelays.forEach(delay => {
         setTimeout(() => {
           console.log(`History panel open refresh (${delay}ms)`);
