@@ -33,6 +33,7 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
   const autoRefreshTimerRef = React.useRef<NodeJS.Timeout | null>(null);
   
   const processedUrls = useRef(new Set<string>());
+  const processedIDs = useRef(new Set<string>());
 
   useEffect(() => {
     if (!isHistoryOpen) {
@@ -174,13 +175,14 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     console.log(`Deduplicating ${previousGenerations.length} history items`);
     
     processedUrls.current.clear();
+    processedIDs.current.clear();
     
-    const idMap = new Map<string, any>();
+    const uniqueItems = new Map<string, any>();
     
     previousGenerations.forEach(generation => {
       if (!generation.image_url) return;
       
-      if (generation.id) {
+      if (generation.id && !processedIDs.current.has(generation.id)) {
         const isVideoFlag = generation.is_video === true || generation.is_video === 'true' || generation.is_video === 1;
         const urlSuggestsVideo = isVideoUrl(generation.image_url);
         const isVideo = isVideoFlag || urlSuggestsVideo;
@@ -193,19 +195,20 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
           generation.workflow = 'no-reference';
         }
         
-        console.log(`Generation ID: ${generation.id}, Workflow: ${generation.workflow}`);
+        uniqueItems.set(generation.id, generation);
+        processedIDs.current.add(generation.id);
         
-        idMap.set(generation.id, generation);
+        const normalizedUrl = generation.image_url.split('?')[0];
+        processedUrls.current.add(normalizedUrl);
       }
     });
     
     previousGenerations.forEach(generation => {
       if (!generation.image_url) return;
       
-      if (generation.id && idMap.has(generation.id)) return;
+      if (generation.id && processedIDs.current.has(generation.id)) return;
       
       const normalizedUrl = generation.image_url.split('?')[0];
-      
       if (!processedUrls.current.has(normalizedUrl)) {
         const isVideoFlag = generation.is_video === true || generation.is_video === 'true' || generation.is_video === 1;
         const urlSuggestsVideo = isVideoUrl(generation.image_url);
@@ -219,23 +222,58 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
           generation.workflow = 'no-reference';
         }
         
-        const compositeKey = `url-${normalizedUrl}`;
-        idMap.set(compositeKey, generation);
+        const urlKey = `url-${normalizedUrl}`;
+        uniqueItems.set(urlKey, generation);
         processedUrls.current.add(normalizedUrl);
       }
     });
     
-    const uniqueItems = Array.from(idMap.values());
-    console.log(`After strong deduplication: ${uniqueItems.length} unique items`);
+    const finalItems = Array.from(uniqueItems.values());
     
-    if (uniqueItems.length > 0) {
-      console.log("Sample workflows:", uniqueItems.slice(0, 5).map(item => ({
+    const baseUrlMap = new Map<string, any[]>();
+    
+    finalItems.forEach(item => {
+      const basePath = item.image_url.split('?')[0].split('#')[0];
+      const basePathKey = basePath.replace(/(_source|_output)\.jpeg$/, '').replace(/(_source|_output)\.jpg$/, '');
+      
+      if (!baseUrlMap.has(basePathKey)) {
+        baseUrlMap.set(basePathKey, []);
+      }
+      baseUrlMap.get(basePathKey)?.push(item);
+    });
+    
+    const finalDeduplicatedItems: any[] = [];
+    
+    baseUrlMap.forEach(itemsGroup => {
+      if (itemsGroup.length === 1) {
+        finalDeduplicatedItems.push(itemsGroup[0]);
+      } else {
+        const sorted = [...itemsGroup].sort((a, b) => {
+          const dateA = new Date(a.created_at).getTime();
+          const dateB = new Date(b.created_at).getTime();
+          return dateB - dateA;
+        });
+        
+        finalDeduplicatedItems.push(sorted[0]);
+      }
+    });
+    
+    finalDeduplicatedItems.sort((a, b) => {
+      const dateA = new Date(a.created_at).getTime();
+      const dateB = new Date(b.created_at).getTime();
+      return dateB - dateA;
+    });
+    
+    console.log(`After strong deduplication: ${finalDeduplicatedItems.length} unique items`);
+    
+    if (finalDeduplicatedItems.length > 0) {
+      console.log("Sample workflows:", finalDeduplicatedItems.slice(0, 5).map(item => ({
         workflow: item.workflow,
         isVideo: item.is_video === true || isVideoUrl(item.image_url)
       })));
     }
     
-    return uniqueItems;
+    return finalDeduplicatedItems;
   }, [previousGenerations, isVideoUrl]);
 
   return (

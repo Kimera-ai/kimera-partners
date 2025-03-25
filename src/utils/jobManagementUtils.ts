@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { GenerationJobType } from "@/components/prompt-maker/GenerationJob";
 
@@ -37,7 +36,7 @@ export const fetchPreviousGenerations = async () => {
     
     console.log(`Fetching previous generations with timestamp: ${timestamp}`);
     
-    // Use a distinct query to avoid duplicates when possible
+    // Query with distinct on image_url to reduce duplicates at the database level
     const { data, error } = await supabase
       .from('generated_images')
       .select('*')
@@ -51,32 +50,95 @@ export const fetchPreviousGenerations = async () => {
     
     console.log(`Fetched ${data?.length || 0} previous generations`);
     
-    // Pre-process data to handle potential duplicates
+    // Process data to handle potential duplicates
     if (data && data.length > 0) {
       console.log('Sample generation data:', JSON.stringify(data[0]));
       
-      // Use a Map with image_url as key for deduplication
-      const uniqueItems = new Map();
+      // First-level deduplication: Use a Map with ID as primary key
+      const uniqueById = new Map();
+      const duplicateUrls = new Set();
+      
+      // First pass: Collect all IDs and track duplicate URLs
+      data.forEach(item => {
+        if (!item.image_url) return;
+        
+        // Check if we already have an item with this ID
+        if (item.id && !uniqueById.has(item.id)) {
+          uniqueById.set(item.id, item);
+        }
+      });
+      
+      // Second pass: Add items by URL for items without ID
+      const uniqueByUrl = new Map();
       
       data.forEach(item => {
         if (!item.image_url) return;
         
+        // Skip items already added by ID
+        if (item.id && uniqueById.has(item.id)) return;
+        
         // Normalize URL by removing query parameters
         const normalizedUrl = item.image_url.split('?')[0];
-        const key = item.id || normalizedUrl;
         
-        if (!uniqueItems.has(key)) {
-          uniqueItems.set(key, item);
+        if (!uniqueByUrl.has(normalizedUrl)) {
+          uniqueByUrl.set(normalizedUrl, item);
+        } else {
+          duplicateUrls.add(normalizedUrl);
         }
       });
       
-      // If we have significantly fewer items after deduplication, log this
-      if (uniqueItems.size < data.length * 0.9) {
-        console.log(`Deduplication removed ${data.length - uniqueItems.size} items`);
+      // Combine results
+      const combinedResults = [
+        ...Array.from(uniqueById.values()),
+        ...Array.from(uniqueByUrl.values())
+      ];
+      
+      // Third-level deduplication: Check for visually similar images using URL patterns
+      const baseUrlMap = new Map();
+      
+      combinedResults.forEach(item => {
+        // Extract base filename without parameters and hash
+        const basePath = item.image_url.split('?')[0].split('#')[0];
+        // Remove source/output variations in filenames
+        const basePathKey = basePath.replace(/(_source|_output)\.jpeg$/, '').replace(/(_source|_output)\.jpg$/, '');
+        
+        if (!baseUrlMap.has(basePathKey)) {
+          baseUrlMap.set(basePathKey, []);
+        }
+        baseUrlMap.get(basePathKey).push(item);
+      });
+      
+      // For each group of similar images, keep only the newest one
+      const finalResults = [];
+      
+      baseUrlMap.forEach(itemsGroup => {
+        if (itemsGroup.length === 1) {
+          finalResults.push(itemsGroup[0]);
+        } else {
+          // Sort by creation date (newest first)
+          const sorted = [...itemsGroup].sort((a, b) => {
+            const dateA = new Date(a.created_at).getTime();
+            const dateB = new Date(b.created_at).getTime();
+            return dateB - dateA;
+          });
+          
+          // Keep only the newest
+          finalResults.push(sorted[0]);
+        }
+      });
+      
+      // Sort by creation date (newest first)
+      finalResults.sort((a, b) => {
+        const dateA = new Date(a.created_at).getTime();
+        const dateB = new Date(b.created_at).getTime();
+        return dateB - dateA;
+      });
+      
+      if (finalResults.length < data.length) {
+        console.log(`Strong deduplication reduced items from ${data.length} to ${finalResults.length}`);
       }
       
-      // Return as array
-      return Array.from(uniqueItems.values());
+      return finalResults;
     } else {
       console.log('No generations found in the database');
       return [];
@@ -87,7 +149,6 @@ export const fetchPreviousGenerations = async () => {
   }
 };
 
-// Define a proper interface for the job configuration
 interface JobConfig {
   jobPrompt: string;
   jobStyle: string;

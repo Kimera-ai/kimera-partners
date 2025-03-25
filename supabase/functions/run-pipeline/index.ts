@@ -55,6 +55,10 @@ serve(async (req) => {
     console.log(`Standardized input workflow: ${standardizedWorkflow}`);
     console.log(`Final workflow being used: ${finalWorkflow}`);
 
+    // Generate a unique request ID to help with deduplication
+    const requestId = crypto.randomUUID();
+    console.log(`Generated unique request ID: ${requestId}`);
+
     // Create request body based on whether it's a video or image generation
     let requestBody;
     
@@ -68,7 +72,8 @@ serve(async (req) => {
         ratio,
         // Add workflow for videos as well
         data: {
-          workflow: 'video' // Always set video workflow for videos
+          workflow: 'video', // Always set video workflow for videos
+          request_id: requestId // Add unique request ID
         }
       };
     } else {
@@ -82,7 +87,8 @@ serve(async (req) => {
           lora_scale: loraScale,
           style: style,
           seed: seed,
-          workflow: finalWorkflow // Include the standardized workflow
+          workflow: finalWorkflow, // Include the standardized workflow
+          request_id: requestId // Add unique request ID
         }
       };
     }
@@ -131,7 +137,10 @@ serve(async (req) => {
     // Explicitly include workflow in the response with the standardized value
     data.workflow = finalWorkflow;
     
-    console.log(`Final response with isVideo=${isVideoBoolean}, workflow=${finalWorkflow}:`, JSON.stringify(data));
+    // Add the request ID to the response for tracking
+    data.request_id = requestId;
+    
+    console.log(`Final response with isVideo=${isVideoBoolean}, workflow=${finalWorkflow}, requestId=${requestId}:`, JSON.stringify(data));
 
     return new Response(
       JSON.stringify(data),
