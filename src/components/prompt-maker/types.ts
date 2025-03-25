@@ -39,3 +39,9 @@ export interface GenerationState {
   isProcessing: boolean;
   handleGenerate: () => Promise<void>;
 }
+
+// Adding the HistoryRefreshProps interface to make the type explicit
+export interface HistoryRefreshProps {
+  isRefreshingHistory: boolean;
+  manualRefreshHistory: () => Promise<void>;
+}

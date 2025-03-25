@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { GenerationJobType } from '@/components/prompt-maker/GenerationJob';
@@ -178,6 +177,7 @@ export const useGenerationJobs = (session: any) => {
     );
   }, [handleJobComplete]);
 
+  // Modify this function to return a Promise
   const manualRefreshHistory = useCallback(async () => {
     toast({
       title: "Refreshing History",
@@ -185,15 +185,26 @@ export const useGenerationJobs = (session: any) => {
       duration: 2000
     });
     
+    // Make sure to await this
     await fetchPreviousGens();
     
-    // Multiple refreshes with increasing delays
+    // Multiple refreshes with increasing delays - converted to use async/await
     const refreshDelays = [1000, 2500, 5000];
-    refreshDelays.forEach(delay => {
-      setTimeout(() => {
-        console.log(`MANUAL REFRESH: Delayed refresh after ${delay}ms`);
-        fetchPreviousGens();
-      }, delay);
+    
+    // Create promises for all the delayed refreshes
+    const refreshPromises = refreshDelays.map(delay => 
+      new Promise<void>(resolve => {
+        setTimeout(async () => {
+          console.log(`MANUAL REFRESH: Delayed refresh after ${delay}ms`);
+          await fetchPreviousGens();
+          resolve();
+        }, delay);
+      })
+    );
+    
+    // Return a promise that resolves when all the delayed refreshes are complete
+    return Promise.all(refreshPromises).then(() => {
+      console.log("All manual refresh operations completed");
     });
   }, [fetchPreviousGens, toast]);
 
