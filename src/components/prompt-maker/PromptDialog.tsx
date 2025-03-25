@@ -1,9 +1,10 @@
 
 import React from 'react';
-import { Download, X, Video } from 'lucide-react';
+import { Download, X, Video, Share } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { toast } from 'sonner';
 
 interface PromptDialogProps {
   showPromptDialog: boolean;
@@ -38,6 +39,41 @@ export const PromptDialog: React.FC<PromptDialogProps> = ({
       case "video": return "Video Generator";
       case "no-reference": 
       default: return "Image Generator";
+    }
+  };
+
+  const handleShareImage = async () => {
+    if (!selectedGeneration?.image_url) {
+      toast.error("No image URL available to share");
+      return;
+    }
+
+    try {
+      // First try using the Web Share API
+      if (navigator.share) {
+        await navigator.share({
+          title: 'Check out this image generated with Kimera',
+          text: selectedGeneration.prompt ? `${selectedGeneration.prompt.substring(0, 50)}...` : 'Generated with Kimera',
+          url: selectedGeneration.image_url
+        });
+        toast.success("Shared successfully!");
+        return;
+      }
+
+      // Fallback to clipboard if Web Share API is not available
+      await navigator.clipboard.writeText(selectedGeneration.image_url);
+      toast.success("Image URL copied to clipboard!");
+    } catch (error) {
+      console.error("Error sharing image:", error);
+      toast.error("Failed to share image");
+      
+      // Try clipboard as a last resort if sharing failed
+      try {
+        await navigator.clipboard.writeText(selectedGeneration.image_url);
+        toast.success("Image URL copied to clipboard instead!");
+      } catch (clipboardError) {
+        toast.error("Unable to share or copy image URL");
+      }
     }
   };
 
@@ -145,7 +181,7 @@ export const PromptDialog: React.FC<PromptDialogProps> = ({
           </div>
         </div>
         
-        <DialogFooter className="flex justify-between sm:justify-between">
+        <DialogFooter className="flex flex-wrap gap-2 justify-between sm:justify-between">
           <Button 
             variant="outline" 
             onClick={() => setShowPromptDialog(false)}
@@ -153,12 +189,21 @@ export const PromptDialog: React.FC<PromptDialogProps> = ({
             <X className="h-4 w-4 mr-2" /> Close
           </Button>
           
-          <Button 
-            variant="default" 
-            onClick={() => selectedGeneration?.image_url && handleDownload(selectedGeneration.image_url)}
-          >
-            <Download className="h-4 w-4 mr-2" /> Download
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="secondary" 
+              onClick={handleShareImage}
+            >
+              <Share className="h-4 w-4 mr-2" /> Share
+            </Button>
+            
+            <Button 
+              variant="default" 
+              onClick={() => selectedGeneration?.image_url && handleDownload(selectedGeneration.image_url)}
+            >
+              <Download className="h-4 w-4 mr-2" /> Download
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

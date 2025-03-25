@@ -176,6 +176,12 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
       if (!generation.image_url) return;
       
       if (generation.id) {
+        if (generation.is_video === true) {
+          generation.workflow = 'video';
+        } else if (!generation.workflow) {
+          generation.workflow = 'no-reference';
+        }
+        
         idMap.set(generation.id, generation);
       }
     });
@@ -188,6 +194,12 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
       const normalizedUrl = generation.image_url.split('?')[0];
       
       if (!processedUrls.current.has(normalizedUrl)) {
+        if (generation.is_video === true) {
+          generation.workflow = 'video';
+        } else if (!generation.workflow) {
+          generation.workflow = 'no-reference';
+        }
+        
         const compositeKey = `url-${normalizedUrl}`;
         idMap.set(compositeKey, generation);
         processedUrls.current.add(normalizedUrl);
@@ -273,6 +285,10 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
                   const urlSuggestsVideo = isVideoUrl(generation.image_url);
                   const isVideo = isVideoFlag || urlSuggestsVideo;
                   
+                  if (isVideo && generation.workflow !== 'video') {
+                    generation.workflow = 'video';
+                  }
+                  
                   const workflowLabel = getWorkflowLabel(generation.workflow);
                   
                   const imageUrl = generation.image_url;
@@ -349,3 +365,4 @@ export const PreviousGenerations: React.FC<PreviousGenerationsProps> = ({
     </Sheet>
   );
 };
+
