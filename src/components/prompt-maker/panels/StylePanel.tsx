@@ -51,7 +51,7 @@ export const StylePanel = ({ style, setStyle, workflow }: StylePanelProps) => {
             <SelectItem value="Fantasy art">Fantasy art</SelectItem>
             <SelectItem value="Neonpunk">Neonpunk</SelectItem>
             <SelectItem value="Enhance">Enhance</SelectItem>
-            <SelectItem value="Comic Book">Comic Book</SelectItem>
+            <SelectItem value="Comic book">Comic book</SelectItem>
             <SelectItem value="Lowpoly">Lowpoly</SelectItem>
             <SelectItem value="Line art">Line art</SelectItem>
           </SelectContent>
