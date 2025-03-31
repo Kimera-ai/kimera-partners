@@ -25,7 +25,7 @@ export const runPipeline = async (config: KimeraApiConfig) => {
       },
       body: JSON.stringify({
         pipeline_id: config.pipelineId,
-        imageUrl: config.imageUrl, // Ensure we consistently use imageUrl
+        imageUrl: config.imageUrl, // Using imageUrl consistently
         ratio: config.ratio || '2:3',
         prompt: config.prompt,
         data: {
