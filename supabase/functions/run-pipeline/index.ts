@@ -17,9 +17,16 @@ serve(async (req) => {
   try {
     const { imageUrl, prompt, ratio = "2:3", loraScale = 0.5, style = "Cinematic", seed = -1, isVideo = false, workflow = "no-reference" } = await req.json();
 
-    if (!imageUrl || !prompt) {
+    if (!imageUrl && workflow !== 'ideogram' && workflow !== 'no-reference') {
       return new Response(
-        JSON.stringify({ error: 'Image URL and prompt are required' }),
+        JSON.stringify({ error: 'Image URL is required for this workflow' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (!prompt && workflow !== 'video') {
+      return new Response(
+        JSON.stringify({ error: 'Prompt is required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -83,8 +90,7 @@ serve(async (req) => {
         ? defaultIdeogramImageUrl 
         : "https://www.jeann.online/cdn-cgi/image/format=jpeg/https://kimera-media.s3.eu-north-1.amazonaws.com/623b36fe-ac7f-4c56-a124-cddb942a38e5_event/623b36fe-ac7f-4c56-a124-cddb942a38e5_source.jpeg";
     
-    // For ideogram workflow, allow using the default image if no specific image is uploaded
-    // Fixed: Changed !uploadedImageUrl to check if imageUrl is null/undefined
+    // For ideogram workflow, always use the specified image if provided, otherwise use the default
     const effectiveImageUrl = (finalWorkflow === 'ideogram' && !imageUrl) ? defaultIdeogramImageUrl : imageUrl;
 
     // Create request body based on whether it's a video or image generation
