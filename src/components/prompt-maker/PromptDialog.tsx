@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { Download, X, Video, Share, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
+import React, { useEffect, useState, useRef } from 'react';
+import { Download, X, Video, Share, ZoomIn, ZoomOut, Maximize2, MousePointer } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { toast } from 'sonner';
 
 interface PromptDialogProps {
@@ -19,6 +20,10 @@ export const PromptDialog: React.FC<PromptDialogProps> = ({
   handleDownload
 }) => {
   const [fullscreenPreview, setFullscreenPreview] = useState(false);
+  const [magnifyEnabled, setMagnifyEnabled] = useState(false);
+  const [magnifyPosition, setMagnifyPosition] = useState({ x: 0, y: 0 });
+  const [magnifyZoom, setMagnifyZoom] = useState(2);
+  const imageRef = useRef<HTMLImageElement>(null);
   
   // Determine if the media is a video based on either the explicit flag or the URL extension
   const isVideo = selectedGeneration?.is_video === true || 
@@ -91,6 +96,34 @@ export const PromptDialog: React.FC<PromptDialogProps> = ({
   // Toggle fullscreen preview
   const toggleFullscreenPreview = () => {
     setFullscreenPreview(!fullscreenPreview);
+    setMagnifyEnabled(false); // Disable magnify when toggling fullscreen
+  };
+
+  // Toggle magnify glass
+  const toggleMagnify = () => {
+    setMagnifyEnabled(!magnifyEnabled);
+  };
+
+  // Handle zoom level change
+  const increaseZoom = () => {
+    setMagnifyZoom(prev => Math.min(prev + 0.5, 5));
+  };
+
+  const decreaseZoom = () => {
+    setMagnifyZoom(prev => Math.max(prev - 0.5, 1.5));
+  };
+
+  // Handle mouse movement for magnifying glass
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!magnifyEnabled || !imageRef.current) return;
+    
+    const rect = imageRef.current.getBoundingClientRect();
+    
+    // Calculate position relative to image
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    
+    setMagnifyPosition({ x, y });
   };
 
   // Close fullscreen on escape key
@@ -98,6 +131,7 @@ export const PromptDialog: React.FC<PromptDialogProps> = ({
     const handleEscKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && fullscreenPreview) {
         setFullscreenPreview(false);
+        setMagnifyEnabled(false);
       }
     };
 
@@ -109,6 +143,7 @@ export const PromptDialog: React.FC<PromptDialogProps> = ({
   useEffect(() => {
     if (!showPromptDialog) {
       setFullscreenPreview(false);
+      setMagnifyEnabled(false);
     }
   }, [showPromptDialog]);
 
@@ -134,6 +169,7 @@ export const PromptDialog: React.FC<PromptDialogProps> = ({
     // Only close if clicking directly on the backdrop, not on the image
     if (e.target === e.currentTarget) {
       setFullscreenPreview(false);
+      setMagnifyEnabled(false);
     }
   };
 
@@ -275,7 +311,7 @@ export const PromptDialog: React.FC<PromptDialogProps> = ({
         </DialogContent>
       </Dialog>
 
-      {/* Fullscreen Preview Dialog - Fixed to properly handle close events */}
+      {/* Fullscreen Preview Dialog with Magnifying Glass */}
       {fullscreenPreview && selectedGeneration?.image_url && !isVideo && (
         <div 
           className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center cursor-zoom-out"
@@ -283,27 +319,123 @@ export const PromptDialog: React.FC<PromptDialogProps> = ({
           role="dialog"
           aria-modal="true"
         >
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="absolute top-4 right-4 text-white bg-black/40 hover:bg-black/60 z-10"
-            onClick={() => setFullscreenPreview(false)}
-            aria-label="Close fullscreen preview"
-          >
-            <X className="h-6 w-6" />
-          </Button>
+          <div className="absolute top-4 right-4 flex gap-2 z-10">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="text-white bg-black/40 hover:bg-black/60"
+                  aria-label="Magnify options"
+                >
+                  <ZoomIn className="h-6 w-6" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-52 p-2">
+                <div className="space-y-2">
+                  <div className="text-sm font-medium mb-2">Magnifying Glass</div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Enable</span>
+                    <Button 
+                      variant={magnifyEnabled ? "default" : "outline"} 
+                      size="sm"
+                      onClick={toggleMagnify}
+                      className="h-8"
+                    >
+                      {magnifyEnabled ? "On" : "Off"}
+                    </Button>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Zoom Level</span>
+                    <div className="flex items-center">
+                      <Button 
+                        variant="outline" 
+                        size="icon" 
+                        className="h-7 w-7" 
+                        onClick={decreaseZoom}
+                        disabled={magnifyZoom <= 1.5}
+                      >
+                        <ZoomOut className="h-4 w-4" />
+                      </Button>
+                      <span className="mx-2 text-sm">{magnifyZoom}x</span>
+                      <Button 
+                        variant="outline" 
+                        size="icon" 
+                        className="h-7 w-7" 
+                        onClick={increaseZoom}
+                        disabled={magnifyZoom >= 5}
+                      >
+                        <ZoomIn className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
+            
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="text-white bg-black/40 hover:bg-black/60"
+              onClick={() => setFullscreenPreview(false)}
+              aria-label="Close fullscreen preview"
+            >
+              <X className="h-6 w-6" />
+            </Button>
+          </div>
           
-          <div className="relative max-w-[95vw] max-h-[95vh] overflow-auto">
+          <div 
+            className="relative max-w-[95vw] max-h-[95vh] overflow-auto"
+            onMouseMove={handleMouseMove}
+          >
             <img 
+              ref={imageRef}
               src={selectedGeneration.image_url} 
               alt="Full size preview" 
               className="max-w-none max-h-none object-contain" 
-              onClick={(e) => e.stopPropagation()} // Prevent clicks on the image from closing the preview
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent clicks on the image from closing the preview
+                if (magnifyEnabled) {
+                  // If magnify is enabled, clicking should not toggle fullscreen
+                  return;
+                }
+              }}
               onError={(e) => {
                 console.error(`Error loading fullscreen image: ${selectedGeneration.image_url}`);
                 e.currentTarget.src = 'https://placehold.co/1200x1600/191223/404040?text=Image+Failed+to+Load';
               }}
             />
+            
+            {/* Magnifying Glass */}
+            {magnifyEnabled && (
+              <div 
+                className="absolute pointer-events-none border-2 border-white rounded-full shadow-lg overflow-hidden"
+                style={{
+                  width: '150px',
+                  height: '150px',
+                  top: `${magnifyPosition.y * 100}%`,
+                  left: `${magnifyPosition.x * 100}%`,
+                  transform: 'translate(-50%, -50%)',
+                  backgroundImage: `url(${selectedGeneration.image_url})`,
+                  backgroundPosition: `${magnifyPosition.x * 100}% ${magnifyPosition.y * 100}%`,
+                  backgroundSize: `${magnifyZoom * 100}%`,
+                  backgroundRepeat: 'no-repeat'
+                }}
+              >
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-0.5 h-full bg-white/20"></div>
+                  <div className="h-0.5 w-full bg-white/20 absolute"></div>
+                </div>
+              </div>
+            )}
+            
+            {/* Magnify instructions indicator */}
+            {magnifyEnabled && (
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 text-white text-xs px-3 py-2 rounded-full flex items-center">
+                <MousePointer className="h-3 w-3 mr-1" />
+                <span>Move cursor to magnify</span>
+              </div>
+            )}
           </div>
         </div>
       )}
