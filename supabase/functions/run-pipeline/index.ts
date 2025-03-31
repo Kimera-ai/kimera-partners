@@ -115,7 +115,7 @@ serve(async (req) => {
       // For video, include the essential parameters
       requestBody = {
         pipeline_id: VIDEO_PIPELINE_ID,
-        imageUrl,
+        imageUrl: effectiveImageUrl,
         prompt,
         // Include ratio for video too for consistency
         ratio,
@@ -129,6 +129,7 @@ serve(async (req) => {
       // For image, include all the additional parameters
       requestBody = {
         pipeline_id: selectedPipelineId, // Use the selected pipeline ID
+        imageUrl: effectiveImageUrl, // IMPORTANT: Use imageUrl, not image
         ratio,
         prompt,
         data: {
@@ -139,12 +140,6 @@ serve(async (req) => {
           request_id: requestId // Add unique request ID
         }
       };
-    }
-
-    // Fix for Kimera API: ensure the "image" field is correctly set in the payload
-    // This overrides any other imageUrl field since the API specifically looks for "image"
-    if (!isVideoBoolean) {
-      requestBody.image = effectiveImageUrl;
     }
 
     console.log(`Making ${isVideoBoolean ? 'video' : 
