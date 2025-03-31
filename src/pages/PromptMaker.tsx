@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { useSession } from "@/hooks/useSession";
@@ -59,7 +58,6 @@ const PromptMaker = () => {
     manualRefreshHistory
   } = useGenerationJobs(session);
 
-  // Initial history fetch
   useEffect(() => {
     if (session?.user) {
       console.log("PROMPTMAKER: Initial fetch of previous generations");
@@ -67,14 +65,12 @@ const PromptMaker = () => {
     }
   }, [session?.user, fetchPreviousGenerations]);
 
-  // History refresh on job completion
   useEffect(() => {
     const completedJobs = generationJobs.filter(job => job.isCompleted);
     if (completedJobs.length > 0) {
       console.log(`PROMPTMAKER: ${completedJobs.length} job(s) completed, refreshing history`);
       setHistoryRefreshTrigger(prev => prev + 1);
       
-      // Force refresh history after generation
       if (!isRefreshingHistory) {
         const now = Date.now();
         if (now - lastRefreshTimeRef.current > 2000) {
@@ -86,7 +82,6 @@ const PromptMaker = () => {
     }
   }, [generationJobs, fetchPreviousGenerations, isRefreshingHistory]);
 
-  // History panel open handler with forced refresh
   useEffect(() => {
     if (isHistoryOpen && session?.user) {
       console.log("PROMPTMAKER: History panel opened, force refreshing history");
@@ -126,18 +121,14 @@ const PromptMaker = () => {
     uploadedImageUrl
   );
 
-  // Enhanced generation handling with multiple history refreshes
   const wrappedHandleGenerate = useCallback(async (): Promise<void> => {
     generationStartTimeRef.current = Date.now();
     console.log("PROMPTMAKER: Generation started at", new Date().toISOString());
     
-    // Pre-generation refresh
     await fetchPreviousGenerations();
     
-    // Start generation
     await handleGenerate();
     
-    // Schedule multiple post-generation refreshes
     const scheduleRefreshes = () => {
       setTimeout(async () => {
         console.log("PROMPTMAKER: First post-generation refresh (5s)");
@@ -175,16 +166,16 @@ const PromptMaker = () => {
       style: style,
       ratio: ratio,
       lora_scale: loraScale,
-      seed: imageData.seed,
+      seed: imageData.seed || 'Unknown',
       pipeline_id: imageData.pipeline_id,
       is_video: imageData.isVideo,
+      workflow: workflow,
       created_at: new Date().toISOString()
     };
     
     handleImageClick(generationData);
-  }, [prompt, style, ratio, loraScale, handleImageClick]);
+  }, [prompt, style, ratio, loraScale, workflow, handleImageClick]);
 
-  // Improved completed images handling
   useEffect(() => {
     if (generatedImages.length > 0 && generationStartTimeRef.current) {
       const generationTime = Date.now() - generationStartTimeRef.current;

@@ -1,5 +1,5 @@
 
-import { Clock, Loader2, Share2, Check, AlertTriangle, Play, Pause } from "lucide-react";
+import { Clock, Loader2, Share2, Check, AlertTriangle, Play, Pause, Maximize2 } from "lucide-react";
 import React, { forwardRef, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -23,7 +23,7 @@ export interface GenerationJobType {
   elapsedTime: number;
   error?: string | null;
   isVideo?: boolean;
-  ratio?: string; // Add ratio to job type
+  ratio?: string;
 }
 
 interface GenerationJobProps {
@@ -39,6 +39,11 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
     const { toast } = useToast();
     const [copiedImageUrl, setCopiedImageUrl] = useState<string | null>(null);
     const [playingVideo, setPlayingVideo] = useState<string | null>(null);
+    const [fullscreenPreview, setFullscreenPreview] = useState<string | null>(null);
+    const [magnifyEnabled, setMagnifyEnabled] = useState(false);
+    const [magnifyPosition, setMagnifyPosition] = useState({ x: 0, y: 0 });
+    const [magnifyZoom, setMagnifyZoom] = useState(2);
+    const imageRef = React.useRef<HTMLImageElement>(null);
     
     console.log(`Job ${job.id}: completed=${job.isCompleted}, validImages=${validImages.length}, isVideo=${job.isVideo}`);
     
@@ -99,6 +104,48 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
     const toggleVideoPlayback = (videoUrl: string, event: React.MouseEvent) => {
       event.stopPropagation();
       setPlayingVideo(playingVideo === videoUrl ? null : videoUrl);
+    };
+
+    // Toggle fullscreen preview
+    const openFullscreenPreview = (imageUrl: string, event: React.MouseEvent) => {
+      event.stopPropagation();
+      setFullscreenPreview(imageUrl);
+      setMagnifyEnabled(false);
+    };
+
+    // Handle fullscreen backdrop click to close
+    const handleFullscreenBackdropClick = (e: React.MouseEvent) => {
+      if (e.target === e.currentTarget) {
+        setFullscreenPreview(null);
+        setMagnifyEnabled(false);
+      }
+    };
+
+    // Toggle magnify glass
+    const toggleMagnify = () => {
+      setMagnifyEnabled(!magnifyEnabled);
+    };
+
+    // Handle zoom level change
+    const increaseZoom = () => {
+      setMagnifyZoom(prev => Math.min(prev + 0.5, 5));
+    };
+
+    const decreaseZoom = () => {
+      setMagnifyZoom(prev => Math.max(prev - 0.5, 1.5));
+    };
+
+    // Handle mouse movement for magnifying glass
+    const handleMouseMove = (e: React.MouseEvent) => {
+      if (!magnifyEnabled || !imageRef.current) return;
+      
+      const rect = imageRef.current.getBoundingClientRect();
+      
+      // Calculate position relative to image
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = (e.clientY - rect.top) / rect.height;
+      
+      setMagnifyPosition({ x, y });
     };
 
     // Always show images if we have valid images, regardless of job completion status
@@ -204,7 +251,7 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
                       <Share2 size={20} />
                     )}
                   </button>
-                  {imageData.isVideo && (
+                  {imageData.isVideo ? (
                     <button 
                       className="bg-white/10 hover:bg-white/20 text-white p-1 rounded-full transition-colors"
                       onClick={(e) => toggleVideoPlayback(imageData.url, e)}
@@ -215,6 +262,14 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
                       ) : (
                         <Play size={20} />
                       )}
+                    </button>
+                  ) : (
+                    <button 
+                      className="bg-white/10 hover:bg-white/20 text-white p-1 rounded-full transition-colors"
+                      onClick={(e) => openFullscreenPreview(imageData.url, e)}
+                      title="View full size"
+                    >
+                      <Maximize2 size={20} />
                     </button>
                   )}
                 </div>
@@ -237,6 +292,126 @@ export const GenerationJobComponent = forwardRef<HTMLDivElement, GenerationJobPr
             <p className="mt-1 text-xs text-amber-300/70">
               {job.completedImages} of {job.totalImages} {job.isVideo ? "videos were" : "images were"} successfully generated.
             </p>
+          </div>
+        )}
+
+        {/* Fullscreen Preview with Magnifying Glass */}
+        {fullscreenPreview && !job.isVideo && (
+          <div 
+            className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center cursor-zoom-out"
+            onClick={handleFullscreenBackdropClick}
+            role="dialog"
+            aria-modal="true"
+          >
+            <div className="absolute top-4 right-4 flex gap-2 z-10">
+              <button 
+                className={`p-2 rounded-full ${magnifyEnabled ? 'bg-primary text-primary-foreground' : 'bg-black/40 text-white hover:bg-black/60'}`}
+                onClick={toggleMagnify}
+                aria-label="Toggle magnifying glass"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  <line x1="11" y1="8" x2="11" y2="14"></line>
+                  <line x1="8" y1="11" x2="14" y2="11"></line>
+                </svg>
+              </button>
+              
+              {magnifyEnabled && (
+                <>
+                  <button 
+                    className="p-2 rounded-full bg-black/40 text-white hover:bg-black/60"
+                    onClick={decreaseZoom}
+                    aria-label="Decrease zoom"
+                    disabled={magnifyZoom <= 1.5}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                      <line x1="8" y1="11" x2="14" y2="11"></line>
+                    </svg>
+                  </button>
+                  
+                  <button 
+                    className="p-2 rounded-full bg-black/40 text-white hover:bg-black/60"
+                    onClick={increaseZoom}
+                    aria-label="Increase zoom"
+                    disabled={magnifyZoom >= 5}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                      <line x1="11" y1="8" x2="11" y2="14"></line>
+                      <line x1="8" y1="11" x2="14" y2="11"></line>
+                    </svg>
+                  </button>
+                </>
+              )}
+              
+              <button 
+                className="p-2 rounded-full bg-black/40 text-white hover:bg-black/60"
+                onClick={() => setFullscreenPreview(null)}
+                aria-label="Close fullscreen preview"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+            
+            <div 
+              className="relative max-w-[95vw] max-h-[95vh] overflow-auto"
+              onMouseMove={handleMouseMove}
+            >
+              <img 
+                ref={imageRef}
+                src={fullscreenPreview} 
+                alt="Full size preview" 
+                className="max-w-none max-h-none object-contain" 
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent clicks on the image from closing the preview
+                }}
+                onError={(e) => {
+                  console.error(`Error loading fullscreen image: ${fullscreenPreview}`);
+                  e.currentTarget.src = 'https://placehold.co/1200x1600/191223/404040?text=Image+Failed+to+Load';
+                }}
+              />
+              
+              {/* Magnifying Glass */}
+              {magnifyEnabled && (
+                <div 
+                  className="absolute pointer-events-none border-2 border-white rounded-full shadow-lg overflow-hidden"
+                  style={{
+                    width: '150px',
+                    height: '150px',
+                    top: `${magnifyPosition.y * 100}%`,
+                    left: `${magnifyPosition.x * 100}%`,
+                    transform: 'translate(-50%, -50%)',
+                    backgroundImage: `url(${fullscreenPreview})`,
+                    backgroundPosition: `${magnifyPosition.x * 100}% ${magnifyPosition.y * 100}%`,
+                    backgroundSize: `${magnifyZoom * 100}%`,
+                    backgroundRepeat: 'no-repeat'
+                  }}
+                >
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-0.5 h-full bg-white/20"></div>
+                    <div className="h-0.5 w-full bg-white/20 absolute"></div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Magnify instructions indicator */}
+              {magnifyEnabled && (
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 text-white text-xs px-3 py-2 rounded-full flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"></path>
+                    <path d="M13 13l6 6"></path>
+                  </svg>
+                  <span>Move cursor to magnify</span>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </Card>
