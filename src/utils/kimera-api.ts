@@ -10,12 +10,22 @@ interface KimeraApiConfig {
   lora_scale?: number;
   style?: string;
   seed?: number;
+  workflow?: string;
 }
 
 // Submit job to Kimera pipeline
 export const runPipeline = async (config: KimeraApiConfig) => {
   try {
     console.log('Starting Kimera pipeline:', config.pipelineId);
+    
+    // Special handling for Ideogram workflow - always use the correct default image
+    let effectiveImageUrl = config.imageUrl;
+    
+    // If it's an ideogram workflow and no image URL is provided, use the default PNG image
+    if (config.workflow === 'ideogram' && !config.imageUrl) {
+      effectiveImageUrl = "https://www.jeann.online/cdn-cgi/image/format=png/https://kimera-media.s3.eu-north-1.amazonaws.com/ec9f7b54-7339-4faf-90ba-f12f54cbe3da/v2_JkeUSRWiMl_source.png";
+      console.log('Using default Ideogram image URL:', effectiveImageUrl);
+    }
     
     const response = await fetch('https://api.kimera.ai/v1/pipeline/run', {
       method: 'POST',
@@ -25,13 +35,14 @@ export const runPipeline = async (config: KimeraApiConfig) => {
       },
       body: JSON.stringify({
         pipeline_id: config.pipelineId,
-        imageUrl: config.imageUrl, // Using imageUrl consistently
+        imageUrl: effectiveImageUrl, // Using the effective image URL with special handling for Ideogram
         ratio: config.ratio || '2:3',
         prompt: config.prompt,
         data: {
           lora_scale: config.lora_scale || 0.5,
           style: config.style || 'Cinematic',
-          seed: config.seed || -1
+          seed: config.seed || -1,
+          workflow: config.workflow || 'no-reference' // Include workflow in the request
         }
       })
     });

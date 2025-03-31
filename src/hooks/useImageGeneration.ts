@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -130,7 +131,9 @@ export const useImageGeneration = (
       
       updateJobStatus(jobId, `Preparing to generate ${numImages} ${isVideoGeneration ? 'videos' : 'images'}...`);
       
+      // Default image URLs - using the correct one for Ideogram
       const defaultImageUrl = "https://www.jeann.online/cdn-cgi/image/format=jpeg/https://kimera-media.s3.eu-north-1.amazonaws.com/623b36fe-ac7f-4c56-a124-cddb942a38e5_event/623b36fe-ac7f-4c56-a124-cddb942a38e5_source.jpeg";
+      const defaultIdeogramImageUrl = "https://www.jeann.online/cdn-cgi/image/format=png/https://kimera-media.s3.eu-north-1.amazonaws.com/ec9f7b54-7339-4faf-90ba-f12f54cbe3da/v2_JkeUSRWiMl_source.png";
       
       updateJobStatus(jobId, `Sending ${numImages} requests to Kimera API...`);
       
@@ -153,10 +156,14 @@ export const useImageGeneration = (
       for (let i = 0; i < numImages; i++) {
         const seedValue = currentSeed === "random" ? -1 : parseInt(currentSeed);
         
+        // Use different default image based on workflow
+        const effectiveImageUrl = currentUploadedImageUrl || 
+                                 (currentWorkflow === 'ideogram' ? defaultIdeogramImageUrl : defaultImageUrl);
+        
         // Use supabase function to handle all API logic
         generateRequests.push(supabase.functions.invoke('run-pipeline', {
           body: {
-            imageUrl: currentUploadedImageUrl || defaultImageUrl,
+            imageUrl: effectiveImageUrl,
             ratio: currentRatio,
             prompt: fullPrompt,
             loraScale: parseFloat(currentLoraScale),

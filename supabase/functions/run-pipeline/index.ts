@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { corsHeaders } from "../_shared/cors.ts";
 
@@ -82,7 +81,7 @@ serve(async (req) => {
                                                                finalWorkflow === 'with-reference' ? 'face gen' : 
                                                                finalWorkflow === 'ideogram' ? 'ideogram' : 'image'} generation`);
 
-    // The correct default image URL for Ideogram - this is the specific one we need to use
+    // The correct default image URL for Ideogram - IMPORTANT: THIS MUST BE USED FOR IDEOGRAM
     const defaultIdeogramImageUrl = "https://www.jeann.online/cdn-cgi/image/format=png/https://kimera-media.s3.eu-north-1.amazonaws.com/ec9f7b54-7339-4faf-90ba-f12f54cbe3da/v2_JkeUSRWiMl_source.png";
     
     // Default image URL for other workflows
@@ -97,6 +96,7 @@ serve(async (req) => {
         effectiveImageUrl = defaultIdeogramImageUrl;
         console.log(`Using default Ideogram image URL: ${effectiveImageUrl}`);
       } else {
+        // Keep the user provided image for ideogram if it exists
         effectiveImageUrl = imageUrl;
         console.log(`Using custom image for Ideogram: ${effectiveImageUrl}`);
       }
