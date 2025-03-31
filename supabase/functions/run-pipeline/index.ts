@@ -4,8 +4,9 @@ import { corsHeaders } from "../_shared/cors.ts";
 
 const KIMERA_API_KEY = "1712edc40e3eb72c858332fe7500bf33e885324f8c1cd52b8cded2cdfd724cee";
 const PIPELINE_ID = "803a4MBY";
-const FACE_GEN_PIPELINE_ID = "FYpcEIUj"; // Added Face Gen specific pipeline ID
-const VIDEO_PIPELINE_ID = "1bPwBZEg"; // Updated video pipeline ID from wkE3eiap to 1bPwBZEg
+const FACE_GEN_PIPELINE_ID = "FYpcEIUj"; // Face Gen specific pipeline ID
+const IDEOGRAM_PIPELINE_ID = "iuR2hxvi"; // Added Ideogram specific pipeline ID
+const VIDEO_PIPELINE_ID = "1bPwBZEg"; // Video pipeline ID
 
 serve(async (req) => {
   // Handle CORS
@@ -43,6 +44,9 @@ serve(async (req) => {
     } else if (standardizedWorkflow === 'cartoon') {
       // Reference mode
       finalWorkflow = 'cartoon';
+    } else if (standardizedWorkflow === 'ideogram') {
+      // Ideogram mode
+      finalWorkflow = 'ideogram';
     } else {
       // Default to no-reference for normal image generation
       finalWorkflow = 'no-reference';
@@ -60,12 +64,16 @@ serve(async (req) => {
     if (isVideoBoolean) {
       selectedPipelineId = VIDEO_PIPELINE_ID;
     } else if (finalWorkflow === 'with-reference') {
-      selectedPipelineId = FACE_GEN_PIPELINE_ID; // Use the Face Gen specific pipeline ID
+      selectedPipelineId = FACE_GEN_PIPELINE_ID;
+    } else if (finalWorkflow === 'ideogram') {
+      selectedPipelineId = IDEOGRAM_PIPELINE_ID;
     } else {
       selectedPipelineId = PIPELINE_ID;
     }
     
-    console.log(`Using pipeline: ${selectedPipelineId} for ${isVideoBoolean ? 'video' : finalWorkflow === 'with-reference' ? 'face gen' : 'image'} generation`);
+    console.log(`Using pipeline: ${selectedPipelineId} for ${isVideoBoolean ? 'video' : 
+                                                               finalWorkflow === 'with-reference' ? 'face gen' : 
+                                                               finalWorkflow === 'ideogram' ? 'ideogram' : 'image'} generation`);
 
     // Create request body based on whether it's a video or image generation
     let requestBody;
@@ -101,7 +109,9 @@ serve(async (req) => {
       };
     }
 
-    console.log(`Making ${isVideoBoolean ? 'video' : finalWorkflow === 'with-reference' ? 'face gen' : 'image'} generation request with:`, JSON.stringify(requestBody));
+    console.log(`Making ${isVideoBoolean ? 'video' : 
+                          finalWorkflow === 'with-reference' ? 'face gen' : 
+                          finalWorkflow === 'ideogram' ? 'ideogram' : 'image'} generation request with:`, JSON.stringify(requestBody));
 
     // Make request to Kimera AI API
     const response = await fetch('https://api.kimera.ai/v1/pipeline/run', {
