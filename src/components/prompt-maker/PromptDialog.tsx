@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Download, X, Video, Share, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
@@ -106,6 +105,13 @@ export const PromptDialog: React.FC<PromptDialogProps> = ({
     return () => window.removeEventListener('keydown', handleEscKey);
   }, [fullscreenPreview]);
 
+  // Fixed: Close dialog when dialog is closed
+  useEffect(() => {
+    if (!showPromptDialog) {
+      setFullscreenPreview(false);
+    }
+  }, [showPromptDialog]);
+
   // Ensure workflow is properly set when component mounts or selectedGeneration changes
   useEffect(() => {
     if (selectedGeneration) {
@@ -122,6 +128,14 @@ export const PromptDialog: React.FC<PromptDialogProps> = ({
       }
     }
   }, [selectedGeneration, isVideo]);
+
+  // Handle clicking outside the image in fullscreen mode to close it
+  const handleFullscreenBackdropClick = (e: React.MouseEvent) => {
+    // Only close if clicking directly on the backdrop, not on the image
+    if (e.target === e.currentTarget) {
+      setFullscreenPreview(false);
+    }
+  };
 
   return (
     <>
@@ -261,17 +275,20 @@ export const PromptDialog: React.FC<PromptDialogProps> = ({
         </DialogContent>
       </Dialog>
 
-      {/* Fullscreen Preview Dialog */}
+      {/* Fullscreen Preview Dialog - Fixed to properly handle close events */}
       {fullscreenPreview && selectedGeneration?.image_url && !isVideo && (
         <div 
-          className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center"
-          onClick={() => setFullscreenPreview(false)}
+          className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center cursor-zoom-out"
+          onClick={handleFullscreenBackdropClick}
+          role="dialog"
+          aria-modal="true"
         >
           <Button 
             variant="ghost" 
             size="icon" 
-            className="absolute top-4 right-4 text-white bg-black/40 hover:bg-black/60"
+            className="absolute top-4 right-4 text-white bg-black/40 hover:bg-black/60 z-10"
             onClick={() => setFullscreenPreview(false)}
+            aria-label="Close fullscreen preview"
           >
             <X className="h-6 w-6" />
           </Button>
@@ -281,7 +298,7 @@ export const PromptDialog: React.FC<PromptDialogProps> = ({
               src={selectedGeneration.image_url} 
               alt="Full size preview" 
               className="max-w-none max-h-none object-contain" 
-              style={{ cursor: 'zoom-out' }}
+              onClick={(e) => e.stopPropagation()} // Prevent clicks on the image from closing the preview
               onError={(e) => {
                 console.error(`Error loading fullscreen image: ${selectedGeneration.image_url}`);
                 e.currentTarget.src = 'https://placehold.co/1200x1600/191223/404040?text=Image+Failed+to+Load';
