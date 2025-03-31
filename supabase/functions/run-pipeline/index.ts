@@ -88,8 +88,19 @@ serve(async (req) => {
     // Default image URL for other workflows
     const defaultImageUrl = "https://www.jeann.online/cdn-cgi/image/format=jpeg/https://kimera-media.s3.eu-north-1.amazonaws.com/623b36fe-ac7f-4c56-a124-cddb942a38e5_event/623b36fe-ac7f-4c56-a124-cddb942a38e5_source.jpeg";
     
-    // For ideogram workflow, use the default ideogram image if no image is provided
-    const effectiveImageUrl = (finalWorkflow === 'ideogram' && !imageUrl) ? defaultIdeogramImageUrl : imageUrl;
+    // Determine the effective image URL based on the workflow
+    let effectiveImageUrl;
+    if (finalWorkflow === 'ideogram') {
+      // For ideogram, always use the default ideogram image if no custom image is provided
+      effectiveImageUrl = imageUrl || defaultIdeogramImageUrl;
+      console.log(`Using Ideogram image URL: ${effectiveImageUrl}`);
+    } else if (imageUrl) {
+      // For other workflows with a provided image
+      effectiveImageUrl = imageUrl;
+    } else {
+      // Default image for workflows that don't need an image
+      effectiveImageUrl = defaultImageUrl;
+    }
 
     // Create request body based on whether it's a video or image generation
     let requestBody;
@@ -112,7 +123,7 @@ serve(async (req) => {
       // For image, include all the additional parameters
       requestBody = {
         pipeline_id: selectedPipelineId, // Use the selected pipeline ID
-        imageUrl: effectiveImageUrl, // Use the effective image URL which may be the default for ideogram
+        imageUrl: effectiveImageUrl, // Use the effective image URL 
         ratio,
         prompt,
         data: {
@@ -123,6 +134,12 @@ serve(async (req) => {
           request_id: requestId // Add unique request ID
         }
       };
+    }
+
+    // Fix for Kimera API: ensure the "image" field is correctly set in the payload
+    // This overrides any other imageUrl field since the API specifically looks for "image"
+    if (!isVideoBoolean) {
+      requestBody.image = effectiveImageUrl;
     }
 
     console.log(`Making ${isVideoBoolean ? 'video' : 
