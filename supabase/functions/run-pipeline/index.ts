@@ -82,13 +82,11 @@ serve(async (req) => {
                                                                finalWorkflow === 'with-reference' ? 'face gen' : 
                                                                finalWorkflow === 'ideogram' ? 'ideogram' : 'image'} generation`);
 
-    // Default image URL to use when no image is provided explicitly for ideogram
+    // UPDATED: Use the correct default image URL for Ideogram
     const defaultIdeogramImageUrl = "https://www.jeann.online/cdn-cgi/image/format=png/https://kimera-media.s3.eu-north-1.amazonaws.com/ec9f7b54-7339-4faf-90ba-f12f54cbe3da/v2_JkeUSRWiMl_source.png";
     
-    // Choose appropriate default image URL based on workflow
-    const defaultImageUrl = finalWorkflow === 'ideogram' 
-        ? defaultIdeogramImageUrl 
-        : "https://www.jeann.online/cdn-cgi/image/format=jpeg/https://kimera-media.s3.eu-north-1.amazonaws.com/623b36fe-ac7f-4c56-a124-cddb942a38e5_event/623b36fe-ac7f-4c56-a124-cddb942a38e5_source.jpeg";
+    // Choose appropriate default image URL for other workflows
+    const defaultImageUrl = "https://www.jeann.online/cdn-cgi/image/format=jpeg/https://kimera-media.s3.eu-north-1.amazonaws.com/623b36fe-ac7f-4c56-a124-cddb942a38e5_event/623b36fe-ac7f-4c56-a124-cddb942a38e5_source.jpeg";
     
     // For ideogram workflow, always use the specified image if provided, otherwise use the default
     const effectiveImageUrl = (finalWorkflow === 'ideogram' && !imageUrl) ? defaultIdeogramImageUrl : imageUrl;
