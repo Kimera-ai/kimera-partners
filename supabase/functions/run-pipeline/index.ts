@@ -84,7 +84,8 @@ serve(async (req) => {
         : "https://www.jeann.online/cdn-cgi/image/format=jpeg/https://kimera-media.s3.eu-north-1.amazonaws.com/623b36fe-ac7f-4c56-a124-cddb942a38e5_event/623b36fe-ac7f-4c56-a124-cddb942a38e5_source.jpeg";
     
     // For ideogram workflow, allow using the default image if no specific image is uploaded
-    const effectiveImageUrl = (finalWorkflow === 'ideogram' && !uploadedImageUrl) ? defaultIdeogramImageUrl : imageUrl;
+    // Fixed: Changed !uploadedImageUrl to check if imageUrl is null/undefined
+    const effectiveImageUrl = (finalWorkflow === 'ideogram' && !imageUrl) ? defaultIdeogramImageUrl : imageUrl;
 
     // Create request body based on whether it's a video or image generation
     let requestBody;
