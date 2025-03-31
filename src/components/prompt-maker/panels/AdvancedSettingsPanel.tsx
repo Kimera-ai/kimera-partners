@@ -23,9 +23,11 @@ export const AdvancedSettingsPanel = ({
   };
 
   const isVideoWorkflow = workflow === "video";
+  const isIdeogramWorkflow = workflow === "ideogram";
+  const isDisabled = isVideoWorkflow || isIdeogramWorkflow;
 
   return (
-    <div className={`space-y-4 ${isVideoWorkflow ? "opacity-50" : ""}`}>
+    <div className={`space-y-4 ${isDisabled ? "opacity-50" : ""}`}>
       <div className="space-y-2">
         <div className="flex justify-between items-center">
           <TooltipProvider>
@@ -37,7 +39,11 @@ export const AdvancedSettingsPanel = ({
                 </div>
               </TooltipTrigger>
               <TooltipContent side="right" className="bg-[#242038] border-purple-500/30 max-w-xs text-white">
-                <p>{isVideoWorkflow ? "LoRA Scale setting is not applicable for video generation" : "Controls the strength of style adaptation. Higher values make the style more prominent, while lower values produce more subtle effects."}</p>
+                <p>{isIdeogramWorkflow 
+                  ? "LoRA Scale setting is not applicable for Ideogram generation" 
+                  : isVideoWorkflow 
+                  ? "LoRA Scale setting is not applicable for video generation" 
+                  : "Controls the strength of style adaptation. Higher values make the style more prominent, while lower values produce more subtle effects."}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -51,7 +57,7 @@ export const AdvancedSettingsPanel = ({
           value={[parseFloat(loraScale)]}
           onValueChange={(values) => setLoraScale(values[0].toString())}
           className="bg-[#141220]"
-          disabled={isVideoWorkflow}
+          disabled={isDisabled}
         />
       </div>
       
@@ -65,7 +71,11 @@ export const AdvancedSettingsPanel = ({
               </div>
             </TooltipTrigger>
             <TooltipContent side="right" className="bg-[#242038] border-purple-500/30 max-w-xs text-white">
-                <p>{isVideoWorkflow ? "Seed setting is not applicable for video generation" : "Seed determines the initial randomness of the generation. Use \"random\" or -1 for random results, or set a specific number to recreate the same image later."}</p>
+                <p>{isIdeogramWorkflow
+                  ? "Seed setting is not applicable for Ideogram generation"
+                  : isVideoWorkflow 
+                  ? "Seed setting is not applicable for video generation" 
+                  : "Seed determines the initial randomness of the generation. Use \"random\" or -1 for random results, or set a specific number to recreate the same image later."}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -75,23 +85,26 @@ export const AdvancedSettingsPanel = ({
             type="text" 
             value={seed} 
             onChange={(e) => setSeed(e.target.value)}
-            placeholder={isVideoWorkflow ? "Not applicable for videos" : "random or number"}
+            placeholder={isIdeogramWorkflow ? "Not applicable for Ideogram" : isVideoWorkflow ? "Not applicable for videos" : "random or number"}
             className="bg-[#141220] border-white/10 text-white flex-1"
-            disabled={isVideoWorkflow}
+            disabled={isDisabled}
           />
           <button
             onClick={generateRandomSeed}
             className="px-2 py-1 text-xs bg-[#242038] hover:bg-[#302b45] text-white/80 rounded border border-white/10 transition-colors"
-            disabled={isVideoWorkflow}
+            disabled={isDisabled}
           >
             Random
           </button>
         </div>
-        {!isVideoWorkflow && (
-          <p className="text-xs text-white/50 mt-1">Type "random" or -1 for random seed, or any number for consistent results</p>
+        {isIdeogramWorkflow && (
+          <p className="text-xs text-white/50 mt-1">Seed settings are not used for Ideogram generation</p>
         )}
         {isVideoWorkflow && (
           <p className="text-xs text-white/50 mt-1">Seed settings are not used for video generation</p>
+        )}
+        {!isVideoWorkflow && !isIdeogramWorkflow && (
+          <p className="text-xs text-white/50 mt-1">Type "random" or -1 for random seed, or any number for consistent results</p>
         )}
       </div>
       

@@ -52,6 +52,7 @@ export const PromptInputPanel = ({
   };
   
   const needsImage = workflow === 'with-reference' || workflow === 'cartoon' || workflow === 'video';
+  const isIdeogramWorkflow = workflow === 'ideogram';
   const missingRequiredImage = needsImage && !imagePreview;
   
   // Get appropriate enhance tooltip text based on workflow
@@ -60,6 +61,9 @@ export const PromptInputPanel = ({
       return imagePreview 
         ? "Analyze image and enhance prompt with cinematic details" 
         : "Upload an image first to analyze for video generation";
+    }
+    if (workflow === 'ideogram') {
+      return "Enhance prompt with AI (for Ideogram)";
     }
     return "Enhance prompt with AI";
   };
@@ -91,6 +95,10 @@ export const PromptInputPanel = ({
       return "Describe the scene or action for your video. For example: 'A person walking through a colorful autumn forest with leaves falling around them, soft natural lighting filtering through the trees, camera slowly following from behind.'";
     }
     
+    if (workflow === 'ideogram') {
+      return "Describe the artistic illustration you want to create with Ideogram. Be detailed about style, elements, and composition.";
+    }
+    
     return "Generate a high-quality, creative, and engaging image about [specific topic]. The tone should be [tone: fun, professional, mysterious, etc.], and it should include [specific details or constraints]. Make it unique and compelling!";
   };
   
@@ -104,7 +112,7 @@ export const PromptInputPanel = ({
                 <div 
                   onClick={triggerFileInput} 
                   className={`h-8 w-8 rounded-md flex items-center justify-center 
-                    ${workflow === 'no-reference' 
+                    ${(workflow === 'no-reference' || workflow === 'ideogram')
                       ? 'opacity-50 cursor-not-allowed bg-[#242038] border border-purple-500/30' 
                       : 'cursor-pointer bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90'}
                     ${needsImage ? 'animate-pulse' : ''} 
@@ -124,9 +132,9 @@ export const PromptInputPanel = ({
               ) : (
                 <button 
                   type="button" 
-                  className={`h-8 w-8 rounded-md p-1 group relative ${isUploading || isProcessing || workflow === 'no-reference' ? 'opacity-50 cursor-not-allowed bg-[#242038] border border-purple-500/30' : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 cursor-pointer'}`} 
+                  className={`h-8 w-8 rounded-md p-1 group relative ${isUploading || isProcessing || workflow === 'no-reference' || workflow === 'ideogram' ? 'opacity-50 cursor-not-allowed bg-[#242038] border border-purple-500/30' : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 cursor-pointer'}`} 
                   onClick={removeImage} 
-                  disabled={isUploading || isProcessing || workflow === 'no-reference'}
+                  disabled={isUploading || isProcessing || workflow === 'no-reference' || workflow === 'ideogram'}
                 >
                   <img src={imagePreview} alt="Reference" className="w-full h-full object-cover rounded transition-opacity group-hover:opacity-50" />
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute inset-0 m-auto h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity">
@@ -139,8 +147,10 @@ export const PromptInputPanel = ({
               <p>
                 {imagePreview 
                   ? "Remove image" 
-                  : workflow === 'no-reference' 
-                    ? "Image not needed for Image Generator mode" 
+                  : workflow === 'no-reference'
+                    ? "Image not needed for Image Generator mode"
+                    : workflow === 'ideogram'
+                    ? "Image not needed for Ideogram mode" 
                     : `Upload image (required for ${
                         workflow === 'with-reference' 
                           ? 'Face Gen' 
@@ -178,7 +188,7 @@ export const PromptInputPanel = ({
         </TooltipProvider>
       </div>
       
-      <Input id="reference-image" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={isUploading || workflow === 'no-reference'} ref={fileInputRef} />
+      <Input id="reference-image" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={isUploading || workflow === 'no-reference' || workflow === 'ideogram'} ref={fileInputRef} />
       
       <Textarea 
         id="prompt" 

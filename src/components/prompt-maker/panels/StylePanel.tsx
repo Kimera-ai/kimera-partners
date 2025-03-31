@@ -10,9 +10,11 @@ type StylePanelProps = Pick<GenerationSettings, "style" | "setStyle" | "workflow
 
 export const StylePanel = ({ style, setStyle, workflow }: StylePanelProps) => {
   const isVideoWorkflow = workflow === "video";
+  const isIdeogramWorkflow = workflow === "ideogram";
+  const isDisabled = isVideoWorkflow || isIdeogramWorkflow;
   
   return (
-    <div className={`p-3 ${isVideoWorkflow ? "opacity-50" : ""}`}>
+    <div className={`p-3 ${isDisabled ? "opacity-50" : ""}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-white/10">
@@ -27,7 +29,11 @@ export const StylePanel = ({ style, setStyle, workflow }: StylePanelProps) => {
                 <HelpCircle size={14} className="text-white/60" />
               </TooltipTrigger>
               <TooltipContent side="right" className="bg-[#242038] border-purple-500/30 max-w-xs text-white">
-                <p>{isVideoWorkflow ? "Style settings are not applicable for video generation" : "Select visual style for your images: Cinematic, Animated, Digital Art, etc. Each style influences the final look of your generation."}</p>
+                <p>{isIdeogramWorkflow 
+                  ? "Style settings are not applicable for Ideogram generation" 
+                  : isVideoWorkflow 
+                  ? "Style settings are not applicable for video generation" 
+                  : "Select visual style for your images: Cinematic, Animated, Digital Art, etc. Each style influences the final look of your generation."}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -38,10 +44,10 @@ export const StylePanel = ({ style, setStyle, workflow }: StylePanelProps) => {
         <Select 
           value={style} 
           onValueChange={setStyle} 
-          disabled={isVideoWorkflow}
+          disabled={isDisabled}
         >
           <SelectTrigger id="style" className="w-full bg-[#141220] border-white/10 text-white">
-            <SelectValue placeholder={isVideoWorkflow ? "Not applicable for videos" : "Select style"} />
+            <SelectValue placeholder={isIdeogramWorkflow ? "Not applicable for Ideogram" : isVideoWorkflow ? "Not applicable for videos" : "Select style"} />
           </SelectTrigger>
           <SelectContent className="bg-[#1D1A27] border-white/10 text-white">
             <SelectItem value="Cinematic">Cinematic</SelectItem>
