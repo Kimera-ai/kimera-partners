@@ -82,7 +82,7 @@ serve(async (req) => {
                                                                finalWorkflow === 'with-reference' ? 'face gen' : 
                                                                finalWorkflow === 'ideogram' ? 'ideogram' : 'image'} generation`);
 
-    // The correct default image URL for Ideogram
+    // The correct default image URL for Ideogram - this is the specific one we need to use
     const defaultIdeogramImageUrl = "https://www.jeann.online/cdn-cgi/image/format=png/https://kimera-media.s3.eu-north-1.amazonaws.com/ec9f7b54-7339-4faf-90ba-f12f54cbe3da/v2_JkeUSRWiMl_source.png";
     
     // Default image URL for other workflows
@@ -90,10 +90,16 @@ serve(async (req) => {
     
     // Determine the effective image URL based on the workflow
     let effectiveImageUrl;
+    
     if (finalWorkflow === 'ideogram') {
-      // For ideogram, always use the default ideogram image if no custom image is provided
-      effectiveImageUrl = imageUrl || defaultIdeogramImageUrl;
-      console.log(`Using Ideogram image URL: ${effectiveImageUrl}`);
+      // For ideogram, ALWAYS use the default ideogram image unless a custom image is explicitly provided
+      if (!imageUrl) {
+        effectiveImageUrl = defaultIdeogramImageUrl;
+        console.log(`Using default Ideogram image URL: ${effectiveImageUrl}`);
+      } else {
+        effectiveImageUrl = imageUrl;
+        console.log(`Using custom image for Ideogram: ${effectiveImageUrl}`);
+      }
     } else if (imageUrl) {
       // For other workflows with a provided image
       effectiveImageUrl = imageUrl;
@@ -123,7 +129,6 @@ serve(async (req) => {
       // For image, include all the additional parameters
       requestBody = {
         pipeline_id: selectedPipelineId, // Use the selected pipeline ID
-        imageUrl: effectiveImageUrl, // Use the effective image URL 
         ratio,
         prompt,
         data: {
