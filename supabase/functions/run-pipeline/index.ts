@@ -75,6 +75,12 @@ serve(async (req) => {
                                                                finalWorkflow === 'with-reference' ? 'face gen' : 
                                                                finalWorkflow === 'ideogram' ? 'ideogram' : 'image'} generation`);
 
+    // Default image URL to use when no image is provided explicitly
+    const defaultImageUrl = "https://www.jeann.online/cdn-cgi/image/format=jpeg/https://kimera-media.s3.eu-north-1.amazonaws.com/623b36fe-ac7f-4c56-a124-cddb942a38e5_event/623b36fe-ac7f-4c56-a124-cddb942a38e5_source.jpeg";
+    
+    // For ideogram workflow, allow using the default image if no specific image is uploaded
+    const effectiveImageUrl = (finalWorkflow === 'ideogram' && !uploadedImageUrl) ? defaultImageUrl : imageUrl;
+
     // Create request body based on whether it's a video or image generation
     let requestBody;
     
@@ -96,7 +102,7 @@ serve(async (req) => {
       // For image, include all the additional parameters
       requestBody = {
         pipeline_id: selectedPipelineId, // Use the selected pipeline ID
-        imageUrl,
+        imageUrl: effectiveImageUrl, // Use the effective image URL which may be the default for ideogram
         ratio,
         prompt,
         data: {

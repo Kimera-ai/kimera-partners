@@ -25,7 +25,7 @@ export const GenerateButtonPanel = ({
 }: GenerateButtonPanelProps) => {
   const isButtonDisabled = isUploading || 
     isGenerating ||
-    ((workflow === 'with-reference' || workflow === 'cartoon' || workflow === 'ideogram' || workflow === 'video') && !uploadedImageUrl) || 
+    ((workflow === 'with-reference' || workflow === 'cartoon' || workflow === 'video') && !uploadedImageUrl) || 
     (credits !== null && credits < CREDITS_PER_GENERATION) || 
     isLoadingCredits;
 
@@ -35,7 +35,7 @@ export const GenerateButtonPanel = ({
   const getButtonText = () => {
     if (isGenerating) return "Generating...";
     if (isUploading) return "Uploading...";
-    if ((workflow === 'with-reference' || workflow === 'cartoon' || workflow === 'ideogram' || workflow === 'video') && !uploadedImageUrl) return "Upload an image";
+    if ((workflow === 'with-reference' || workflow === 'cartoon' || workflow === 'video') && !uploadedImageUrl) return "Upload an image";
     if (credits !== null && credits < CREDITS_PER_GENERATION) return "Insufficient Credits";
     if (isLoadingCredits) return "Loading Credits...";
     return workflow === 'video' ? `Generate Video (${totalCost} credits)` : `Generate`;
