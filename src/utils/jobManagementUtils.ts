@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { GenerationJobType } from "@/components/prompt-maker/GenerationJob";
 
@@ -42,7 +41,7 @@ export const fetchPreviousGenerations = async () => {
       .from('generated_images')
       .select('*')
       .order('created_at', { ascending: false })
-      .limit(200);  // Increased from 100 to 200
+      .limit(500);  // Increased from 200 to 500
     
     if (error) {
       console.error('Error fetching previous generations:', error);
