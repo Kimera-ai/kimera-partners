@@ -14,7 +14,16 @@ serve(async (req) => {
   }
 
   try {
-    const { imageUrl, prompt, ratio = "2:3", loraScale = 0.5, style = "Cinematic", seed = -1, isVideo = false, workflow = "no-reference" } = await req.json();
+    const { 
+      imageUrl, 
+      prompt, 
+      ratio = "2:3",  // Default to 2:3, but allow 16:9 as well
+      loraScale = 0.5, 
+      style = "Cinematic", 
+      seed = -1, 
+      isVideo = false, 
+      workflow = "no-reference" 
+    } = await req.json();
 
     if (!imageUrl && workflow !== 'ideogram' && workflow !== 'no-reference') {
       return new Response(
@@ -117,12 +126,11 @@ serve(async (req) => {
         pipeline_id: VIDEO_PIPELINE_ID,
         imageUrl: effectiveImageUrl,
         prompt,
-        // Include ratio for video too for consistency
-        ratio,
-        // Add workflow for videos as well
+        ratio,  // Include the selected ratio for video generation
         data: {
-          workflow: 'video', // Always set video workflow for videos
-          request_id: requestId // Add unique request ID
+          workflow: 'video',
+          request_id: requestId,
+          aspectRatio: ratio  // Potentially add aspect ratio specific parameters if the video pipeline supports it
         }
       };
     } else {
