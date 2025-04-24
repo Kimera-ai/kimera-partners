@@ -3,7 +3,7 @@ import React from "react";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { GenerationSettings } from "../types";
-import { ChevronDown, HelpCircle, AspectRatio } from "lucide-react";
+import { ChevronDown, HelpCircle, LayoutIcon } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 type RatioAndImagesPanelProps = Pick<GenerationSettings, "ratio" | "setRatio" | "numberOfImages" | "setNumberOfImages" | "workflow"> & {
@@ -30,7 +30,7 @@ export const RatioAndImagesPanel = ({
                 <TooltipTrigger asChild>
                   <div className="flex items-center gap-1.5">
                     <Label htmlFor="ratio" className="text-sm font-medium text-white/80">Aspect Ratio</Label>
-                    <AspectRatio size={14} className="text-white/60" />
+                    <LayoutIcon size={14} className="text-white/60" />
                   </div>
                 </TooltipTrigger>
                 <TooltipContent side="right" className="bg-[#242038] border-purple-500/30 text-white">
