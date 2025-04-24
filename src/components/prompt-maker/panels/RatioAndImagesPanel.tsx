@@ -34,7 +34,40 @@ export const RatioAndImagesPanel = ({
                   </div>
                 </TooltipTrigger>
                 <TooltipContent side="right" className="bg-[#242038] border-purple-500/30 text-white">
-                  <p>Choose the aspect ratio for your video</p>
+                  <p>Choose the aspect ratio for your video. Note: The video API only supports 1:1, 2:3, and 3:4 ratios.</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+          <Select value={ratio} onValueChange={setRatio}>
+            <SelectTrigger className="w-full bg-[#141220] border-white/10">
+              <SelectValue placeholder="Select ratio" />
+            </SelectTrigger>
+            <SelectContent className="bg-[#1D1A27] border-purple-500/30">
+              <SelectItem value="1:1">Square (1:1)</SelectItem>
+              <SelectItem value="2:3">Portrait (2:3)</SelectItem>
+              <SelectItem value="3:4">Portrait (3:4)</SelectItem>
+            </SelectContent>
+          </Select>
+          <div className="text-xs text-amber-400 mt-1">
+            Note: The video API only supports 1:1, 2:3, and 3:4 ratios.
+          </div>
+        </div>
+      )}
+
+      {!isVideo && (
+        <div className="mb-4">
+          <div className="flex items-center gap-1.5 mb-2">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-1.5">
+                    <Label htmlFor="ratio" className="text-sm font-medium text-white/80">Aspect Ratio</Label>
+                    <LayoutIcon size={14} className="text-white/60" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="bg-[#242038] border-purple-500/30 text-white">
+                  <p>Choose the aspect ratio for your image</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>

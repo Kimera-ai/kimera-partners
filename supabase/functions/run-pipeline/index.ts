@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { corsHeaders } from "../_shared/cors.ts";
 
@@ -6,6 +7,10 @@ const PIPELINE_ID = "803a4MBY";
 const FACE_GEN_PIPELINE_ID = "FYpcEIUj"; // Face Gen specific pipeline ID
 const IDEOGRAM_PIPELINE_ID = "iuR2hxvi"; // Added Ideogram specific pipeline ID
 const VIDEO_PIPELINE_ID = "1bPwBZEg"; // Video pipeline ID
+
+// Valid ratios for different pipelines
+const VALID_VIDEO_RATIOS = ["1:1", "2:3", "3:4"];
+const VALID_IMAGE_RATIOS = ["2:3", "16:9"];
 
 serve(async (req) => {
   // Handle CORS
@@ -17,7 +22,7 @@ serve(async (req) => {
     const { 
       imageUrl, 
       prompt, 
-      ratio = "2:3",  // Default to 2:3, but allow 16:9 as well
+      ratio = "2:3",
       loraScale = 0.5, 
       style = "Cinematic", 
       seed = -1, 
@@ -117,6 +122,22 @@ serve(async (req) => {
       effectiveImageUrl = defaultImageUrl;
     }
 
+    // Map UI ratio to API-compatible ratio for videos
+    // For video generation, we need to make sure we use a supported ratio
+    let apiRatio = ratio;
+    if (isVideoBoolean) {
+      // If the requested ratio is 16:9 but that's not supported for videos,
+      // map it to the closest supported video ratio (1:1 in this case)
+      if (ratio === "16:9" && !VALID_VIDEO_RATIOS.includes(ratio)) {
+        console.log(`Requested ratio ${ratio} is not supported for videos. Using 1:1 instead.`);
+        apiRatio = "1:1";
+      } else if (!VALID_VIDEO_RATIOS.includes(ratio)) {
+        // Default to 2:3 if ratio is not supported for videos
+        console.log(`Requested ratio ${ratio} is not supported for videos. Using 2:3 instead.`);
+        apiRatio = "2:3";
+      }
+    }
+
     // Create request body based on whether it's a video or image generation
     let requestBody;
     
@@ -126,11 +147,11 @@ serve(async (req) => {
         pipeline_id: VIDEO_PIPELINE_ID,
         imageUrl: effectiveImageUrl,
         prompt,
-        ratio,  // Include the selected ratio for video generation
+        ratio: apiRatio,  // Use the API-compatible ratio
         data: {
           workflow: 'video',
           request_id: requestId,
-          aspectRatio: ratio  // Potentially add aspect ratio specific parameters if the video pipeline supports it
+          aspectRatio: apiRatio  // Use the API-compatible ratio here as well
         }
       };
     } else {
@@ -198,6 +219,9 @@ serve(async (req) => {
     
     // Add the request ID to the response for tracking
     data.request_id = requestId;
+
+    // Add the mapped ratio to the response so the UI knows what was actually used
+    data.ratio = isVideoBoolean ? apiRatio : ratio;
     
     console.log(`Final response with isVideo=${isVideoBoolean}, workflow=${finalWorkflow}, requestId=${requestId}:`, JSON.stringify(data));
 
