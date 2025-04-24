@@ -92,7 +92,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           setRatio={setRatio} 
           numberOfImages={numberOfImages} 
           setNumberOfImages={setNumberOfImages}
-          workflow={workflow}
           CREDITS_PER_GENERATION={CREDITS_PER_GENERATION}
         />
       </div>
