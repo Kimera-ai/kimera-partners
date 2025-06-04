@@ -112,17 +112,12 @@ serve(async (req) => {
     let requestBody;
     
     if (isVideoBoolean) {
-      // For video, include the essential parameters
+      // For video, use the new API format with inputs
       requestBody = {
         pipeline_id: VIDEO_PIPELINE_ID,
-        imageUrl: effectiveImageUrl,
-        prompt,
-        // Include ratio for video too for consistency
-        ratio,
-        // Add workflow for videos as well
-        data: {
-          workflow: 'video', // Always set video workflow for videos
-          request_id: requestId // Add unique request ID
+        inputs: {
+          genText: prompt,
+          yourImage: effectiveImageUrl
         }
       };
     } else {
